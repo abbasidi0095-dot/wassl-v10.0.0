@@ -8,7 +8,7 @@ import { money } from "@/lib/utils";
 import { useI18n } from "@/components/locale-provider";
 
 export function CartView() {
-  const { items, ready, subtotal, deliveryFee, minOrder, setQty, removeItem, clear, storeName, storeSlug } =
+  const { items, ready, subtotal, deliveryFee, minOrder, setQty, removeItem, clear, storeName, storeSlug, storeCategory } =
     useCart();
   const { t } = useI18n();
 
@@ -71,7 +71,9 @@ export function CartView() {
                 <div className="truncate text-[13px] font-extrabold">{item.name}</div>
                 {item.options.length ? (
                   <div className="mt-0.5 line-clamp-2 text-[10px] font-bold text-ink/40">
-                    {item.options.map((option) => option.optionName).join(" · ")}
+                    {[item.variantLabel || item.unit, ...item.options.filter((option) => option.groupId !== "__variant").map((option) => option.optionName)]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </div>
                 ) : null}
                 <div className="mt-0.5 text-[11px] font-bold text-ink/40">
@@ -154,7 +156,7 @@ export function CartView() {
         ) : null}
 
         <Link
-          href="/checkout"
+          href={storeCategory === "grocery" ? "/grocery/checkout" : "/checkout"}
           className={`btn mt-4 w-full ${belowMinimum ? "pointer-events-none opacity-40" : "btn-primary"}`}
           aria-disabled={belowMinimum}
         >

@@ -7,6 +7,7 @@ import {
   type OrderView,
 } from "@/lib/db";
 import { getSessionFromRequest } from "@/lib/auth";
+import { actorFromSession } from "@/lib/api-auth";
 import { notifyOrderPush } from "@/lib/push";
 import { storePhoto } from "@/lib/store-images";
 
@@ -108,26 +109,39 @@ export async function POST(request: Request) {
         lat?: number;
         lng?: number;
         scheduledFor?: string;
+        deliveryWindow?: string;
+        fulfillment?: "delivery" | "pickup";
+        express?: boolean;
+        substitutionPreference?: "allow" | "refund" | "contact";
+        loyaltyPoints?: number;
         promoCode?: string;
-        items?: { productId?: string; qty?: number; optionIds?: string[] }[];
+        idempotencyKey?: string;
+        items?: { productId?: string; qty?: number; optionIds?: string[]; variantId?: string }[];
       }
     | null;
 
   if (!body) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
+  const fulfillment = body.fulfillment === "pickup" ? "pickup" : "delivery";
   if (
     !body.citySlug ||
     !body.storeId ||
     !body.customerName?.trim() ||
     !body.customerPhone?.trim() ||
-    !body.address?.trim() ||
-    !body.landmark?.trim() ||
-    typeof body.lat !== "number" ||
-    typeof body.lng !== "number"
+    (fulfillment === "delivery" &&
+      (!body.address?.trim() ||
+        !body.landmark?.trim() ||
+        typeof body.lat !== "number" ||
+        typeof body.lng !== "number"))
   ) {
     return NextResponse.json(
-      { error: "Please complete your name, phone, address and map pin" },
+      {
+        error:
+          fulfillment === "pickup"
+            ? "Please complete your name and phone"
+            : "Please complete your name, phone, address and map pin",
+      },
       { status: 400 },
     );
   }
@@ -155,6 +169,7 @@ export async function POST(request: Request) {
       optionIds: Array.isArray(item.optionIds)
         ? item.optionIds.map((id) => String(id)).filter(Boolean)
         : [],
+      variantId: item.variantId ? String(item.variantId) : undefined,
     }))
     .filter((item) => item.productId && item.qty > 0);
 
@@ -169,15 +184,21 @@ export async function POST(request: Request) {
       customerName: body.customerName.trim(),
       customerPhone: body.customerPhone.trim(),
       customerEmail,
-      address: body.address.trim(),
-      landmark: body.landmark.trim(),
+      address: body.address?.trim() || "",
+      landmark: body.landmark?.trim() || "",
       notes: body.notes?.trim(),
-      lat: body.lat,
-      lng: body.lng,
+      lat: typeof body.lat === "number" ? body.lat : 0,
+      lng: typeof body.lng === "number" ? body.lng : 0,
       scheduledFor: body.scheduledFor,
+      deliveryWindow: body.deliveryWindow,
+      fulfillment,
+      express: Boolean(body.express),
+      substitutionPreference: body.substitutionPreference,
+      loyaltyPoints: typeof body.loyaltyPoints === "number" ? body.loyaltyPoints : undefined,
       promoCode: body.promoCode?.trim() || undefined,
+      idempotencyKey: body.idempotencyKey,
       items,
-    });
+    }, session ? actorFromSession(session) : { role: "customer" });
     void notifyOrderPush(order);
     return NextResponse.json(
       { ok: true, order: await getOrderView(order.id) },

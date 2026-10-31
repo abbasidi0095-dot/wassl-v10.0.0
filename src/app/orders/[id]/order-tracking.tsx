@@ -21,6 +21,7 @@ import { ProductTile } from "@/components/product-icon";
 import { STATUS_META } from "@/lib/types";
 import { clock, money, timeAgo } from "@/lib/utils";
 import { MapView } from "@/components/map-view";
+import { OrderRefundPanel } from "./order-refund-panel";
 import { useLiveEvents } from "@/lib/use-live-events";
 
 const STEPS: { status: string; label: string; caption: string }[] = [
@@ -165,6 +166,32 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           </button>
         </div>
       </div>
+
+      {order.deliveryPin && !delivered && !cancelled ? (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-teal/20 bg-teal/8 px-4 py-3">
+          <div>
+            <div className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-teal">
+              {order.fulfillment === "pickup" ? "Pickup code" : "Delivery PIN"}
+            </div>
+            <div className="mt-1 text-lg font-extrabold tracking-[0.12em]">
+              {order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin}
+            </div>
+            <div className="text-[10px] font-bold text-ink/40">
+              {order.fulfillment === "pickup"
+                ? "Show this code to the store when you collect."
+                : "Share this PIN with the driver at handover."}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-[9px] font-extrabold">
+            {order.fulfillment === "pickup" ? <span className="pill">Pickup</span> : null}
+            {order.express ? <span className="pill pill-warm">Express</span> : null}
+            {order.deliveryWindow ? <span className="pill">{order.deliveryWindow}</span> : null}
+            {order.substitutionPreference ? (
+              <span className="pill">Substitution: {order.substitutionPreference}</span>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
         <div className="space-y-4">
@@ -390,9 +417,14 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           </div>
 
           {delivered ? (
-            <Link href={`/store/${order.store?.slug}`} className="btn btn-ghost w-full">
-              <CheckCircle2 size={15} className="text-teal" /> Order again
-            </Link>
+            <>
+              {order.store?.category === "grocery" ? (
+                <OrderRefundPanel orderId={order.id} />
+              ) : null}
+              <Link href={`/store/${order.store?.slug}`} className="btn btn-ghost w-full">
+                <CheckCircle2 size={15} className="text-teal" /> Order again
+              </Link>
+            </>
           ) : null}
         </aside>
       </div>

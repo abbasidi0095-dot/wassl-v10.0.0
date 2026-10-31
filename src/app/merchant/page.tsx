@@ -24,7 +24,9 @@ export default async function MerchantPage() {
         links={[
           { href: "/merchant", label: "Overview" },
           { href: "/merchant#orders", label: "Order board" },
-          { href: "/merchant#menu", label: "Menu" },
+          ...(store.category === "grocery"
+            ? [{ href: "/merchant/grocery", label: "Catalog & stock" }]
+            : [{ href: "/merchant#menu", label: "Menu" }]),
           { href: "/merchant#store", label: "Store & money" },
         ]}
       />

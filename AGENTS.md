@@ -16,11 +16,11 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.0.0** (31 October 2026)
+- Release: **10.0.0** (31 October 2026; grocery module included)
 - Live: <https://wassl-34-preview.fly.dev>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
-- Product: local delivery + **Wassl Taxi**, cash only (COD / cash fare).
+- Product: local delivery + **Wassl Grocery** + **Wassl Taxi**, cash only (COD / cash fare).
 - Languages: English, French, Spanish, Arabic (RTL). Theme: light + dark.
 - Native app id: `ma.wassl.app`.
 
@@ -44,11 +44,12 @@ Java 21 is required. iOS builds need macOS/Xcode 16+.
 ## Architecture map
 
 ```
-src/app/            routes (customer, taxi, store, cart, checkout, orders,
-                    merchant, driver, admin, auth, APIs)
+src/app/            routes (customer, grocery, taxi, store, cart, checkout,
+                    orders, merchant, driver, admin, auth, APIs)
 src/components/     site/staff headers, menu, map, product icons, live activity,
                     notification bell, ongoing tracker, locale/theme providers
 src/lib/            db.ts (all mutations + audit), i18n.ts, push.ts, taxi.ts,
+                    grocery.ts (availability, zones, fees, stock),
                     order-machine.ts, auth.ts, security.ts, events.ts
 src/data/           cities.json (209), restaurants.locked.json (checksum-locked)
 android/ ios/       Capacitor native shells
@@ -74,14 +75,28 @@ persists; every mutation should add an audit entry via `recordAudit`.
    Unlayered rules override Tailwind utilities (this caused two regressions).
 7. Prefer logical utilities (`ms/me/ps/pe/start/end`, `text-start/end`) so Arabic
    RTL keeps working. Centered toasts intentionally keep `left-1/2`.
-8. Customer-facing strings should go through `t()`; the English string is the
+8. Grocery stock is decremented/reserved inside `mutate()` only. Never trust
+   client price/stock; use `resolveProductStock` and `groceryFees`. Release on
+   cancellation, commit on delivery, restock on refund.
+9. Customer-facing strings should go through `t()`; the English string is the
    dictionary key and missing translations fall back safely.
-9. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
+10. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
    passwords live in the host environment.
 
 ## Change history (newest first)
 
-### 10.0.0 — repository consolidation
+### 10.0.0 — grocery module + repository consolidation
+- Grocery data model: `Store.grocery` settings, product SKU/barcode/unit/stock/
+  variants, order fulfilment/PIN/loyalty, stock reservations and refund requests;
+  lazy backfill in `db-backend.ts` for older documents.
+- Customer `/grocery`, `/grocery/[slug]`, `/grocery/checkout`, favourites and
+  shopping lists.
+- Vendor `/merchant/grocery` catalog, variants, stock, zones and 24/7 settings.
+- Admin `/admin/grocery` inventory/refunds.
+- Transactional stock reserve/release/commit; pickup code and delivery PIN proof;
+  loyalty earn/redeem; refund restock.
+- Tests in `tests/grocery.test.ts`; mobile/RTL/dark mode checks.
+- Repository snapshot and docs consolidation (this entry).
 - Created the `wassl-v10.0.0` repository snapshot with README and this agent
   guide. Version bumped across package, Android (`10.0.0`, code 6) and iOS
   (`10.0.0`, build 6).

@@ -1,7 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Database } from "./types";
-import { createSeedDatabase } from "./seed";
+import { createSeedDatabase, groceryExtra } from "./seed";
+import { GROCERY_PRESETS } from "./grocery-presets";
+import { defaultGrocerySettings } from "./grocery";
 
 /**
  * Persistence backends.
@@ -49,6 +51,58 @@ function ensureDir() {
 function hydrate(db: Database): Database {
   db.addresses ??= [];
   db.auditLogs ??= [];
+  db.stockReservations ??= [];
+  db.refundRequests ??= [];
+  db.pushSubscriptions ??= [];
+  db.taxiRides ??= [];
+
+  // Backfill older documents with grocery settings and SKU/stock fields. This
+  // is intentionally additive and never touches locked snapshot products.
+  for (const store of db.stores) {
+    if (store.category !== "grocery") continue;
+    store.grocery ??= GROCERY_PRESETS[store.slug] ?? defaultGrocerySettings(store);
+  }
+  const groceryIds = new Set(
+    db.stores.filter((store) => store.category === "grocery").map((store) => store.id),
+  );
+  let migrated = 0;
+  for (const product of db.products) {
+    if (!groceryIds.has(product.storeId) || product.locked) continue;
+    if (product.stock !== undefined && product.sku) continue;
+    const prefix =
+      db.stores.find((store) => store.id === product.storeId)?.slug
+        .slice(0, 3)
+        .toUpperCase() || "GRO";
+    product.sku ??= `${prefix}-${String(product.id).slice(-6).toUpperCase()}`;
+    product.barcode ??= `61112${String(product.id).replace(/\D/g, "").slice(-8).padStart(8, "0")}`;
+    product.unit ??= /\d+\s?(kg|g|l|ml|cl)/i.exec(product.name)?.[1] || "each";
+    product.stock ??= 18;
+    product.lowStockThreshold ??= 5;
+    product.aisle ??= product.category;
+    product.substitutionAllowed ??= true;
+    migrated += 1;
+  }
+  let added = 0;
+  for (const [index, item] of groceryExtra.entries()) {
+    const exists = db.products.some(
+      (product) => product.storeId === item.storeId && product.sku === item.sku,
+    );
+    if (exists) continue;
+    db.products.push({
+      ...item,
+      id: `product_migrated_${index + 1}`,
+      available: true,
+      emoji: "",
+      variants: item.variants?.map((variant) => ({ ...variant })),
+    });
+    added += 1;
+  }
+  if (migrated || added) {
+    // Persisted on the next mutation; the in-memory view is correct now.
+    console.info(
+      `[grocery] backfilled ${migrated} products, added ${added} catalogue items`,
+    );
+  }
   return db;
 }
 

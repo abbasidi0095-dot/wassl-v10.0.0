@@ -20,6 +20,8 @@ export type TransitionRule = {
   action: string;
   /** The order must already have a driver (pickup, delivery). */
   requiresDriver?: boolean;
+  /** Only valid for grocery pickup orders. */
+  requiresPickup?: boolean;
   /** Cancelling requires a written reason. */
   requiresReason?: boolean;
   /** Free-text hint shown in the UI when the step is unavailable. */
@@ -86,6 +88,13 @@ export const ORDER_TRANSITIONS: Record<OrderStatus, TransitionRule[]> = {
       roles: ["driver", "admin", "system"],
       action: "assign_driver",
       description: "A driver is dispatched to the store",
+    },
+    {
+      to: "delivered",
+      roles: ["merchant", ...ALL_STAFF],
+      action: "handover_pickup",
+      requiresPickup: true,
+      description: "Customer collected the order at the store",
     },
     {
       to: "cancelled",
@@ -181,7 +190,7 @@ export function transitionFor(
  * server will actually accept.
  */
 export function availableTransitions(
-  order: Pick<Order, "status" | "driverId" | "storeId">,
+  order: Pick<Order, "status" | "driverId" | "storeId" | "fulfillment">,
   actor: Pick<OrderActor, "role" | "storeId" | "driverId">,
 ): TransitionRule[] {
   return (ORDER_TRANSITIONS[order.status] ?? []).filter((rule) =>
@@ -191,12 +200,13 @@ export function availableTransitions(
 
 function canAct(
   rule: TransitionRule,
-  order: Pick<Order, "status" | "driverId" | "storeId">,
+  order: Pick<Order, "status" | "driverId" | "storeId" | "fulfillment">,
   actor: Pick<OrderActor, "role" | "storeId" | "driverId">,
 ): boolean {
   if (!rule.roles.includes(actor.role)) return false;
   if (actor.role === "merchant" && actor.storeId !== order.storeId) return false;
   if (rule.requiresDriver && !order.driverId) return false;
+  if (rule.requiresPickup && order.fulfillment !== "pickup") return false;
   if (
     actor.role === "driver" &&
     order.driverId &&
@@ -227,7 +237,7 @@ export class OrderRuleError extends Error {
  * so API routes can answer 400/403 without duplicating the rules.
  */
 export function checkTransition(
-  order: Pick<Order, "status" | "driverId" | "storeId">,
+  order: Pick<Order, "status" | "driverId" | "storeId" | "fulfillment">,
   next: OrderStatus,
   actor: OrderActor,
   options: { note?: string } = {},
@@ -255,6 +265,13 @@ export function checkTransition(
   }
   if (rule.requiresDriver && !order.driverId) {
     return { ok: false, code: "driver_required", error: "Assign a driver first" };
+  }
+  if (rule.requiresPickup && order.fulfillment !== "pickup") {
+    return {
+      ok: false,
+      code: "pickup_only",
+      error: "This handover is only valid for store pickup orders",
+    };
   }
   if (
     actor.role === "driver" &&

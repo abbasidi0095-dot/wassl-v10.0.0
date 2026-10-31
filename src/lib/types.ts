@@ -37,6 +37,9 @@ export interface User {
   requestedStoreName?: string;
   /** Driver sign-up detail; used to provision the courier profile. */
   requestedVehicle?: string;
+  loyaltyPoints?: number;
+  favorites?: string[];
+  shoppingLists?: ShoppingList[];
   createdAt?: string;
   lastLoginAt?: string;
 }
@@ -89,6 +92,36 @@ export interface Store {
   verifiedAt?: string;
   /** Public source page for an imported establishment. */
   sourceUrl?: string | null;
+  /** Grocery/supermarket settings. Absent on restaurants and older records. */
+  grocery?: GrocerySettings;
+}
+
+export interface GroceryZone {
+  id: string;
+  name: string;
+  maxKm: number;
+  fee: number;
+  minOrder: number;
+}
+
+export interface GrocerySettings {
+  expressEnabled: boolean;
+  expressFee: number;
+  expressMinutes: number;
+  pickupEnabled: boolean;
+  /** 24/7 ordering. Still subject to overnight staffing and driver capacity. */
+  alwaysOpen: boolean;
+  overnightStaffed: boolean;
+  nightStart: string;
+  nightEnd: string;
+  nightFee: number;
+  schedulingEnabled: boolean;
+  scheduleSlots: string[];
+  deliveryZones: GroceryZone[];
+  substitutionDefault: "allow" | "refund" | "contact";
+  lowStockThreshold: number;
+  /** Loyalty points earned per 10 MAD of grocery spend. */
+  loyaltyPointsPer10Mad: number;
 }
 
 export interface OpeningHours {
@@ -136,6 +169,27 @@ export interface Product {
   tags?: string[];
   modifiers?: ModifierGroup[];
   calories?: number;
+  /* Grocery fields. Optional so restaurant products are unchanged. */
+  sku?: string;
+  barcode?: string;
+  brand?: string;
+  unit?: string;
+  stock?: number;
+  lowStockThreshold?: number;
+  aisle?: string;
+  variants?: ProductVariant[];
+  substitutionAllowed?: boolean;
+  limitPerOrder?: number;
+}
+
+export interface ProductVariant {
+  id: string;
+  label: string;
+  sku: string;
+  barcode?: string;
+  price: number;
+  stock: number;
+  unit?: string;
 }
 
 export type DriverStatus = "offline" | "available" | "busy";
@@ -176,6 +230,10 @@ export interface OrderItem {
   price: number;
   qty: number;
   options?: SelectedModifier[];
+  variantId?: string;
+  variantLabel?: string;
+  sku?: string;
+  unit?: string;
 }
 
 export interface OrderEvent {
@@ -219,6 +277,20 @@ export interface Order {
   deliveredAt?: string;
   cancelledAt?: string;
   cashCollected?: boolean;
+  fulfillment?: "delivery" | "pickup";
+  express?: boolean;
+  deliveryWindow?: string;
+  deliveryPin?: string;
+  pickupCode?: string;
+  substitutionPreference?: "allow" | "refund" | "contact";
+  loyaltyPointsUsed?: number;
+  loyaltyDiscount?: number;
+  proofOfDelivery?: {
+    method: "pin";
+    note?: string;
+    at: string;
+  };
+  idempotencyKey?: string;
   cancellationReason?: string;
   events: OrderEvent[];
 }
@@ -318,6 +390,52 @@ export interface PushSubscriptionRecord {
   createdAt: string;
 }
 
+export interface ShoppingListItem {
+  productId: string;
+  qty: number;
+  checked?: boolean;
+}
+
+export interface ShoppingList {
+  id: string;
+  name: string;
+  items: ShoppingListItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StockReservation {
+  id: string;
+  orderId: string;
+  productId: string;
+  variantId?: string;
+  qty: number;
+  status: "reserved" | "committed" | "released";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RefundLine {
+  productId: string;
+  name: string;
+  qty: number;
+  amount: number;
+}
+
+export interface RefundRequest {
+  id: string;
+  orderId: string;
+  customerEmail?: string;
+  reason: string;
+  lines: RefundLine[];
+  amount: number;
+  status: "pending" | "approved" | "rejected" | "refunded";
+  restock: boolean;
+  adminNote?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -334,6 +452,8 @@ export interface Database {
   taxiRides?: TaxiRide[];
   /** Browser Web Push subscriptions. */
   pushSubscriptions?: PushSubscriptionRecord[];
+  stockReservations?: StockReservation[];
+  refundRequests?: RefundRequest[];
 }
 
 /**

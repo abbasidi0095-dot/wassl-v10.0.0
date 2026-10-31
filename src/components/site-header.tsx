@@ -11,6 +11,7 @@ import {
   Menu,
   ReceiptText,
   ShoppingBag,
+  ShoppingBasket,
   Store,
   UserRound,
   X,
@@ -73,6 +74,7 @@ export function SiteHeader({
 
   const nav = [
     { href: currentCity ? `/city/${currentCity.slug}` : "/", label: t("Discover") },
+    { href: "/grocery", label: t("Grocery") },
     { href: "/taxi", label: t("Taxi") },
     { href: "/orders", label: t("My orders") },
     { href: "/login?next=merchant", label: t("For business") },
@@ -225,6 +227,7 @@ export function SiteHeader({
               </div>
               {[
                 { href: "/", label: t("Home"), icon: MapPin },
+                { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
                 { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
                 { href: "/orders", label: t("My orders"), icon: ReceiptText },
                 ...(account

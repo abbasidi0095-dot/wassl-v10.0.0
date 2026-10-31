@@ -9,6 +9,7 @@ import {
   DEMO_STORE_PASSWORD,
 } from "./auth-config";
 import { hashPassword } from "./security";
+import { GROCERY_PRESETS } from "./grocery-presets";
 import type {
   City,
   Database,
@@ -106,6 +107,7 @@ const storeSeed = [
     commissionRate: 10,
     phone: "+212 660 33 44 55",
     ownerName: "Brahim E.",
+    grocery: GROCERY_PRESETS["sahara-market"],
   },
   {
     id: "store_laayoune_burger",
@@ -178,6 +180,7 @@ const storeSeed = [
     commissionRate: 10,
     phone: "+212 660 66 77 88",
     ownerName: "Omar L.",
+    grocery: GROCERY_PRESETS["boujdour-fresh"],
   },
   {
     id: "store_smara_kitchen",
@@ -247,7 +250,7 @@ const stores: Store[] = [
   ...buildImportedRestaurants().stores,
 ];
 
-type ProductSeed = Omit<Product, "id" | "available"> & { available?: boolean };
+export type ProductSeed = Omit<Product, "id" | "available"> & { available?: boolean };
 
 const p = (
   storeId: string,
@@ -267,6 +270,124 @@ const p = (
   popular,
   available: true,
 });
+
+export const groceryExtra: ProductSeed[] = [
+  {
+    storeId: "store_sahara_market", category: "Dairy", name: "Whole Milk 1L",
+    description: "Fresh whole milk, chilled", price: 9, emoji: "", available: true,
+    sku: "SAH-DAIRY-101", barcode: "6111200001011", brand: "Local", unit: "1 L",
+    stock: 4, lowStockThreshold: 6, aisle: "Dairy", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Dairy", name: "Eggs 12",
+    description: "Farm eggs, tray of twelve", price: 18, emoji: "", available: true,
+    sku: "SAH-DAIRY-102", barcode: "6111200001028", brand: "Local", unit: "12 eggs",
+    stock: 22, lowStockThreshold: 6, aisle: "Dairy", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Bakery", name: "Fresh Bread",
+    description: "Baked this morning", price: 4, emoji: "", available: true,
+    sku: "SAH-BAKE-201", barcode: "6111200002018", unit: "1 loaf",
+    stock: 16, lowStockThreshold: 5, aisle: "Bakery", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Meat", name: "Chicken 1kg",
+    description: "Fresh chicken, cut to order", price: 45, emoji: "", available: true,
+    sku: "SAH-MEAT-301", barcode: "6111200003015", unit: "1 kg",
+    stock: 8, lowStockThreshold: 4, aisle: "Meat", substitutionAllowed: false,
+    variants: [
+      { id: "v500", label: "500 g", sku: "SAH-MEAT-301-500", price: 25, stock: 6, unit: "500 g" },
+      { id: "v1000", label: "1 kg", sku: "SAH-MEAT-301-1K", price: 45, stock: 8, unit: "1 kg" },
+    ],
+  },
+  {
+    storeId: "store_sahara_market", category: "Fresh", name: "Apples 1kg",
+    description: "Crisp local apples", price: 16, emoji: "", available: true,
+    sku: "SAH-FRESH-401", barcode: "6111200004012", unit: "1 kg",
+    stock: 30, lowStockThreshold: 6, aisle: "Fresh produce", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Fresh", name: "Oranges 1kg",
+    description: "Juicing oranges", price: 12, emoji: "", available: true,
+    sku: "SAH-FRESH-402", barcode: "6111200004029", unit: "1 kg",
+    stock: 26, lowStockThreshold: 6, aisle: "Fresh produce", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Pantry", name: "Rice 1kg",
+    description: "Long-grain rice", price: 14, emoji: "", available: true,
+    sku: "SAH-PANT-501", barcode: "6111200005019", unit: "1 kg",
+    stock: 40, lowStockThreshold: 8, aisle: "Pantry", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Pantry", name: "Pasta 500g",
+    description: "Durum wheat pasta", price: 8, emoji: "", available: true,
+    sku: "SAH-PANT-502", barcode: "6111200005026", unit: "500 g",
+    stock: 35, lowStockThreshold: 8, aisle: "Pantry", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Dairy", name: "Yogurt 4-pack",
+    description: "Natural yogurt, four cups", price: 12, emoji: "", available: true,
+    sku: "SAH-DAIRY-103", barcode: "6111200001035", unit: "4 × 125 g",
+    stock: 18, lowStockThreshold: 6, aisle: "Dairy", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Pantry", name: "Olive Oil 500ml",
+    description: "Cold-pressed olive oil", price: 48, emoji: "", available: true,
+    sku: "SAH-PANT-503", barcode: "6111200005033", unit: "500 ml",
+    stock: 12, lowStockThreshold: 4, aisle: "Pantry", substitutionAllowed: true,
+    variants: [
+      { id: "v250", label: "250 ml", sku: "SAH-PANT-503-250", price: 28, stock: 9, unit: "250 ml" },
+      { id: "v500", label: "500 ml", sku: "SAH-PANT-503-500", price: 48, stock: 12, unit: "500 ml" },
+    ],
+  },
+  {
+    storeId: "store_sahara_market", category: "Pantry", name: "Dates 500g",
+    description: "Soft Medjool-style dates", price: 35, emoji: "", available: true,
+    sku: "SAH-PANT-504", barcode: "6111200005040", unit: "500 g",
+    stock: 14, lowStockThreshold: 4, aisle: "Pantry", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Household", name: "Laundry Detergent 2L",
+    description: "Concentrated liquid detergent", price: 38, emoji: "", available: true,
+    sku: "SAH-HOME-601", barcode: "6111200006013", unit: "2 L",
+    stock: 10, lowStockThreshold: 4, aisle: "Household", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Household", name: "Paper Towels 4-pack",
+    description: "Absorbent kitchen towels", price: 22, emoji: "", available: true,
+    sku: "SAH-HOME-602", barcode: "6111200006020", unit: "4 rolls",
+    stock: 3, lowStockThreshold: 6, aisle: "Household", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Drinks", name: "Sparkling Water 1L",
+    description: "Chilled sparkling water", price: 6, emoji: "", available: true,
+    sku: "SAH-DRINK-701", barcode: "6111200007010", unit: "1 L",
+    stock: 48, lowStockThreshold: 10, aisle: "Drinks", substitutionAllowed: true,
+  },
+  {
+    storeId: "store_sahara_market", category: "Drinks", name: "Cola 1.5L",
+    description: "Chilled cola bottle", price: 10, emoji: "", available: true,
+    sku: "SAH-DRINK-702", barcode: "6111200007027", brand: "Cola", unit: "1.5 L",
+    stock: 24, lowStockThreshold: 8, aisle: "Drinks", substitutionAllowed: true,
+  },
+];
+
+function groceryStock(item: ProductSeed, index: number): Partial<ProductSeed> {
+  if (item.storeId !== "store_sahara_market" && item.storeId !== "store_boujdour_fresh") {
+    return {};
+  }
+  const prefix = item.storeId === "store_sahara_market" ? "SAH" : "BJD";
+  const unitMatch = item.name.match(/(\d+(?:\.\d+)?\s?(?:kg|g|l|ml|cl))/i);
+  return {
+    sku: `${prefix}-${item.category.slice(0, 4).toUpperCase()}-${String(index + 1).padStart(3, "0")}`,
+    barcode: `61112${String(index + 1).padStart(8, "0")}`,
+    unit: unitMatch ? unitMatch[1].replace(/\s/g, " ") : "each",
+    stock: item.name === "Water 6 x 1.5L" ? 7 : 5 + ((index * 7) % 28),
+    lowStockThreshold: 5,
+    aisle: item.category,
+    substitutionAllowed: true,
+  };
+}
 
 const productSeed: ProductSeed[] = [
   p("store_dakhla_grill", "Burgers", "Dakhla Smash", "Double beef, cheddar, house sauce", 58, "🍔", true),
@@ -317,7 +438,13 @@ const productSeed: ProductSeed[] = [
 const products: Product[] = [
   ...productSeed.map((item, index) => ({
     ...item,
+    ...groceryStock(item, index),
     id: `product_${String(index + 1).padStart(3, "0")}`,
+    available: item.available ?? true,
+  })),
+  ...groceryExtra.map((item, index) => ({
+    ...item,
+    id: `product_${String(productSeed.length + index + 1).padStart(3, "0")}`,
     available: item.available ?? true,
   })),
   ...buildImportedRestaurants().products,

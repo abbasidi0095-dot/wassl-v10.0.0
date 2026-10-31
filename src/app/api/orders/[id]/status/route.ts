@@ -27,7 +27,7 @@ export async function POST(
 ) {
   const { id } = await params;
   const body = (await request.json().catch(() => null)) as
-    | { status?: OrderStatus; note?: string }
+    | { status?: OrderStatus; note?: string; proofPin?: string }
     | null;
   if (!body?.status || !KNOWN_STATUSES.includes(body.status)) {
     return NextResponse.json({ error: "A valid status is required" }, { status: 400 });
@@ -44,6 +44,7 @@ export async function POST(
   try {
     const updated = await updateOrderStatus(order.id, body.status, actorFromSession(session), {
       note: body.note,
+      proofPin: body.proofPin,
     });
     void notifyOrderStatusChange(
       updated as unknown as OrderView,

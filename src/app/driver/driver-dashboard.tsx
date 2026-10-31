@@ -220,12 +220,22 @@ export function DriverDashboard({
   async function advance(order: OrderView) {
     const action = NEXT_ACTION[order.status];
     if (!action) return;
+    let proofPin: string | undefined;
+    if (action.status === "delivered" && order.deliveryPin) {
+      const entered = window.prompt(
+        order.fulfillment === "pickup"
+          ? "Ask the customer for their pickup code"
+          : "Ask the customer for their 4-digit delivery PIN",
+      );
+      if (!entered?.trim()) return;
+      proofPin = entered.trim();
+    }
     setBusy(order.id);
     try {
       const response = await fetch(`/api/orders/${order.id}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: action.status }),
+        body: JSON.stringify({ status: action.status, proofPin }),
       });
       const data = (await response.json()) as { error?: string; order?: OrderView };
       if (!response.ok) {

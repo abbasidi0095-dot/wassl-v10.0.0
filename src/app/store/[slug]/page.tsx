@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -46,6 +46,7 @@ export default async function StorePage({
   const { slug } = await params;
   const store = await getStore(slug);
   if (!store) notFound();
+  if (store.category === "grocery") redirect(`/grocery/${store.slug}`);
   const city = await getCity(store.citySlug);
   if (!city) notFound();
   const products = await getProducts(store.id);

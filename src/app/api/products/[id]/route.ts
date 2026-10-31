@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb, updateProduct } from "@/lib/db";
+import { getDb, updateProductDetails, type UpdateProductInput } from "@/lib/db";
 import { actorFromSession, isResponse, requireApiRole } from "@/lib/api-auth";
 
 export const runtime = "nodejs";
@@ -18,13 +18,20 @@ export async function PATCH(
     return NextResponse.json({ error: "This product belongs to another store" }, { status: 403 });
   }
   const body = (await request.json().catch(() => null)) as
-    | { available?: boolean }
+    | UpdateProductInput
     | null;
-  if (typeof body?.available !== "boolean") {
-    return NextResponse.json({ error: "available is required" }, { status: 400 });
+  if (!body || !Object.keys(body).length) {
+    return NextResponse.json({ error: "No product changes supplied" }, { status: 400 });
   }
-  return NextResponse.json({
-    ok: true,
-    product: await updateProduct(id, body.available, actorFromSession(session)),
-  });
+  try {
+    return NextResponse.json({
+      ok: true,
+      product: await updateProductDetails(id, body, actorFromSession(session)),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Could not update the product" },
+      { status: 400 },
+    );
+  }
 }

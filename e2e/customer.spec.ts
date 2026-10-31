@@ -50,3 +50,31 @@ test("filters stores by diet and exposes the map link", async ({ page }) => {
     page.getByRole("link", { name: /on Google Maps/ }).first(),
   ).toBeVisible();
 });
+
+test("grocery pickup reserves stock and returns a pickup code", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("customer@wassl.ma");
+  await page.getByLabel("Password", { exact: true }).fill("Wsl-Customer-2Dkh!2026");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/(taxi|account|orders)/);
+
+  await page.goto("/grocery/sahara-market");
+  await expect(page.getByRole("heading", { name: "Sahara Market" })).toBeVisible();
+  await page.getByRole("button", { name: /Add Whole Milk 1L to cart/ }).click();
+  for (let index = 0; index < 3; index += 1) {
+    await page.getByRole("button", { name: /Add Apples 1kg to cart/ }).click();
+  }
+
+  await page.goto("/cart");
+  await page.getByRole("link", { name: /Continue to delivery/ }).click();
+  await page.getByRole("button", { name: "Pickup", exact: true }).click();
+  await page.getByLabel("Full name").fill("E2E Grocery");
+  await page.getByLabel("Phone number").fill("+212 600 111 222");
+  await page.getByRole("button", { name: /Place pickup order/ }).click();
+
+  await expect(page).toHaveURL(/\/orders\/order_/);
+  await expect(page.getByText("Pickup code")).toBeVisible();
+  await expect(page.getByText(/^P\d{4}$/)).toBeVisible();
+});

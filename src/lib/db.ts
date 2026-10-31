@@ -8,6 +8,8 @@ import {
 } from "./events";
 import { hashPassword, orderCode, randomId, verifyPassword } from "./security";
 import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
+import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
+import { casablancaNow } from "./hours";
 import {
   BOOTSTRAP_ADMIN_EMAIL,
   BOOTSTRAP_ADMIN_PASSWORD,
@@ -32,13 +34,16 @@ import type {
   Database,
   DeviceToken,
   Driver,
+  GrocerySettings,
   Order,
   OrderEvent,
   OrderStatus,
   PlatformSettings,
   Product,
   PushSubscriptionRecord,
+  RefundRequest,
   Role,
+  ShoppingList,
   Store,
   TaxiRide,
   TaxiStatus,
@@ -906,6 +911,7 @@ export async function getDriverBoard(
       .filter(
         (order) =>
           !order.driverId &&
+          order.fulfillment !== "pickup" &&
           !["delivered", "cancelled"].includes(order.status),
       )
       .map((order) => driverQueueViewFromDb(db, order)),
@@ -948,29 +954,161 @@ export async function createOrder(
     notes?: string;
     lat: number;
     lng: number;
-    items: { productId: string; qty: number; optionIds?: string[] }[];
+    items: { productId: string; qty: number; optionIds?: string[]; variantId?: string }[];
     scheduledFor?: string;
+    deliveryWindow?: string;
+    fulfillment?: "delivery" | "pickup";
+    express?: boolean;
+    substitutionPreference?: "allow" | "refund" | "contact";
+    loyaltyPoints?: number;
     promoCode?: string;
+    idempotencyKey?: string;
   },
   actor: OrderActor = { role: "customer" },
 ): Promise<Order> {
   return mutate((db) => {
+    if (input.idempotencyKey) {
+      const prior = db.orders.find(
+        (order) =>
+          order.idempotencyKey === input.idempotencyKey &&
+          (!order.customerEmail ||
+            !input.customerEmail ||
+            order.customerEmail.toLowerCase() === input.customerEmail.toLowerCase()),
+      );
+      if (prior) return prior;
+    }
     const store = db.stores.find((item) => item.id === input.storeId);
     if (!store) throw new Error("Store not found");
     if (!store.isOpen) throw new Error("Store is currently closed");
     if (store.citySlug !== input.citySlug) throw new Error("Store is not in this city");
 
-    const items = input.items
+    const isGrocery = store.category === "grocery";
+    const settings = isGrocery ? grocerySettings(store) : null;
+    const fulfillment = isGrocery ? input.fulfillment ?? "delivery" : "delivery";
+    const scheduled = Boolean(input.deliveryWindow);
+    const activeDrivers = db.drivers.filter(
+      (driver) => driver.active && driver.citySlug === store.citySlug,
+    ).length;
+    const availability = isGrocery
+      ? groceryAvailability(store, activeDrivers)
+      : null;
+
+    if (isGrocery && settings && availability) {
+      if (!availability.open) {
+        throw new Error(availability.reason || "Grocery store is closed");
+      }
+      if (fulfillment === "pickup") {
+        if (!availability.pickup) {
+          throw new Error(availability.reason || "Pickup is unavailable right now");
+        }
+      } else {
+        if (!scheduled && !availability.delivery) {
+          throw new Error(
+            availability.reason || "Delivery is unavailable right now — choose pickup or schedule later",
+          );
+        }
+        if (input.express) {
+          if (!availability.express) {
+            throw new Error("Express delivery is not available right now");
+          }
+          if (scheduled) throw new Error("Express cannot be combined with a scheduled slot");
+        }
+      }
+      if (scheduled) {
+        if (!availability.scheduling) throw new Error("Scheduled delivery is not enabled");
+        if (availability.night && !settings.overnightStaffed) {
+          throw new Error("Overnight ordering is not staffed right now");
+        }
+        if (!settings.scheduleSlots.includes(input.deliveryWindow ?? "")) {
+          throw new Error("Choose one of the available delivery windows");
+        }
+        const { minutes } = casablancaNow();
+        const [hour, minute] = (input.deliveryWindow ?? "09:00").split(":").map(Number);
+        if (hour * 60 + (minute || 0) <= minutes + 15) {
+          throw new Error("Choose a later delivery window");
+        }
+      }
+    }
+
+    const deliveryAddress =
+      fulfillment === "pickup"
+        ? input.address?.trim() || store.address
+        : input.address.trim();
+    const deliveryLandmark =
+      fulfillment === "pickup"
+        ? input.landmark?.trim() || store.landmark
+        : input.landmark.trim();
+    const customerPoint = {
+      lat: fulfillment === "pickup" ? store.lat : input.lat,
+      lng: fulfillment === "pickup" ? store.lng : input.lng,
+    };
+    const distanceKm =
+      isGrocery && fulfillment === "delivery"
+        ? haversineKm({ lat: store.lat, lng: store.lng }, customerPoint)
+        : 0;
+    const fees =
+      isGrocery && fulfillment === "delivery"
+        ? groceryFees({
+            store,
+            distanceKm,
+            express: Boolean(input.express),
+          })
+        : null;
+    if (isGrocery && fulfillment === "delivery" && !fees) {
+      throw new Error("This address is outside the store's delivery zone");
+    }
+    const minimum = fees?.minOrder ?? store.minOrder;
+    const baseDeliveryFee =
+      fulfillment === "pickup"
+        ? 0
+        : fees?.deliveryFee ?? store.deliveryFee;
+
+    type PreparedLine = {
+      item: NonNullable<Order["items"][number]>;
+      product: Product;
+      variantId: string | undefined;
+      stockBefore: number | undefined;
+    };
+
+    const prepared: PreparedLine[] = input.items
       .map((line) => {
         const product = db.products.find(
           (item) => item.id === line.productId && item.storeId === store.id,
         );
-        if (!product || !product.available) return null;
+        if (!product) {
+          throw new Error("One of the items is no longer available");
+        }
+        if (!product.available) {
+          if (isGrocery) throw new Error(`${product.name} is no longer available`);
+          return null;
+        }
         const qty = Math.max(1, Math.min(20, Math.floor(line.qty)));
+        if (product.limitPerOrder && qty > product.limitPerOrder) {
+          throw new Error(`${product.name} is limited to ${product.limitPerOrder} per order`);
+        }
+
+        const stockInfo = isGrocery
+          ? resolveProductStock(product, line.variantId)
+          : { stock: undefined, price: product.price, label: undefined, sku: product.sku, unit: product.unit };
+        if (isGrocery && !stockInfo) {
+          throw new Error(`Choose a valid size for ${product.name}`);
+        }
+        if (
+          isGrocery &&
+          stockInfo &&
+          typeof stockInfo.stock === "number" &&
+          stockInfo.stock < qty
+        ) {
+          throw new Error(
+            stockInfo.stock <= 0
+              ? `${product.name} is sold out`
+              : `Only ${stockInfo.stock} × ${product.name} left in stock`,
+          );
+        }
 
         const requested = line.optionIds ?? [];
         const selected: NonNullable<Order["items"][number]["options"]> = [];
-        let unitPrice = product.price;
+        let unitPrice = stockInfo?.price ?? product.price;
 
         for (const group of product.modifiers ?? []) {
           const ids = requested.filter((id) =>
@@ -1002,38 +1140,97 @@ export async function createOrder(
         }
 
         return {
-          productId: product.id,
-          name: product.name,
-          emoji: product.emoji,
-          price: unitPrice,
-          qty,
-          options: selected.length ? selected : undefined,
+          product,
+          variantId: line.variantId,
+          stockBefore: stockInfo?.stock,
+          item: {
+            productId: product.id,
+            name: product.name,
+            emoji: product.emoji,
+            price: unitPrice,
+            qty,
+            options: selected.length ? selected : undefined,
+            variantId: line.variantId,
+            variantLabel: stockInfo?.label,
+            sku: stockInfo?.sku,
+            unit: stockInfo?.unit,
+          },
         };
       })
-      .filter((line): line is NonNullable<typeof line> => Boolean(line));
+      .filter((line) => line !== null) as PreparedLine[];
 
-    if (items.length === 0) throw new Error("Cart is empty");
+    if (prepared.length === 0) throw new Error("Cart is empty");
+    const items = prepared.map((line) => line.item);
 
     const subtotal = items.reduce((sum, line) => sum + line.price * line.qty, 0);
-    if (subtotal < store.minOrder) {
-      throw new Error(`Minimum order is ${store.minOrder} MAD`);
+    if (subtotal < minimum) {
+      throw new Error(`Minimum order is ${minimum} MAD`);
     }
 
     const promo = input.promoCode
       ? quotePromo(input.promoCode, {
           subtotal,
-          deliveryFee: store.deliveryFee,
+          deliveryFee: baseDeliveryFee,
           citySlug: store.citySlug,
         })
       : null;
     if (promo && !promo.ok) throw new Error(promo.error);
 
-    const deliveryFee =
-      promo?.ok && promo.quote.freeDelivery ? 0 : store.deliveryFee;
-    const discount = promo?.ok ? promo.quote.discount : 0;
-    const total = Math.max(0, subtotal + deliveryFee - discount);
+    let loyaltyDiscount = 0;
+    let loyaltyPointsUsed = 0;
+    if (isGrocery && input.loyaltyPoints && actor.id) {
+      const customer = db.users.find((user) => user.id === actor.id);
+      const balance = customer?.loyaltyPoints ?? 0;
+      const requested = Math.max(0, Math.min(Math.floor(input.loyaltyPoints), balance));
+      const maxPoints = Math.floor((subtotal * 0.5) * 10); // at most 50% of subtotal
+      const usable = Math.min(requested, maxPoints);
+      loyaltyPointsUsed = Math.floor(usable / 100) * 100;
+      loyaltyDiscount = loyaltyPointsUsed / 10;
+      if (customer && loyaltyPointsUsed > 0) {
+        customer.loyaltyPoints = balance - loyaltyPointsUsed;
+      }
+    }
 
-    const now = new Date().toISOString();
+    const deliveryFee =
+      promo?.ok && promo.quote.freeDelivery ? 0 : baseDeliveryFee;
+    const discount = promo?.ok ? promo.quote.discount : 0;
+    const total = Math.max(
+      0,
+      subtotal + deliveryFee - discount - loyaltyDiscount,
+    );
+
+    // Reserve stock inside the same serialized mutation: no oversell window.
+    const now = new Date();
+    const nowIso = now.toISOString();
+    for (const line of prepared) {
+      if (!isGrocery || typeof line.stockBefore !== "number") continue;
+      if (line.variantId) {
+        const variant = line.product.variants?.find(
+          (item) => item.id === line.variantId,
+        );
+        if (variant) variant.stock = Math.max(0, variant.stock - line.item.qty);
+      } else if (typeof line.product.stock === "number") {
+        line.product.stock = Math.max(0, line.product.stock - line.item.qty);
+      }
+    }
+    if (isGrocery) {
+      db.stockReservations ??= [];
+      for (const line of prepared) {
+        if (typeof line.stockBefore !== "number") continue;
+        db.stockReservations.push({
+          id: randomId("stock", 6),
+          orderId: "",
+          productId: line.product.id,
+          variantId: line.variantId,
+          qty: line.item.qty,
+          status: "reserved",
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        });
+      }
+    }
+
+    const pin = String(1000 + Math.floor(Math.random() * 9000));
     const order: Order = {
       id: randomId("order", 6),
       code: orderCode(),
@@ -1043,11 +1240,11 @@ export async function createOrder(
       customerName: input.customerName,
       customerPhone: input.customerPhone,
       customerEmail: input.customerEmail,
-      address: input.address,
-      landmark: input.landmark,
+      address: deliveryAddress,
+      landmark: deliveryLandmark,
       notes: input.notes,
-      lat: input.lat,
-      lng: input.lng,
+      lat: customerPoint.lat,
+      lng: customerPoint.lng,
       items,
       subtotal,
       deliveryFee,
@@ -1056,17 +1253,39 @@ export async function createOrder(
       discount: discount || undefined,
       paymentMethod: "cod",
       scheduledFor: input.scheduledFor,
-      createdAt: now,
-      updatedAt: now,
+      fulfillment: isGrocery ? fulfillment : undefined,
+      express: isGrocery ? Boolean(input.express) : undefined,
+      deliveryWindow: isGrocery ? input.deliveryWindow : undefined,
+      deliveryPin: isGrocery ? pin : undefined,
+      pickupCode: isGrocery && fulfillment === "pickup" ? `P${pin}` : undefined,
+      substitutionPreference: isGrocery
+        ? input.substitutionPreference ?? settings?.substitutionDefault
+        : undefined,
+      loyaltyPointsUsed: loyaltyPointsUsed || undefined,
+      loyaltyDiscount: loyaltyDiscount || undefined,
+      idempotencyKey: input.idempotencyKey,
+      createdAt: nowIso,
+      updatedAt: nowIso,
       events: [
         {
           id: randomId("evt", 5),
           type: "placed",
-          label: "Order placed — cash on delivery",
-          at: now,
+          label:
+            isGrocery && fulfillment === "pickup"
+              ? "Order placed — pickup, cash on collection"
+              : "Order placed — cash on delivery",
+          at: nowIso,
         },
       ],
     };
+
+    if (isGrocery) {
+      for (const reservation of db.stockReservations ?? []) {
+        if (!reservation.orderId && reservation.status === "reserved") {
+          reservation.orderId = order.id;
+        }
+      }
+    }
 
     db.orders.unshift(order);
     recordAudit(db, {
@@ -1076,8 +1295,18 @@ export async function createOrder(
       action: "order.create",
       entity: "order",
       entityId: order.id,
-      summary: `Order ${order.code} placed at ${store.name} — ${order.items.length} line(s), ${order.total} MAD cash on delivery`,
+      summary: `Order ${order.code} placed at ${store.name} — ${order.items.length} line(s), ${order.total} MAD ${
+        isGrocery ? (fulfillment === "pickup" ? "pickup" : "delivery") : "cash on delivery"
+      }`,
       after: "placed",
+      metadata: isGrocery
+        ? {
+            fulfillment,
+            express: Boolean(input.express),
+            distanceKm: Math.round(distanceKm * 100) / 100,
+            stockReserved: prepared.filter((line) => typeof line.stockBefore === "number").length,
+          }
+        : undefined,
     });
     publish({
       type: "order",
@@ -1086,6 +1315,7 @@ export async function createOrder(
       citySlug: order.citySlug,
       status: order.status,
     });
+    if (isGrocery) publish({ type: "store", storeId: store.id, citySlug: store.citySlug });
     void getOrderView(order.id).then(
       (view) => view && notifyOrderStatusChange(view, order.customerEmail),
     );
@@ -1097,13 +1327,31 @@ export async function updateOrderStatus(
   orderId: string,
   next: OrderStatus,
   actor: OrderActor,
-  options: { note?: string } = {},
+  options: { note?: string; proofPin?: string } = {},
 ): Promise<Order> {
   return mutate((db) => {
     const order = db.orders.find(
       (item) => item.id === orderId || item.code.toLowerCase() === orderId.toLowerCase(),
     );
     if (!order) throw new OrderRuleError("not_found", "Order not found");
+
+    const store = db.stores.find((item) => item.id === order.storeId);
+    const isGrocery = store?.category === "grocery";
+    const isPickup = order.fulfillment === "pickup";
+
+    if (isGrocery && next === "delivered" && actor.role !== "admin") {
+      const supplied = (options.proofPin ?? "").trim().toUpperCase();
+      const expected = (order.deliveryPin ?? "").trim().toUpperCase();
+      const pickupExpected = (order.pickupCode ?? "").trim().toUpperCase();
+      if (!supplied || (supplied !== expected && supplied !== pickupExpected)) {
+        throw new OrderRuleError(
+          "proof_required",
+          isPickup
+            ? "Enter the customer pickup code to complete this order"
+            : "Enter the customer delivery PIN to complete this order",
+        );
+      }
+    }
 
     const check = checkTransition(order, next, actor, options);
     if (!check.ok) throw new OrderRuleError(check.code, check.error);
@@ -1129,18 +1377,70 @@ export async function updateOrderStatus(
     if (next === "delivered") {
       order.deliveredAt = now;
       order.cashCollected = true;
-      const driver = db.drivers.find((d) => d.id === order.driverId);
-      if (driver) {
-        driver.cashOnHand += order.total;
-        driver.deliveries += 1;
-        driver.status = "available";
+      order.proofOfDelivery = {
+        method: "pin",
+        note: options.note?.trim() || undefined,
+        at: now,
+      };
+      if (!isPickup) {
+        const driver = db.drivers.find((d) => d.id === order.driverId);
+        if (driver) {
+          driver.cashOnHand += order.total;
+          driver.deliveries += 1;
+          driver.status = "available";
+        }
       }
+      db.stockReservations ??= [];
+      for (const reservation of db.stockReservations) {
+        if (reservation.orderId === order.id && reservation.status === "reserved") {
+          reservation.status = "committed";
+          reservation.updatedAt = now;
+        }
+      }
+      if (isGrocery && order.customerEmail) {
+        const customer = db.users.find(
+          (user) => user.email.toLowerCase() === order.customerEmail!.toLowerCase(),
+        );
+        const rate = store ? grocerySettings(store).loyaltyPointsPer10Mad : 1;
+        if (customer) {
+          customer.loyaltyPoints =
+            (customer.loyaltyPoints ?? 0) +
+            Math.floor(order.subtotal / 10) * Math.max(0, rate);
+        }
+      }
+      if (isGrocery) publish({ type: "store", storeId: order.storeId, citySlug: order.citySlug });
     }
     if (next === "cancelled") {
       order.cancelledAt = now;
       order.cancellationReason = options.note?.trim() || undefined;
       const driver = db.drivers.find((d) => d.id === order.driverId);
       if (driver && driver.status === "busy") driver.status = "available";
+      db.stockReservations ??= [];
+      for (const reservation of db.stockReservations) {
+        if (reservation.orderId !== order.id || reservation.status !== "reserved") continue;
+        reservation.status = "released";
+        reservation.updatedAt = now;
+        const product = db.products.find((item) => item.id === reservation.productId);
+        if (!product) continue;
+        if (reservation.variantId) {
+          const variant = product.variants?.find(
+            (item) => item.id === reservation.variantId,
+          );
+          if (variant) variant.stock += reservation.qty;
+        } else if (typeof product.stock === "number") {
+          product.stock += reservation.qty;
+        }
+      }
+      if (isGrocery && order.customerEmail && order.loyaltyPointsUsed) {
+        const customer = db.users.find(
+          (user) => user.email.toLowerCase() === order.customerEmail!.toLowerCase(),
+        );
+        if (customer) {
+          customer.loyaltyPoints =
+            (customer.loyaltyPoints ?? 0) + order.loyaltyPointsUsed;
+        }
+      }
+      if (isGrocery) publish({ type: "store", storeId: order.storeId, citySlug: order.citySlug });
     }
 
     order.status = next;
@@ -1157,7 +1457,14 @@ export async function updateOrderStatus(
       delivered: "Delivered — cash collected",
       cancelled: "Order cancelled",
     };
-    pushEvent(order, next, labels[next], options.note);
+    pushEvent(
+      order,
+      next,
+      next === "delivered" && order.fulfillment === "pickup"
+        ? "Collected from store — cash paid"
+        : labels[next],
+      options.note,
+    );
 
     recordAudit(db, {
       actorRole: actor.role,
@@ -1657,6 +1964,16 @@ export type CreateProductInput = {
   popular?: boolean;
   tags?: string[];
   calories?: number;
+  sku?: string;
+  barcode?: string;
+  brand?: string;
+  unit?: string;
+  stock?: number;
+  lowStockThreshold?: number;
+  aisle?: string;
+  variants?: Product["variants"];
+  substitutionAllowed?: boolean;
+  limitPerOrder?: number;
 };
 
 export async function createProduct(
@@ -1675,6 +1992,17 @@ export async function createProduct(
     const store = db.stores.find((item) => item.id === input.storeId);
     if (!store) throw new Error("Store not found");
 
+    if (input.sku?.trim()) {
+      const sku = input.sku.trim().toUpperCase();
+      if (
+        db.products.some(
+          (item) => item.storeId === store.id && item.sku?.toUpperCase() === sku,
+        )
+      ) {
+        throw new Error("That SKU already exists in this store");
+      }
+    }
+
     const product: Product = {
       id: `product_${randomId("x", 6).slice(2)}`,
       storeId: store.id,
@@ -1689,6 +2017,25 @@ export async function createProduct(
       calories:
         typeof input.calories === "number" && Number.isFinite(input.calories)
           ? Math.round(input.calories)
+          : undefined,
+      sku: input.sku?.trim() || undefined,
+      barcode: input.barcode?.trim() || undefined,
+      brand: input.brand?.trim() || undefined,
+      unit: input.unit?.trim() || undefined,
+      stock:
+        typeof input.stock === "number" && Number.isFinite(input.stock)
+          ? Math.max(0, Math.round(input.stock))
+          : undefined,
+      lowStockThreshold:
+        typeof input.lowStockThreshold === "number" && Number.isFinite(input.lowStockThreshold)
+          ? Math.max(0, Math.round(input.lowStockThreshold))
+          : undefined,
+      aisle: input.aisle?.trim() || undefined,
+      variants: input.variants?.length ? input.variants : undefined,
+      substitutionAllowed: input.substitutionAllowed,
+      limitPerOrder:
+        typeof input.limitPerOrder === "number" && input.limitPerOrder > 0
+          ? Math.round(input.limitPerOrder)
           : undefined,
     };
     db.products.push(product);
@@ -1803,6 +2150,288 @@ export async function getPushSubscriptions(filter: {
       (filter.email && subscription.email === filter.email) ||
       (filter.userId && subscription.userId === filter.userId),
   );
+}
+
+export async function toggleFavorite(
+  userId: string,
+  productId: string,
+): Promise<string[]> {
+  return mutate((db) => {
+    const user = db.users.find((candidate) => candidate.id === userId);
+    if (!user) throw new Error("Account not found");
+    const product = db.products.find((candidate) => candidate.id === productId);
+    if (!product) throw new Error("Product not found");
+    const current = user.favorites ?? [];
+    user.favorites = current.includes(productId)
+      ? current.filter((id) => id !== productId)
+      : [...current, productId];
+    return user.favorites;
+  });
+}
+
+export async function updateGrocerySettings(
+  storeId: string,
+  patch: Partial<GrocerySettings>,
+  actor: OrderActor,
+): Promise<Store> {
+  return mutate((db) => {
+    const store = db.stores.find((item) => item.id === storeId);
+    if (!store) throw new Error("Store not found");
+    if (store.category !== "grocery") throw new Error("This store is not a grocery store");
+    const current = store.grocery ?? {
+      expressEnabled: false,
+      expressFee: 10,
+      expressMinutes: 30,
+      pickupEnabled: true,
+      alwaysOpen: false,
+      overnightStaffed: false,
+      nightStart: "23:00",
+      nightEnd: "06:00",
+      nightFee: 8,
+      schedulingEnabled: true,
+      scheduleSlots: ["09:00", "12:00", "15:00", "18:00", "21:00"],
+      deliveryZones: [],
+      substitutionDefault: "allow" as const,
+      lowStockThreshold: 5,
+      loyaltyPointsPer10Mad: 1,
+    };
+
+    const next: GrocerySettings = {
+      ...current,
+      ...patch,
+      expressFee: Math.max(0, Math.round(patch.expressFee ?? current.expressFee)),
+      expressMinutes: Math.max(10, Math.min(180, Math.round(patch.expressMinutes ?? current.expressMinutes))),
+      nightFee: Math.max(0, Math.round(patch.nightFee ?? current.nightFee)),
+      lowStockThreshold: Math.max(0, Math.round(patch.lowStockThreshold ?? current.lowStockThreshold)),
+      loyaltyPointsPer10Mad: Math.max(0, Math.round(patch.loyaltyPointsPer10Mad ?? current.loyaltyPointsPer10Mad)),
+      scheduleSlots: (patch.scheduleSlots ?? current.scheduleSlots)
+        .filter((slot) => /^\d{2}:\d{2}$/.test(slot))
+        .slice(0, 12),
+      deliveryZones: (patch.deliveryZones ?? current.deliveryZones)
+        .filter((zone) => zone && zone.name && Number.isFinite(zone.maxKm))
+        .slice(0, 12)
+        .map((zone, index) => ({
+          id: zone.id || `zone-${index + 1}`,
+          name: zone.name.slice(0, 40),
+          maxKm: Math.max(0.5, Math.min(100, zone.maxKm)),
+          fee: Math.max(0, Math.round(zone.fee)),
+          minOrder: Math.max(0, Math.round(zone.minOrder)),
+        })),
+      substitutionDefault: ["allow", "refund", "contact"].includes(
+        patch.substitutionDefault ?? current.substitutionDefault,
+      )
+        ? (patch.substitutionDefault ?? current.substitutionDefault)
+        : "allow",
+    };
+    store.grocery = next;
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "store.grocery_settings",
+      entity: "store",
+      entityId: store.id,
+      summary: `Grocery settings updated for ${store.name}`,
+      metadata: { storeId: store.id },
+    });
+    publish({ type: "store", storeId: store.id, citySlug: store.citySlug });
+    return store;
+  });
+}
+
+export async function createRefundRequest(input: {
+  orderId: string;
+  reason: string;
+  productIds?: string[];
+  restock?: boolean;
+  customerEmail?: string;
+}): Promise<RefundRequest> {
+  return mutate((db) => {
+    const order = db.orders.find((item) => item.id === input.orderId);
+    if (!order) throw new Error("Order not found");
+    if (order.status !== "delivered") {
+      throw new Error("Refunds can be requested after delivery");
+    }
+    if (
+      input.customerEmail &&
+      order.customerEmail?.toLowerCase() !== input.customerEmail.toLowerCase()
+    ) {
+      throw new Error("This is not your order");
+    }
+    db.refundRequests ??= [];
+    if (
+      db.refundRequests.some(
+        (request) => request.orderId === order.id && request.status === "pending",
+      )
+    ) {
+      throw new Error("A refund request is already pending for this order");
+    }
+    const lines = order.items
+      .filter(
+        (line) => !input.productIds?.length || input.productIds.includes(line.productId),
+      )
+      .map((line) => ({
+        productId: line.productId,
+        name: line.name,
+        qty: line.qty,
+        amount: line.price * line.qty,
+      }));
+    if (!lines.length) throw new Error("Choose at least one item");
+    const amount = lines.reduce((sum, line) => sum + line.amount, 0);
+    const now = new Date().toISOString();
+    const request: RefundRequest = {
+      id: randomId("refund", 6),
+      orderId: order.id,
+      customerEmail: order.customerEmail,
+      reason: input.reason.trim() || "Customer reported an issue",
+      lines,
+      amount,
+      status: "pending",
+      restock: Boolean(input.restock),
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.refundRequests.unshift(request);
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: order.customerEmail,
+      actorName: order.customerName,
+      action: "refund.request",
+      entity: "order",
+      entityId: order.id,
+      summary: `Refund requested for ${order.code} · ${amount} MAD`,
+      metadata: { refundId: request.id },
+    });
+    return request;
+  });
+}
+
+export async function getRefundRequests(filter?: {
+  customerEmail?: string;
+  orderId?: string;
+  status?: RefundRequest["status"];
+}): Promise<RefundRequest[]> {
+  const requests = (await getDb()).refundRequests ?? [];
+  return requests.filter(
+    (request) =>
+      (!filter?.customerEmail ||
+        request.customerEmail?.toLowerCase() === filter.customerEmail.toLowerCase()) &&
+      (!filter?.orderId || request.orderId === filter.orderId) &&
+      (!filter?.status || request.status === filter.status),
+  );
+}
+
+export async function updateRefundRequest(
+  refundId: string,
+  next: RefundRequest["status"],
+  actor: OrderActor,
+  options: { note?: string; restock?: boolean } = {},
+): Promise<RefundRequest> {
+  return mutate((db) => {
+    const request = (db.refundRequests ?? []).find((item) => item.id === refundId);
+    if (!request) throw new Error("Refund request not found");
+    const allowed: Record<RefundRequest["status"], RefundRequest["status"][]> = {
+      pending: ["approved", "rejected"],
+      approved: ["refunded"],
+      rejected: [],
+      refunded: [],
+    };
+    if (!allowed[request.status].includes(next)) {
+      throw new Error(`Cannot move a ${request.status} refund to ${next}`);
+    }
+    request.status = next;
+    request.adminNote = options.note?.trim() || request.adminNote;
+    request.restock = options.restock ?? request.restock;
+    request.updatedAt = new Date().toISOString();
+
+    if (next === "refunded" && request.restock) {
+      const order = db.orders.find((item) => item.id === request.orderId);
+      if (order) {
+        for (const line of request.lines) {
+          const product = db.products.find((item) => item.id === line.productId);
+          if (!product) continue;
+          const orderLine = order.items.find((item) => item.productId === line.productId);
+          if (orderLine?.variantId) {
+            const variant = product.variants?.find(
+              (item) => item.id === orderLine.variantId,
+            );
+            if (variant) variant.stock += line.qty;
+          } else if (typeof product.stock === "number") {
+            product.stock += line.qty;
+          }
+        }
+      }
+    }
+
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: `refund.${next}`,
+      entity: "order",
+      entityId: request.orderId,
+      summary: `Refund ${request.id}: ${next}`,
+      note: request.adminNote,
+      metadata: { refundId: request.id, restock: request.restock },
+    });
+    return request;
+  });
+}
+
+export async function addToShoppingList(
+  userId: string,
+  productId: string,
+  qty = 1,
+): Promise<ShoppingList> {
+  return mutate((db) => {
+    const user = db.users.find((item) => item.id === userId);
+    if (!user) throw new Error("Account not found");
+    const product = db.products.find((item) => item.id === productId);
+    if (!product) throw new Error("Product not found");
+    user.shoppingLists ??= [];
+    let list = user.shoppingLists[0];
+    if (!list) {
+      const now = new Date().toISOString();
+      list = {
+        id: randomId("list", 5),
+        name: "My list",
+        items: [],
+        createdAt: now,
+        updatedAt: now,
+      };
+      user.shoppingLists.push(list);
+    }
+    const existing = list.items.find((item) => item.productId === productId);
+    if (existing) existing.qty = Math.min(99, existing.qty + qty);
+    else list.items.push({ productId, qty: Math.max(1, qty) });
+    list.updatedAt = new Date().toISOString();
+    return list;
+  });
+}
+
+export async function updateShoppingList(
+  userId: string,
+  listId: string,
+  input: { productId?: string; qty?: number; checked?: boolean; remove?: boolean },
+): Promise<ShoppingList> {
+  return mutate((db) => {
+    const user = db.users.find((item) => item.id === userId);
+    if (!user) throw new Error("Account not found");
+    const list = user.shoppingLists?.find((item) => item.id === listId);
+    if (!list) throw new Error("List not found");
+    if (input.productId) {
+      const item = list.items.find((entry) => entry.productId === input.productId);
+      if (!item) throw new Error("Item not found");
+      if (input.remove) {
+        list.items = list.items.filter((entry) => entry.productId !== input.productId);
+      } else {
+        if (typeof input.qty === "number") item.qty = Math.max(1, Math.min(99, input.qty));
+        if (typeof input.checked === "boolean") item.checked = input.checked;
+      }
+    }
+    list.updatedAt = new Date().toISOString();
+    return list;
+  });
 }
 
 export type CreateTaxiRideInput = {
@@ -1967,6 +2596,114 @@ export async function updateTaxiRideStatus(
       metadata: { citySlug: ride.citySlug, fare: ride.fare },
     });
     return ride;
+  });
+}
+
+export type UpdateProductInput = Partial<
+  Pick<
+    Product,
+    | "name"
+    | "category"
+    | "description"
+    | "price"
+    | "available"
+    | "popular"
+    | "tags"
+    | "calories"
+    | "sku"
+    | "barcode"
+    | "brand"
+    | "unit"
+    | "stock"
+    | "lowStockThreshold"
+    | "aisle"
+    | "variants"
+    | "substitutionAllowed"
+    | "limitPerOrder"
+  >
+>;
+
+/** Merchant/admin product editor. Availability-only callers keep using updateProduct. */
+export async function updateProductDetails(
+  productId: string,
+  patch: UpdateProductInput,
+  actor: OrderActor,
+): Promise<Product> {
+  return mutate((db) => {
+    const product = db.products.find((item) => item.id === productId);
+    if (!product) throw new Error("Product not found");
+    const store = db.stores.find((item) => item.id === product.storeId);
+    if (!store) throw new Error("Store not found");
+
+    if (patch.sku?.trim()) {
+      const sku = patch.sku.trim().toUpperCase();
+      if (
+        db.products.some(
+          (item) =>
+            item.id !== product.id &&
+            item.storeId === product.storeId &&
+            item.sku?.toUpperCase() === sku,
+        )
+      ) {
+        throw new Error("That SKU already exists in this store");
+      }
+    }
+
+    const allowed: UpdateProductInput = {};
+    for (const key of [
+      "name",
+      "category",
+      "description",
+      "price",
+      "available",
+      "popular",
+      "tags",
+      "calories",
+      "sku",
+      "barcode",
+      "brand",
+      "unit",
+      "stock",
+      "lowStockThreshold",
+      "aisle",
+      "variants",
+      "substitutionAllowed",
+      "limitPerOrder",
+    ] as const) {
+      if (key in patch) {
+        (allowed as Record<string, unknown>)[key] = patch[key];
+      }
+    }
+    if (typeof allowed.price === "number") {
+      allowed.price = Math.max(1, Math.round(allowed.price));
+    }
+    if (typeof allowed.stock === "number") {
+      allowed.stock = Math.max(0, Math.round(allowed.stock));
+    }
+    if (typeof allowed.lowStockThreshold === "number") {
+      allowed.lowStockThreshold = Math.max(0, Math.round(allowed.lowStockThreshold));
+    }
+    if (Array.isArray(allowed.variants)) {
+      allowed.variants = allowed.variants.map((variant) => ({
+        ...variant,
+        price: Math.max(1, Math.round(variant.price)),
+        stock: Math.max(0, Math.round(variant.stock)),
+      }));
+    }
+
+    Object.assign(product, allowed);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "product.update",
+      entity: "product",
+      entityId: product.id,
+      summary: `${product.name} updated${typeof patch.stock === "number" ? ` · stock ${patch.stock}` : ""}`,
+      metadata: { storeId: product.storeId, fields: Object.keys(allowed).join(",") },
+    });
+    publish({ type: "store", storeId: product.storeId, citySlug: store.citySlug });
+    return product;
   });
 }
 

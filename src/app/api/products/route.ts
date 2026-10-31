@@ -52,6 +52,19 @@ export async function POST(request: Request) {
         popular: Boolean(body.popular),
         tags: Array.isArray(body.tags) ? body.tags : undefined,
         calories: numberOrUndefined(body.calories),
+        sku: body.sku,
+        barcode: body.barcode,
+        brand: body.brand,
+        unit: body.unit,
+        stock: numberOrUndefined(body.stock),
+        lowStockThreshold: numberOrUndefined(body.lowStockThreshold),
+        aisle: body.aisle,
+        variants: Array.isArray(body.variants) ? body.variants : undefined,
+        substitutionAllowed:
+          typeof body.substitutionAllowed === "boolean"
+            ? body.substitutionAllowed
+            : undefined,
+        limitPerOrder: numberOrUndefined(body.limitPerOrder),
       },
       actorFromSession(session),
     );

@@ -113,13 +113,13 @@ export function MerchantDashboard({
     return () => window.removeEventListener("hashchange", apply);
   }, []);
 
-  async function setStatus(orderId: string, status: string, note?: string) {
+  async function setStatus(orderId: string, status: string, note?: string, proofPin?: string) {
     setBusy(orderId);
     try {
       const response = await fetch(`/api/orders/${orderId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, note }),
+        body: JSON.stringify({ status, note, proofPin }),
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) {
@@ -322,7 +322,7 @@ export function MerchantDashboard({
                   key={order.id}
                   order={order}
                   busy={busy === order.id}
-                  onStatus={(status, note) => setStatus(order.id, status, note)}
+                  onStatus={(status, note, proofPin) => setStatus(order.id, status, note, proofPin)}
                 />
               ))}
             </div>
@@ -786,7 +786,7 @@ function MerchantOrderCard({
 }: {
   order: OrderView;
   busy: boolean;
-  onStatus: (status: string, note?: string) => void;
+  onStatus: (status: string, note?: string, proofPin?: string) => void;
 }) {
   const meta = STATUS_META[order.status];
   const [rejecting, setRejecting] = useState(false);
@@ -839,6 +839,23 @@ function MerchantOrderCard({
           {order.notes ? <span className="block italic text-ink/30">“{order.notes}”</span> : null}
         </span>
       </div>
+
+      {order.fulfillment || order.deliveryWindow || order.express || order.substitutionPreference ? (
+        <div className="mt-2 flex flex-wrap gap-1.5 text-[9px] font-extrabold">
+          {order.fulfillment === "pickup" ? (
+            <span className="pill">{order.pickupCode} · pickup</span>
+          ) : order.express ? (
+            <span className="pill pill-warm">Express</span>
+          ) : order.deliveryWindow ? (
+            <span className="pill">{order.deliveryWindow}</span>
+          ) : null}
+          {order.substitutionPreference ? (
+            <span className="pill">
+              Substitution: {order.substitutionPreference}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       {order.driver ? (
         <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-ink/45">
@@ -927,7 +944,24 @@ function MerchantOrderCard({
         </div>
       ) : null}
 
-      {order.status === "ready" ? (
+      {order.status === "ready" && order.fulfillment === "pickup" ? (
+        <div className="mt-3 rounded-xl bg-teal/8 px-3 py-2 text-[10px] font-bold text-ink/55">
+          <div className="flex items-center justify-between gap-2">
+            <span>Customer pickup · ask for the pickup code.</span>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                const code = window.prompt("Enter the customer pickup code (e.g. P4821)");
+                if (code?.trim()) onStatus("delivered", undefined, code.trim());
+              }}
+              className="btn btn-primary btn-sm shrink-0"
+            >
+              Complete pickup
+            </button>
+          </div>
+        </div>
+      ) : order.status === "ready" ? (
         <div className="mt-3 rounded-xl bg-saffron/15 px-3 py-2 text-[10px] font-bold text-ink/55">
           Waiting for dispatch to assign a driver.
         </div>

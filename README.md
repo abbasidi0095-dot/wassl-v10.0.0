@@ -3,12 +3,12 @@
 **From the store to your door. From the curb to your destination.**
 **من المتجر إلى بابك، ومن الرصيف إلى وجهتك.**
 
-A web-first delivery and ride-hailing platform for Morocco, built around the
-Southern corridor: **Dakhla, Laâyoune, Boujdour, Esmara and Tarfaya** first, with
+A web-first delivery, ride-hailing and 24/7 supermarket platform for Morocco,
+built around the Southern corridor: **Dakhla, Laâyoune, Boujdour, Esmara and Tarfaya** first, with
 every Moroccan city in the directory.
 
-One platform brand, five experiences: **customer storefront**, **Wassl Taxi**,
-**store dashboard**, **driver app** and **admin dispatch console**. Cash on
+One platform brand, six experiences: **customer storefront**, **Wassl Grocery**,
+**Wassl Taxi**, **store dashboard**, **driver app** and **admin dispatch console**. Cash on
 delivery and cash fares only. Live order/ride tracking, a persistent activity
 dock, web push notifications, four languages (EN/FR/ES/AR) with RTL, and light
 and dark themes.
@@ -29,7 +29,17 @@ and dark themes.
 
 ## Release history
 
-### 10.0.0 — 31 October 2026 — consolidated release
+### 10.0.0 — 31 October 2026 — grocery module + consolidated release
+- **Wassl Grocery**: dedicated supermarket discovery and storefronts, aisles,
+  search, variants, SKU/barcode, stock badges and favourites.
+- Vendor catalog & stock workspace: product CRUD, variants, SKU/barcode, units,
+  low-stock alerts, delivery zones, express/pickup, night pricing, 24/7 and
+  overnight-staffing settings.
+- Grocery checkout: delivery or pickup, express, scheduled windows, substitution
+  preference, loyalty redemption, promo codes and cash payment.
+- Transactional stock reservations/release/commit, low-stock admin view, refund
+  requests with optional restock, pickup codes and delivery PIN proof.
+- Admin grocery operations, inventory metrics and refund queue.
 - New public repository snapshot containing the full platform.
 - Customer delivery and **Wassl Taxi** in one app, with persistent live tracking,
   web push notifications, in-app notification centre and cash settlement.
@@ -298,12 +308,16 @@ staff out.
 - Receipt, cash status, order history, one-click reorder (with modifiers)
 - Wassl Taxi: map-based pickup/drop-off, distance and fare estimate, cash ride,
   live status timeline, driver card and trip history
+- Wassl Grocery: store discovery, aisles, search, variants, stock, favourites,
+  shopping lists, pickup/express/scheduled checkout, loyalty and refunds
 - Persistent live tracker dock for active orders and taxi rides (progress bar,
   expandable list, minimise to a floating pill, auto-hides when complete)
 - Notification centre with unread badge, in-app history, browser Web Push and
   one-tap test; confetti when an order or ride completes
 
 ### Store owner
+- Grocery catalog and stock workspace: SKU/barcode, variants, units, low-stock
+  alerts, delivery zones, express/pickup, night fees and 24/7 staffing settings
 - Live order board with sound toggle and automatic refresh
 - Accept / reject / preparing / ready transitions
 - Open or pause the store
@@ -322,6 +336,8 @@ staff out.
   added to the driver wallet
 
 ### Admin
+- Grocery operations: inventory value, low/out-of-stock, stock adjustment,
+  refund approval/rejection/refund with optional restock
 - Live operations map with store, driver and customer markers
 - Order queue: manual assignment, nearest-driver auto-assign, force status
 - Store open/closed control
@@ -343,6 +359,24 @@ staff out.
 - English, French, Spanish and Arabic UI with RTL layout and a persisted locale
 - Light and dark themes with native status-bar sync in the mobile shells
 - Arabic brand and city names, MAD pricing, `+212`, Africa/Casablanca assumptions
+
+---
+
+## Grocery module
+
+The grocery module lives alongside restaurants and taxi without replacing them.
+See [docs/GROCERY.md](docs/GROCERY.md) for the architecture audit, migration
+plan, risk assessment and phase breakdown.
+
+- Customer: `/grocery` discovery, `/grocery/[slug]` storefront, `/grocery/checkout`,
+  `/grocery/favorites`, `/grocery/lists`.
+- Vendor: `/merchant/grocery` catalog, stock, variants and fulfilment settings.
+- Admin: `/admin/grocery` inventory health and refunds.
+- Data: optional `Store.grocery`, `Product` SKU/barcode/unit/stock/variants,
+  `Order` fulfilment/PIN/loyalty fields, `StockReservation` and `RefundRequest`.
+  Legacy databases are backfilled lazily and safely.
+- Stock is decremented and reserved in the serialized `mutate()` transaction;
+  cancellation releases it, delivery commits it, refunds can restock it.
 
 ---
 

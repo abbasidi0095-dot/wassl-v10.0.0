@@ -26,6 +26,12 @@ export type CartItem = {
   name: string;
   emoji: string;
   basePrice: number;
+  storeCategory?: "restaurant" | "grocery" | "pharmacy" | "cafe" | "gifts";
+  variantId?: string;
+  variantLabel?: string;
+  sku?: string;
+  unit?: string;
+  stockMax?: number;
   /** Base price plus every selected modifier. */
   price: number;
   options: SelectedModifier[];
@@ -40,6 +46,7 @@ type CartContextValue = {
   storeId: string | null;
   storeName: string | null;
   storeSlug: string | null;
+  storeCategory: CartItem["storeCategory"] | null;
   deliveryFee: number;
   minOrder: number;
   storeLat: number | null;
@@ -59,7 +66,9 @@ export function cartLineId(productId: string, options: SelectedModifier[]) {
     .map((option) => option.optionId)
     .sort()
     .join("+");
-  return suffix ? `${productId}::${suffix}` : productId;
+  const variant = options.find((option) => option.groupId === "__variant")?.optionId;
+  const parts = [variant, suffix].filter(Boolean);
+  return parts.length ? `${productId}::${parts.join("::")}` : productId;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -112,11 +121,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existing) {
         return base.map((line) =>
           line.lineId === lineId
-            ? { ...line, qty: Math.min(20, line.qty + qty) }
+            ? { ...line, qty: Math.min(20, line.stockMax ?? 20, line.qty + qty) }
             : line,
         );
       }
-      return [...base, { ...item, lineId, qty: Math.min(20, Math.max(1, qty)) }];
+      return [
+        ...base,
+        {
+          ...item,
+          lineId,
+          qty: Math.min(20, item.stockMax ?? 20, Math.max(1, qty)),
+        },
+      ];
     });
     setLastAdded(item.name);
   }, []);
@@ -126,7 +142,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       qty <= 0
         ? current.filter((line) => line.lineId !== lineId)
         : current.map((line) =>
-            line.lineId === lineId ? { ...line, qty: Math.min(20, qty) } : line,
+            line.lineId === lineId
+              ? { ...line, qty: Math.min(20, line.stockMax ?? 20, qty) }
+              : line,
           ),
     );
   }, []);
@@ -148,6 +166,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       storeId: items[0]?.storeId ?? null,
       storeName: items[0]?.storeName ?? null,
       storeSlug: items[0]?.storeSlug ?? null,
+      storeCategory: items[0]?.storeCategory ?? null,
       deliveryFee: items[0]?.deliveryFee ?? 0,
       minOrder: items[0]?.minOrder ?? 0,
       storeLat: items[0]?.storeLat ?? null,

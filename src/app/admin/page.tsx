@@ -28,6 +28,7 @@ export default async function AdminPage() {
         links={[
           { href: "/admin", label: "Overview" },
           { href: "/admin/accounts", label: "Accounts" },
+          { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
           { href: "/admin#orders", label: "Orders" },
           { href: "/admin#stores", label: "Stores" },
