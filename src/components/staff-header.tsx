@@ -41,14 +41,14 @@ export function StaffHeader({
         <div className="flex min-w-0 items-center gap-3">
           <Logo compact />
           <div className="min-w-0 border-s border-line ps-3">
-            <div className="truncate text-[12px] font-semibold leading-4">
+            <div className="truncate text-[13px] font-semibold leading-4">
               {title}
             </div>
-            <div className="truncate text-[10px] leading-4 text-muted">
+            <div className="truncate text-[11px] leading-4 text-muted">
               {subtitle}
             </div>
           </div>
-          <span className="hidden rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-muted md:inline">
+          <span className="hidden rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium text-muted md:inline">
             {roleLabel}
           </span>
         </div>
@@ -62,7 +62,7 @@ export function StaffHeader({
           </Link>
           <div className="hidden text-end sm:block">
             <div className="text-[11px] font-medium leading-4">{session.name}</div>
-            <div className="text-[10px] leading-4 text-muted">
+            <div className="text-[11px] leading-4 text-muted">
               {session.role === "driver" ? "On shift" : "Signed in"}
             </div>
           </div>

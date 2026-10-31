@@ -547,7 +547,7 @@ export function AdminConsole({
           >
             <Users size={14} /> Accounts
             {pendingUsers.length ? (
-              <span className="ms-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold text-on-dark">
+              <span className="ms-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[11px] font-extrabold text-on-dark">
                 {pendingUsers.length}
               </span>
             ) : null}
@@ -573,11 +573,11 @@ export function AdminConsole({
               <Users size={16} />
             </span>
             <div>
-              <div className="text-[12px] font-extrabold">
+              <div className="text-[13px] font-extrabold">
                 {pendingUsers.length} account{pendingUsers.length === 1 ? "" : "s"} waiting
                 for approval
               </div>
-              <div className="text-[10px] font-bold text-ink/45">
+              <div className="text-[11px] font-bold text-ink/45">
                 Approving a store owner provisions a storefront. Approving a driver
                 provisions a courier profile.
               </div>
@@ -619,7 +619,7 @@ export function AdminConsole({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 start-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2 text-[12px] font-medium text-on-dark shadow-lg rtl:translate-x-1/2">
+        <div className="fixed bottom-6 start-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2 text-[13px] font-medium text-on-dark shadow-lg rtl:translate-x-1/2">
           {toast}
         </div>
       ) : null}
@@ -643,7 +643,7 @@ export function AdminConsole({
               </span>
               <div>
                 <h2 className="text-base font-extrabold">Cancel {cancelTarget.code}?</h2>
-                <p className="text-[10px] font-bold text-ink/40">
+                <p className="text-[11px] font-bold text-ink/40">
                   The reason is saved on the order and in the activity trail.
                 </p>
               </div>
@@ -709,11 +709,11 @@ export function AdminConsole({
           <div className="card overflow-hidden">
             <MapView points={mapPoints} zoom={12} height={420} />
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/8 bg-paper px-4 py-3">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-ink/45">
+              <div className="flex items-center gap-2 text-[11px] font-bold text-ink/45">
                 <span className="status-dot live-dot text-teal" />
                 {mapPoints.length} live markers · updated in real time
               </div>
-              <div className="flex flex-wrap gap-3 text-[10px] font-medium text-ink/35">
+              <div className="flex flex-wrap gap-3 text-[11px] font-medium text-ink/35">
                 <span className="inline-flex items-center gap-1">
                   <StoreIcon size={10} /> store
                 </span>
@@ -759,7 +759,7 @@ export function AdminConsole({
         <section className="mt-4" id="orders">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-extrabold tracking-[-0.04em]">All orders</h2>
-            <span className="text-[10px] font-bold text-ink/35">{orders.length} total</span>
+            <span className="text-[11px] font-bold text-ink/35">{orders.length} total</span>
           </div>
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             {orders.map((order) => (
@@ -837,7 +837,7 @@ export function AdminConsole({
                           </span>
                           <div>
                             <div className="font-extrabold">{store.name}</div>
-                            <div className="text-[10px] text-ink/35">{store.landmark}</div>
+                            <div className="text-[11px] text-ink/35">{store.landmark}</div>
                           </div>
                         </div>
                       </td>
@@ -847,13 +847,13 @@ export function AdminConsole({
                       <td className="font-extrabold">{money(store.deliveryFee)}</td>
                       <td>
                         <span
-                          className={`rounded-full px-2 py-1 text-[9px] font-extrabold uppercase ${
+                          className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
                             openState.open ? "bg-teal/10 text-teal" : "bg-red-50 text-red-500"
                           }`}
                         >
                           {openState.open ? "Open" : "Closed"}
                         </span>
-                        <div className="mt-1 text-[9px] font-bold text-ink/35">
+                        <div className="mt-1 text-[11px] font-bold text-ink/35">
                           {openState.detail}
                         </div>
                       </td>
@@ -913,13 +913,13 @@ export function AdminConsole({
                       </span>
                       <div>
                         <div className="text-[13px] font-extrabold">{driver.name}</div>
-                        <div className="text-[10px] font-bold text-ink/35">
+                        <div className="text-[11px] font-bold text-ink/35">
                           {driver.citySlug} · {driver.vehicle}
                         </div>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-2 py-1 text-[9px] font-extrabold uppercase ${
+                      className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
                         !driver.active
                           ? "bg-red-50 text-red-500"
                           : driver.status === "available"
@@ -932,12 +932,12 @@ export function AdminConsole({
                       {driver.active ? driver.status : "inactive"}
                     </span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-ink/40">
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-ink/40">
                     <span>{driver.deliveries} deliveries</span>
                     <span className="inline-flex items-center gap-1"><Star size={11} className="fill-saffron text-saffron" /> {driver.rating}</span>
                   </div>
                   <div className="mt-3">
-                    <div className="flex justify-between text-[10px] font-extrabold">
+                    <div className="flex justify-between text-[11px] font-extrabold">
                       <span className="text-ink/40">Cash on hand</span>
                       <span className={ratio > 85 ? "text-red-500" : "text-ink"}>
                         {money(driver.cashOnHand)} / {money(driver.cashLimit)}
@@ -951,7 +951,7 @@ export function AdminConsole({
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1 text-[9px] font-bold text-ink/30">
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-ink/30">
                       <MapPin size={10} /> {driver.lat.toFixed(4)}, {driver.lng.toFixed(4)}
                     </div>
                     <button
@@ -1000,7 +1000,7 @@ export function AdminConsole({
                   key={item.value}
                   type="button"
                   onClick={() => setCityFilter(item.value)}
-                  className={`rounded-xl border px-3 py-1.5 text-[10px] font-extrabold transition ${
+                  className={`rounded-xl border px-3 py-1.5 text-[11px] font-extrabold transition ${
                     cityFilter === item.value
                       ? "border-ink bg-ink text-on-dark"
                       : "border-ink/10 bg-white/60 text-ink/50"
@@ -1030,7 +1030,7 @@ export function AdminConsole({
                     <tr key={city.id}>
                       <td>
                         <div className="font-extrabold">{city.name}</div>
-                        <div className="arabic text-[10px] text-ink/35">{city.nameAr}</div>
+                        <div className="arabic text-[11px] text-ink/35">{city.nameAr}</div>
                       </td>
                       <td className="text-ink/45">{city.region}</td>
                       <td className="text-ink/45">
@@ -1040,12 +1040,12 @@ export function AdminConsole({
                         {city.priority ? (
                           <span className="pill pill-warm">Priority</span>
                         ) : (
-                          <span className="text-[10px] text-ink/25">—</span>
+                          <span className="text-[11px] text-ink/25">—</span>
                         )}
                       </td>
                       <td>
                         <span
-                          className={`rounded-full px-2 py-1 text-[9px] font-extrabold uppercase ${
+                          className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
                             city.launchStatus === "live"
                               ? "bg-teal/10 text-teal"
                               : "bg-ink/5 text-ink/40"
@@ -1115,14 +1115,14 @@ export function AdminConsole({
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[12px] font-extrabold">{entry.summary}</span>
+                        <span className="text-[13px] font-extrabold">{entry.summary}</span>
                         {entry.before || entry.after ? (
-                          <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-[9px] font-bold text-ink/40">
+                          <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-[11px] font-bold text-ink/40">
                             {entry.before} → {entry.after}
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-bold text-ink/35">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-bold text-ink/35">
                         <span className="rounded-full bg-teal/8 px-2 py-0.5 uppercase tracking-wide text-teal">
                           {entry.actorRole}
                         </span>
@@ -1161,26 +1161,26 @@ export function AdminConsole({
                   content and cannot be edited at runtime.
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-[10px] font-medium text-ink/50">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-[11px] font-medium text-ink/50">
                 <Lock size={10} /> {dataSource.locked ? "Locked" : "Live"}
               </span>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[10px] font-medium text-ink/35">
+                <div className="text-[11px] font-medium text-ink/35">
                   Restaurants
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">{dataSource.restaurantCount}</div>
               </div>
               <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[10px] font-medium text-ink/35">
+                <div className="text-[11px] font-medium text-ink/35">
                   Menu items
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">{dataSource.menuItemCount}</div>
               </div>
               <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[10px] font-medium text-ink/35">
+                <div className="text-[11px] font-medium text-ink/35">
                   Cities
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">
@@ -1205,10 +1205,10 @@ export function AdminConsole({
                   ? "Snapshot checksum verified"
                   : "Snapshot checksum mismatch"}
               </div>
-              <div className="mt-1 break-all font-mono text-[9px] text-ink/40">
+              <div className="mt-1 break-all font-mono text-[11px] text-ink/40">
                 sha256:{dataSource.integrity.actual}
               </div>
-              <div className="mt-1 text-[10px] text-ink/40">
+              <div className="mt-1 text-[11px] text-ink/40">
                 Generated{" "}
                 {new Date(dataSource.generatedAt).toLocaleString("en-GB", {
                   dateStyle: "medium",
@@ -1223,7 +1223,7 @@ export function AdminConsole({
               </div>
             </div>
 
-            <p className="mt-4 rounded-xl bg-saffron/10 p-3 text-[10px] leading-5 text-ink/50">
+            <p className="mt-4 rounded-xl bg-saffron/10 p-3 text-[11px] leading-5 text-ink/50">
               {dataSource.notice}
             </p>
 
@@ -1262,12 +1262,12 @@ export function AdminConsole({
                       >
                         {source.name} ↗
                       </a>
-                      <span className="text-[9px] font-bold uppercase tracking-wide text-ink/30">
+                      <span className="text-[11px] font-bold uppercase tracking-wide text-ink/30">
                         {source.id}
                       </span>
                     </div>
-                    <div className="mt-1 text-[10px] font-bold text-ink/50">{source.role}</div>
-                    <div className="mt-0.5 text-[9px] text-ink/35">{source.license}</div>
+                    <div className="mt-1 text-[11px] font-bold text-ink/50">{source.role}</div>
+                    <div className="mt-0.5 text-[11px] text-ink/35">{source.license}</div>
                   </div>
                 ))}
               </div>
@@ -1288,7 +1288,7 @@ export function AdminConsole({
                   </div>
                 ))}
               </div>
-              <p className="mt-3 text-[9px] leading-4 text-ink/35">
+              <p className="mt-3 text-[11px] leading-4 text-ink/35">
                 Esmara has no restaurant records in the directory yet, so only preset
                 partner stores are available there.
               </p>
@@ -1367,7 +1367,7 @@ export function AdminConsole({
               <div className="flex items-center justify-between rounded-xl bg-cream p-3">
                 <div>
                   <div className="text-[11px] font-extrabold">City waitlist</div>
-                  <div className="text-[10px] text-ink/40">
+                  <div className="text-[11px] text-ink/40">
                     Accept store and driver applications in coming-soon cities.
                   </div>
                 </div>
@@ -1407,7 +1407,7 @@ export function AdminConsole({
                 <h2 className="text-lg font-extrabold tracking-[-0.04em]">COD reconciliation</h2>
                 <Banknote size={18} className="text-teal" />
               </div>
-              <div className="mt-4 space-y-2 text-[12px]">
+              <div className="mt-4 space-y-2 text-[13px]">
                 <div className="flex justify-between text-ink/45">
                   <span>Cash held by drivers</span>
                   <span className="font-extrabold text-ink">
@@ -1433,7 +1433,7 @@ export function AdminConsole({
                   </span>
                 </div>
               </div>
-              <div className="mt-4 flex items-start gap-2 rounded-xl bg-saffron/15 p-3 text-[10px] leading-5 font-bold text-ink/55">
+              <div className="mt-4 flex items-start gap-2 rounded-xl bg-saffron/15 p-3 text-[11px] leading-5 font-bold text-ink/55">
                 <AlertTriangle size={13} className="mt-0.5 shrink-0" />
                 Weekly settlement run. A driver at their cash limit is blocked from new COD
                 orders until they hand over cash.
@@ -1703,7 +1703,7 @@ function StoreFormModal({
           <label className="flex items-center justify-between gap-3 rounded-xl bg-cream px-3 py-2 sm:col-span-2">
             <span>
               <span className="block text-[11px] font-extrabold">Open for orders</span>
-              <span className="block text-[10px] text-ink/40">
+              <span className="block text-[11px] text-ink/40">
                 Leave closed while you add the menu.
               </span>
             </span>
@@ -1791,7 +1791,7 @@ function DriverEditModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-extrabold">{driver.name}</h2>
-            <p className="flex items-center gap-1 text-[10px] font-bold text-ink/40">
+            <p className="flex items-center gap-1 text-[11px] font-bold text-ink/40">
               {driver.citySlug} · {driver.deliveries} deliveries ·
               <Star size={10} className="fill-saffron text-saffron" />
               {driver.rating}
@@ -1871,7 +1871,7 @@ function DriverEditModal({
           <label className="flex items-center justify-between gap-3 rounded-xl bg-cream px-3 py-2">
             <span>
               <span className="block text-[11px] font-extrabold">Reset cash on hand</span>
-              <span className="block text-[10px] text-ink/40">
+              <span className="block text-[11px] text-ink/40">
                 Currently {money(driver.cashOnHand)} collected.
               </span>
             </span>
@@ -1940,17 +1940,17 @@ function AdminOrderCard({
               </span>
             ) : null}
           </div>
-          <div className="mt-1 text-[10px] font-bold text-ink/35">
+          <div className="mt-1 text-[11px] font-bold text-ink/35">
             {order.citySlug} · {timeAgo(order.createdAt)} · {order.customerName}
           </div>
         </div>
         <div className="text-end">
           <div className="text-base font-extrabold">{money(order.total)}</div>
-          <div className="text-[10px] font-medium text-teal">COD</div>
+          <div className="text-[11px] font-medium text-teal">COD</div>
         </div>
       </div>
 
-      <div className="mt-3 flex items-start gap-2 text-[10px] leading-4 text-ink/45">
+      <div className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-ink/45">
         <MapPin size={12} className="mt-0.5 shrink-0 text-teal" />
         <span>
           <span className="font-extrabold text-ink/65">{order.store?.name}</span> ·{" "}
@@ -1959,7 +1959,7 @@ function AdminOrderCard({
       </div>
 
       {!compact ? (
-        <div className="mt-2 flex flex-wrap gap-2 text-[10px]">
+        <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
           {order.items.map((item) => (
             <span key={item.productId} className="rounded-lg bg-cream px-2 py-1 font-bold text-ink/55">
               {item.qty}× {item.name}
@@ -1970,11 +1970,11 @@ function AdminOrderCard({
 
       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink/5 pt-3">
         {order.driver ? (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-teal/8 px-2 py-1 text-[10px] font-extrabold text-teal">
+          <span className="inline-flex items-center gap-1 rounded-lg bg-teal/8 px-2 py-1 text-[11px] font-extrabold text-teal">
             <Bike size={11} /> {order.driver.name}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/40">
+          <span className="inline-flex items-center gap-1 rounded-lg bg-ink/5 px-2 py-1 text-[11px] font-bold text-ink/40">
             <Bike size={11} /> no driver
           </span>
         )}
@@ -1984,7 +1984,7 @@ function AdminOrderCard({
             <select
               value={chosenDriver || ""}
               onChange={(event) => onChooseDriver(event.target.value)}
-              className="h-8 rounded-lg border border-ink/10 bg-white px-2 text-[10px] font-bold"
+              className="h-8 rounded-lg border border-ink/10 bg-white px-2 text-[11px] font-bold"
               aria-label="Choose driver"
             >
               <option value="">Choose driver…</option>
@@ -2019,7 +2019,7 @@ function AdminOrderCard({
             onChange={(event) => {
               if (event.target.value) onStatus(event.target.value as OrderStatus);
             }}
-            className="ms-auto h-8 rounded-lg border border-ink/10 bg-white px-2 text-[10px] font-bold text-ink/55"
+            className="ms-auto h-8 rounded-lg border border-ink/10 bg-white px-2 text-[11px] font-bold text-ink/55"
             aria-label="Next legal status"
           >
             <option value="">Next step…</option>
@@ -2031,7 +2031,7 @@ function AdminOrderCard({
             ))}
           </select>
         ) : (
-          <span className="ms-auto text-[10px] font-medium text-ink/30">
+          <span className="ms-auto text-[11px] font-medium text-ink/30">
             closed
           </span>
         )}

@@ -96,7 +96,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-line px-3 text-[12px] font-medium text-muted">
+          <label className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-line px-3 text-[13px] font-medium text-muted">
             <input
               type="checkbox"
               checked={openOnly}
@@ -108,7 +108,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
           <select
             value={dietary}
             onChange={(event) => setDietary(event.target.value)}
-            className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand"
+            className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[13px] font-medium text-muted outline-none focus:border-brand"
             aria-label="Dietary filter"
           >
             <option value="all">{t("Any diet")}</option>
@@ -121,7 +121,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
           <select
             value={sort}
             onChange={(event) => setSort(event.target.value as Sort)}
-            className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand"
+            className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[13px] font-medium text-muted outline-none focus:border-brand"
             aria-label="Sort stores"
           >
             {SORTS.map((option) => (
@@ -157,7 +157,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
         <button
           type="button"
           onClick={() => setTag("all")}
-          className={`whitespace-nowrap text-[12px] transition-colors ${
+          className={`whitespace-nowrap text-[13px] transition-colors ${
             tag === "all" ? "font-semibold text-ink" : "text-muted hover:text-ink"
           }`}
         >
@@ -168,7 +168,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
             key={item}
             type="button"
             onClick={() => setTag(tag === item ? "all" : item)}
-            className={`whitespace-nowrap text-[12px] transition-colors ${
+            className={`whitespace-nowrap text-[13px] transition-colors ${
               tag === item ? "font-semibold text-ink" : "text-muted hover:text-ink"
             }`}
           >
@@ -177,7 +177,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
         ))}
       </div>
 
-      <p className="mt-5 text-[12px] text-muted tnum">
+      <p className="mt-5 text-[13px] text-muted tnum">
         {filtered.length} {filtered.length === 1 ? t("store") : t("stores")}
         {storeCategoryLabel(category, t)}
         {tag !== "all" ? ` · ${tag}` : ""}

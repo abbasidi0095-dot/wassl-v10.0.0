@@ -189,7 +189,7 @@ export function AccountsManager({
           <button
             type="button"
             onClick={() => setPendingOnly((value) => !value)}
-            className={`rounded-xl border px-3 py-1.5 text-[10px] font-extrabold transition ${
+            className={`rounded-xl border px-3 py-1.5 text-[11px] font-extrabold transition ${
               pendingOnly
                 ? "border-ink bg-ink text-on-dark"
                 : "border-ink/10 bg-white/60 text-ink/50"
@@ -245,14 +245,14 @@ export function AccountsManager({
                         </div>
                         <div>
                           <div className="font-extrabold">{user.name}</div>
-                          <div className="text-[10px] text-ink/40">{user.email}</div>
+                          <div className="text-[11px] text-ink/40">{user.email}</div>
                           {user.requestedStoreName ? (
-                            <div className="text-[10px] font-semibold text-teal">
+                            <div className="text-[11px] font-semibold text-teal">
                               {user.requestedStoreName}
                             </div>
                           ) : null}
                           {user.phone || user.citySlug ? (
-                            <div className="text-[9px] text-ink/30">
+                            <div className="text-[11px] text-ink/30">
                               {[user.phone, user.citySlug].filter(Boolean).join(" · ")}
                             </div>
                           ) : null}
@@ -312,7 +312,7 @@ export function AccountsManager({
                           ))}
                         </select>
                       ) : (
-                        <span className="text-[10px] text-ink/30">
+                        <span className="text-[11px] text-ink/30">
                           {draft.role === "admin"
                             ? "Full platform access"
                             : "Customer storefront account"}
@@ -321,15 +321,15 @@ export function AccountsManager({
                     </td>
                     <td>
                       {status === "pending" ? (
-                        <span className="rounded-full bg-saffron/20 px-2 py-1 text-[9px] font-extrabold uppercase text-saffron-deep">
+                        <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-extrabold uppercase text-saffron-deep">
                           Pending
                         </span>
                       ) : status === "rejected" ? (
-                        <span className="rounded-full bg-red-50 px-2 py-1 text-[9px] font-extrabold uppercase text-red-600">
+                        <span className="rounded-full bg-red-50 px-2 py-1 text-[11px] font-extrabold uppercase text-red-600">
                           Rejected
                         </span>
                       ) : (
-                        <span className="rounded-full bg-teal/10 px-2 py-1 text-[9px] font-extrabold uppercase text-teal">
+                        <span className="rounded-full bg-teal/10 px-2 py-1 text-[11px] font-extrabold uppercase text-teal">
                           Active
                         </span>
                       )}

@@ -102,6 +102,10 @@ persists; every mutation should add an audit entry via `recordAudit`.
   removed, workspace tabs moved to underlines, table status labels de-cased.
 - RTL: numeric runs are bidi-isolated, tabs have short labels, Arabic city names
   in the hero, `dir="auto"` on mixed-language copy.
+- Mobile: 16px gutters, 11px minimum text, compact door rows, header scrolls away,
+  tab bar hides on scroll-down.
+- Ran the taste-skill inspector (1440/768/390). Fixed 4 of 6 failures; the two
+  remaining are triaged false positives documented in the release notes.
 - Checked at 320/390/768/1440, light/dark, EN/AR; 66 unit + 10 e2e tests pass.
 
 ### 10.0.0 — grocery module + repository consolidation

@@ -110,7 +110,7 @@ export function CartView() {
                 >
                   <Minus size={13} />
                 </button>
-                <span className="w-7 text-center text-[12px] font-semibold tnum">
+                <span className="w-7 text-center text-[13px] font-semibold tnum">
                   {item.qty}
                 </span>
                 <button
@@ -142,7 +142,7 @@ export function CartView() {
         <div className="flex items-center justify-between border-t border-line px-5 py-3">
           <Link
             href={`/store/${storeSlug}`}
-            className="inline-flex items-center gap-1 text-[12px] font-medium text-brand"
+            className="inline-flex items-center gap-1 text-[13px] font-medium text-brand"
           >
             <Plus size={13} /> {t("Add more items")}
           </Link>
@@ -156,7 +156,7 @@ export function CartView() {
         <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
           {t("Summary")}
         </h2>
-        <div className="mt-4 space-y-2 text-[12px]">
+        <div className="mt-4 space-y-2 text-[13px]">
           <div className="flex justify-between text-muted">
             <span>{t("Subtotal")}</span>
             <span className="font-medium text-ink tnum">{money(subtotal)}</span>
@@ -172,7 +172,7 @@ export function CartView() {
         </div>
 
         <div className="mt-4 border-s-2 border-signal ps-3">
-          <div className="text-[12px] font-medium">{t("Cash on delivery")}</div>
+          <div className="text-[13px] font-medium">{t("Cash on delivery")}</div>
           <p className="mt-0.5 text-[11px] leading-5 text-muted">
             {storeCategory === "grocery"
               ? t("Delivery, night and express fees are confirmed at checkout.")
@@ -201,7 +201,7 @@ export function CartView() {
           {t("Continue to delivery")}
           <ArrowRight size={15} className="rtl:-scale-x-100" />
         </Link>
-        <p className="mt-3 text-center text-[10px] text-muted">
+        <p className="mt-3 text-center text-[11px] text-muted">
           {t("No account needed · Pay cash on arrival")}
         </p>
       </aside>

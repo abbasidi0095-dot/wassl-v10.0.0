@@ -24,7 +24,7 @@ export function SiteFooter() {
             <p className="arabic mt-3 text-[15px] font-medium text-saffron">
               {BRAND.taglineAr}
             </p>
-            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[12px] opacity-50">
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[13px] opacity-50">
               <span>{t("Cash on delivery")}</span>
               <span>{t("Verified partners")}</span>
               <span>{t("Prices in MAD")}</span>
@@ -83,7 +83,7 @@ export function SiteFooter() {
               <Phone size={14} className="opacity-50" />
               {BRAND.supportPhone}
             </a>
-            <p className="mt-3 text-[12px] leading-5 opacity-45">
+            <p className="mt-3 text-[13px] leading-5 opacity-45">
               {t("Daily 09:00–23:00")}
               <br />
               {t("Arabic · Français · English")}
@@ -98,7 +98,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-[12px] opacity-40 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-[13px] opacity-40 sm:flex-row sm:items-center sm:justify-between">
           <span>
             {t("© {year} {brand}. Built for Morocco.", {
               year: new Date().getFullYear(),

@@ -31,7 +31,7 @@ export function StoreCard({ store }: { store: Store }) {
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
           <span
-            className="absolute start-3 top-3 rounded-[2px] bg-surface/95 px-1.5 py-0.5 text-[10px] font-medium text-ink"
+            className="absolute start-3 top-3 rounded-[2px] bg-surface/95 px-1.5 py-0.5 text-[11px] font-medium text-ink"
             aria-hidden="true"
           >
             {categoryLabel(store.category)}
@@ -60,7 +60,7 @@ export function StoreCard({ store }: { store: Store }) {
             ) : null}
           </div>
 
-          <p className="mt-2.5 line-clamp-1 text-[12px] text-muted">
+          <p className="mt-2.5 line-clamp-1 text-[13px] text-muted">
             {store.tagline}
           </p>
 

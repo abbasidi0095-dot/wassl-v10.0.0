@@ -79,7 +79,7 @@ export function OrderRefundPanel({ orderId }: { orderId: string }) {
             onChange={(event) => setReason(event.target.value)}
             required
           />
-          <label className="flex items-center gap-2 text-[10px] font-bold text-ink/50">
+          <label className="flex items-center gap-2 text-[11px] font-bold text-ink/50">
             <input
               type="checkbox"
               checked={restock}
@@ -88,7 +88,7 @@ export function OrderRefundPanel({ orderId }: { orderId: string }) {
             />
             {t("Return the items to the store")}
           </label>
-          {error ? <p className="text-[10px] font-bold text-coral">{error}</p> : null}
+          {error ? <p className="text-[11px] font-bold text-coral">{error}</p> : null}
           <div className="flex gap-2">
             <button
               type="button"

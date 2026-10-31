@@ -52,12 +52,12 @@ export function FavoritesView({
           />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13px] font-extrabold">{product.name}</div>
-            <div className="text-[10px] font-bold text-ink/40">
+            <div className="text-[11px] font-bold text-ink/40">
               {storeName} · {product.unit || "each"}
             </div>
             <div className="mt-1 text-sm font-extrabold">{money(product.price)}</div>
             <div className="mt-1 flex items-center gap-2">
-              <Link href={`/store/${storeSlug}`} className="text-[10px] font-extrabold text-teal">
+              <Link href={`/store/${storeSlug}`} className="text-[11px] font-extrabold text-teal">
                 {t("Open store")} <ArrowRight size={10} className="inline rtl:-scale-x-100" />
               </Link>
               <button

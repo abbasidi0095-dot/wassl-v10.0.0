@@ -41,15 +41,15 @@ export default async function AdminTaxiPage() {
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="card-flat px-4 py-2">
               <div className="text-lg font-extrabold">{active.length}</div>
-              <div className="text-[9px] uppercase tracking-wider text-ink/40">Active</div>
+              <div className="text-[11px] uppercase tracking-wider text-ink/40">Active</div>
             </div>
             <div className="card-flat px-4 py-2">
               <div className="text-lg font-extrabold">{completed.length}</div>
-              <div className="text-[9px] uppercase tracking-wider text-ink/40">Completed</div>
+              <div className="text-[11px] uppercase tracking-wider text-ink/40">Completed</div>
             </div>
             <div className="card-flat px-4 py-2">
               <div className="text-lg font-extrabold">{money(cash)}</div>
-              <div className="text-[9px] uppercase tracking-wider text-ink/40">Cash</div>
+              <div className="text-[11px] uppercase tracking-wider text-ink/40">Cash</div>
             </div>
           </div>
         </div>
@@ -74,17 +74,17 @@ export default async function AdminTaxiPage() {
                     <tr key={ride.id}>
                       <td className="mono text-[11px] text-ink/45">
                         {ride.id.replace("ride_", "#").toUpperCase()}
-                        <div className="text-[10px] text-ink/30">{timeAgo(ride.createdAt)}</div>
+                        <div className="text-[11px] text-ink/30">{timeAgo(ride.createdAt)}</div>
                       </td>
                       <td>
                         <div className="font-extrabold">{ride.customerName}</div>
-                        <div className="text-[10px] text-ink/35">{ride.customerPhone}</div>
+                        <div className="text-[11px] text-ink/35">{ride.customerPhone}</div>
                       </td>
                       <td>
-                        <div className="max-w-[220px] truncate text-[12px] font-bold">
+                        <div className="max-w-[220px] truncate text-[13px] font-bold">
                           {ride.pickupLabel} → {ride.dropoffLabel}
                         </div>
-                        <div className="text-[10px] text-ink/35">
+                        <div className="text-[11px] text-ink/35">
                           {ride.distanceKm.toFixed(1)} km · {ride.citySlug}
                         </div>
                       </td>
@@ -92,7 +92,7 @@ export default async function AdminTaxiPage() {
                       <td>
                         <span className="pill">{t(TAXI_STATUS_TEXT[ride.status])}</span>
                       </td>
-                      <td className="text-[12px]">
+                      <td className="text-[13px]">
                         {ride.driverName || <span className="text-ink/30">—</span>}
                       </td>
                       <td className="text-end">

@@ -33,7 +33,7 @@ export function CartMini({ storeId }: { storeId: string }) {
             <span className="min-w-0 flex-1 truncate font-medium">
               {item.qty}× {item.name}
               {item.options.length ? (
-                <span className="block truncate text-[10px] text-muted">
+                <span className="block truncate text-[11px] text-muted">
                   {item.options.map((option) => option.optionName).join(" · ")}
                 </span>
               ) : null}
@@ -42,7 +42,7 @@ export function CartMini({ storeId }: { storeId: string }) {
           </div>
         ))}
         {items.length > 4 ? (
-          <div className="text-[10px] text-muted">+{items.length - 4} more</div>
+          <div className="text-[11px] text-muted">+{items.length - 4} more</div>
         ) : null}
       </div>
       <div className="mt-3 space-y-1.5 border-t border-line pt-3 text-[11px]">
@@ -60,7 +60,7 @@ export function CartMini({ storeId }: { storeId: string }) {
         </div>
       </div>
       {subtotal < minOrder ? (
-        <p className="mt-2 text-[10px] text-signal">
+        <p className="mt-2 text-[11px] text-signal">
           Add {money(minOrder - subtotal)} more to reach the minimum order.
         </p>
       ) : null}
@@ -70,7 +70,7 @@ export function CartMini({ storeId }: { storeId: string }) {
       >
         Review cart <ArrowRight size={14} />
       </Link>
-      <p className="mt-2 text-center text-[10px] text-muted">
+      <p className="mt-2 text-center text-[11px] text-muted">
         Cash on delivery · {storeName}
       </p>
     </div>

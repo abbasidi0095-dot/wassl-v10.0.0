@@ -235,7 +235,7 @@ export function MerchantDashboard({
           >
             <span className={`status-dot ${store.isOpen ? "live-dot" : ""}`} />
             <div>
-              <div className="text-[10px] font-medium opacity-60">
+              <div className="text-[11px] font-medium opacity-60">
                 Store status
               </div>
               <div className="text-[11px] font-extrabold">
@@ -307,7 +307,7 @@ export function MerchantDashboard({
                 {soundOn ? <Bell size={13} /> : <BellOff size={13} />}
                 {soundOn ? "Sound on" : "Sound off"}
               </button>
-              <span className="hidden text-[10px] font-bold text-ink/35 sm:block">
+              <span className="hidden text-[11px] font-bold text-ink/35 sm:block">
                 {active.length} active
               </span>
             </div>
@@ -378,7 +378,7 @@ export function MerchantDashboard({
                           <div className="truncate text-[13px] font-extrabold">
                             {product.name}
                           </div>
-                          <div className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-ink/40">
+                          <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-ink/40">
                             {product.description}
                           </div>
                         </div>
@@ -388,11 +388,11 @@ export function MerchantDashboard({
                       </div>
                       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="max-w-[9rem] truncate rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-medium text-ink/45">
+                          <span className="max-w-[9rem] truncate rounded-full bg-ink/5 px-2 py-0.5 text-[11px] font-medium text-ink/45">
                             {product.category}
                           </span>
                           <span
-                            className={`shrink-0 text-[10px] font-medium ${
+                            className={`shrink-0 text-[11px] font-medium ${
                               product.available ? "text-success" : "text-danger"
                             }`}
                           >
@@ -438,7 +438,7 @@ export function MerchantDashboard({
                             />
                             <div>
                               <div className="font-extrabold">{product.name}</div>
-                              <div className="max-w-[220px] truncate text-[10px] text-ink/35">
+                              <div className="max-w-[220px] truncate text-[11px] text-ink/35">
                                 {product.description}
                               </div>
                             </div>
@@ -448,7 +448,7 @@ export function MerchantDashboard({
                         <td className="font-extrabold">{money(product.price)}</td>
                         <td>
                           <span
-                            className={`rounded-full px-2 py-1 text-[9px] font-extrabold uppercase ${
+                            className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
                               product.available
                                 ? "bg-teal/10 text-teal"
                                 : "bg-red-50 text-red-500"
@@ -499,7 +499,7 @@ export function MerchantDashboard({
         <section className="mt-4 grid gap-4 lg:grid-cols-2" id="store">
           <div className="card p-5">
             <h2 className="text-xl font-extrabold tracking-[-0.04em]">Store profile</h2>
-            <div className="mt-4 space-y-3 text-[12px]">
+            <div className="mt-4 space-y-3 text-[13px]">
               {[
                 ["Store name", store.name],
                 ["Arabic name", store.nameAr],
@@ -517,7 +517,7 @@ export function MerchantDashboard({
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-cream p-3 text-[10px] font-bold text-ink/45">
+            <div className="mt-4 flex items-center gap-2 rounded-xl bg-cream p-3 text-[11px] font-bold text-ink/45">
               <MapPin size={13} className="text-teal" />
               {store.lat.toFixed(4)}, {store.lng.toFixed(4)}
             </div>
@@ -532,7 +532,7 @@ export function MerchantDashboard({
               <p className="mt-1 text-[11px] text-ink/40">
                 Delivered cash orders minus Wassl commission.
               </p>
-              <div className="mt-4 space-y-2 text-[12px]">
+              <div className="mt-4 space-y-2 text-[13px]">
                 <div className="flex justify-between text-ink/45">
                   <span>Delivered GMV</span>
                   <span className="font-extrabold text-ink">{money(gmv)}</span>
@@ -546,7 +546,7 @@ export function MerchantDashboard({
                   <span>{money(gmv - commission)}</span>
                 </div>
               </div>
-              <div className="mt-4 rounded-xl bg-saffron/15 p-3 text-[10px] font-bold text-ink/55">
+              <div className="mt-4 rounded-xl bg-saffron/15 p-3 text-[11px] font-bold text-ink/55">
                 Weekly settlement · Next payout on Sunday. COD is collected by the
                 driver and confirmed by dispatch.
               </div>
@@ -556,7 +556,7 @@ export function MerchantDashboard({
               <div className="mt-3 flex items-center justify-between rounded-xl bg-cream p-3">
                 <div>
                   <div className="text-[11px] font-extrabold">Accepting orders</div>
-                  <div className="text-[10px] text-ink/40">
+                  <div className="text-[11px] text-ink/40">
                     Customers can browse, but cannot checkout when paused.
                   </div>
                 </div>
@@ -800,13 +800,13 @@ function MerchantOrderCard({
             <span className="pill">{meta.label}</span>
             {order.status === "placed" ? <span className="pill pill-warm">New</span> : null}
           </div>
-          <div className="mt-1 text-[10px] font-bold text-ink/35">
+          <div className="mt-1 text-[11px] font-bold text-ink/35">
             {timeAgo(order.createdAt)} · {order.customerName}
           </div>
         </div>
         <div className="text-end">
           <div className="text-lg font-extrabold">{money(order.total)}</div>
-          <div className="text-[10px] font-medium text-teal">COD</div>
+          <div className="text-[11px] font-medium text-teal">COD</div>
         </div>
       </div>
 
@@ -817,7 +817,7 @@ function MerchantOrderCard({
             <span className="min-w-0 flex-1 font-bold text-ink/65">
               <span className="block truncate">{item.qty}× {item.name}</span>
               {item.options?.length ? (
-                <span className="block truncate text-[9px] text-ink/35">
+                <span className="block truncate text-[11px] text-ink/35">
                   {item.options.map((option) => option.optionName).join(" · ")}
                 </span>
               ) : null}
@@ -827,7 +827,7 @@ function MerchantOrderCard({
         ))}
       </div>
 
-      <div className="mt-3 flex items-start gap-2 text-[10px] leading-4 text-ink/45">
+      <div className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-ink/45">
         <MapPin size={13} className="mt-0.5 shrink-0 text-teal" />
         <span>
           {order.address} · {order.landmark}
@@ -836,7 +836,7 @@ function MerchantOrderCard({
       </div>
 
       {order.fulfillment || order.deliveryWindow || order.express || order.substitutionPreference ? (
-        <div className="mt-2 flex flex-wrap gap-1.5 text-[9px] font-extrabold">
+        <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-extrabold">
           {order.fulfillment === "pickup" ? (
             <span className="pill">{order.pickupCode} · pickup</span>
           ) : order.express ? (
@@ -853,7 +853,7 @@ function MerchantOrderCard({
       ) : null}
 
       {order.driver ? (
-        <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-ink/45">
+        <div className="mt-3 flex items-center gap-2 text-[11px] font-bold text-ink/45">
           <Truck size={13} className="text-teal" />
           {order.driver.name} · {order.driver.vehicle} · {order.driver.plate}
         </div>
@@ -940,7 +940,7 @@ function MerchantOrderCard({
       ) : null}
 
       {order.status === "ready" && order.fulfillment === "pickup" ? (
-        <div className="mt-3 rounded-xl bg-teal/8 px-3 py-2 text-[10px] font-bold text-ink/55">
+        <div className="mt-3 rounded-xl bg-teal/8 px-3 py-2 text-[11px] font-bold text-ink/55">
           <div className="flex items-center justify-between gap-2">
             <span>Customer pickup · ask for the pickup code.</span>
             <button
@@ -957,7 +957,7 @@ function MerchantOrderCard({
           </div>
         </div>
       ) : order.status === "ready" ? (
-        <div className="mt-3 rounded-xl bg-saffron/15 px-3 py-2 text-[10px] font-bold text-ink/55">
+        <div className="mt-3 rounded-xl bg-saffron/15 px-3 py-2 text-[11px] font-bold text-ink/55">
           Waiting for dispatch to assign a driver.
         </div>
       ) : null}

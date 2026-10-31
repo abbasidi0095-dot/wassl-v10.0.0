@@ -27,13 +27,13 @@ export default async function TaxiPage() {
         <div className="border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-[12px] text-muted">
+              <div className="flex items-center gap-2 text-[13px] text-muted">
                 <span className="status-dot live-dot text-success" />
                 {t("Cash to driver")}
               </div>
               <h1 className="display mt-3 text-[clamp(2.4rem,1.6rem+3vw,4rem)]">Wassl Taxi</h1>
             </div>
-            <div className="text-[12px] text-muted">
+            <div className="text-[13px] text-muted">
               {t("Fare confirmed before you book")}
             </div>
           </div>

@@ -110,7 +110,7 @@ export function LoginForm({
                 <dt className="tnum font-display text-[22px] font-semibold leading-none">
                   {value}
                 </dt>
-                <dd className="mt-1.5 text-[10px] leading-4 opacity-50">{label}</dd>
+                <dd className="mt-1.5 text-[11px] leading-4 opacity-50">{label}</dd>
               </div>
             ))}
           </dl>
@@ -127,7 +127,7 @@ export function LoginForm({
             <Logo />
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-[12px] text-muted"
+              className="inline-flex items-center gap-1 text-[13px] text-muted"
             >
               <ArrowLeft size={13} className="rtl:-scale-x-100" /> {t("Storefront")}
             </Link>
@@ -138,7 +138,7 @@ export function LoginForm({
             <ThemeToggle />
           </div>
 
-          <p className="text-[12px] text-muted">{t("Welcome back")}</p>
+          <p className="text-[13px] text-muted">{t("Welcome back")}</p>
           <h2 className="display mt-2 text-[clamp(2rem,1.6rem+1.4vw,2.7rem)]">
             {t("Sign in")}
           </h2>
@@ -189,7 +189,7 @@ export function LoginForm({
             </label>
 
             {error ? (
-              <p className="border-s-2 border-danger ps-3 text-[12px] leading-5 text-danger">
+              <p className="border-s-2 border-danger ps-3 text-[13px] leading-5 text-danger">
                 {error}
               </p>
             ) : null}
@@ -209,7 +209,7 @@ export function LoginForm({
           </form>
 
           <div className="mt-8 border-t border-line pt-5">
-            <p className="text-[12px] text-muted">{t("New to Wassl?")}</p>
+            <p className="text-[13px] text-muted">{t("New to Wassl?")}</p>
             <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
               {[
                 { href: "/signup?role=customer", label: t("Customer") },
@@ -219,7 +219,7 @@ export function LoginForm({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="inline-flex items-center gap-1 text-[12px] font-medium text-brand"
+                  className="inline-flex items-center gap-1 text-[13px] font-medium text-brand"
                 >
                   {item.label}
                   <ArrowRight size={11} className="rtl:-scale-x-100" />

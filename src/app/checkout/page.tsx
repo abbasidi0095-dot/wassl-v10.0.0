@@ -24,7 +24,7 @@ export default async function CheckoutPage() {
           description="Delivery or pickup, cash on arrival. Your cart chooses the right flow automatically."
         >
           {!session ? (
-            <p className="mt-3 text-[12px] text-muted">
+            <p className="mt-3 text-[13px] text-muted">
               Checking out as a guest.{" "}
               <Link href="/login?next=customer" className="font-medium text-brand">
                 Sign in
@@ -32,7 +32,7 @@ export default async function CheckoutPage() {
               to keep your order history in one place.
             </p>
           ) : session.role === "customer" ? (
-            <p className="mt-3 text-[12px] text-muted">
+            <p className="mt-3 text-[13px] text-muted">
               Signed in as <strong className="text-ink/70">{session.email}</strong>. Your
               order will appear in{" "}
               <Link href="/account" className="font-medium text-brand">

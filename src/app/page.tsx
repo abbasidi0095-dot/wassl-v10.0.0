@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
+  Check,
   Bike,
   CarTaxiFront,
   Clock3,
@@ -15,7 +16,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
 import { MapView } from "@/components/map-view";
-import { getCities, getPriorityCities, getStores } from "@/lib/db";
+import { dashboardStats, getCities, getPriorityCities, getStores } from "@/lib/db";
 import { getTranslator } from "@/lib/i18n-server";
 import { storePhoto } from "@/lib/store-images";
 import { money } from "@/lib/utils";
@@ -24,10 +25,11 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const { t, locale } = await getTranslator();
-  const [cities, priority, stores] = await Promise.all([
+  const [cities, priority, stores, stats] = await Promise.all([
     getCities(),
     getPriorityCities(),
     getStores(),
+    dashboardStats(),
   ]);
   const dakhla = cities.find((city) => city.slug === "dakhla") || priority[0];
   const cityLabel = locale === "ar" ? dakhla.nameAr : dakhla.name;
@@ -81,7 +83,7 @@ export default async function HomePage() {
         {/* Hero: type left, one real live panel right. */}
         <section className="container-wassl grid gap-10 pb-12 pt-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:gap-14 lg:pb-16 lg:pt-16">
           <div>
-            <div className="flex items-center gap-2 text-[12px] font-medium text-muted">
+            <div className="flex items-center gap-2 text-[13px] font-medium text-muted">
               <span className="status-dot live-dot text-success" />
               {t("Now delivering in {city}", { city: cityLabel })}
               <span className="text-line-strong">/</span>
@@ -137,7 +139,7 @@ export default async function HomePage() {
           {featuredStore ? (
             <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
               <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
-                <div className="flex min-w-0 items-center gap-2 text-[12px] font-medium">
+                <div className="flex min-w-0 items-center gap-2 text-[13px] font-medium">
                   <span className="status-dot live-dot text-success" />
                   <span className="truncate">
                     {t("Live in {city}", { city: cityLabel })}
@@ -197,7 +199,7 @@ export default async function HomePage() {
                 </div>
                 <Link
                   href={`/store/${featuredStore.slug}`}
-                  className="inline-flex shrink-0 items-center gap-1 text-[12px] font-semibold text-brand"
+                  className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-brand"
                 >
                   {t("Open store")}
                   <ArrowRight size={13} className="rtl:-scale-x-100" />
@@ -213,7 +215,7 @@ export default async function HomePage() {
             <h2 className="text-[13px] font-semibold text-muted">
               {t("What do you need?")}
             </h2>
-            <Link href="/cities" className="text-[12px] font-medium text-brand">
+            <Link href="/cities" className="text-[13px] font-medium text-brand">
               {t("All Moroccan cities")}
             </Link>
           </div>
@@ -222,18 +224,16 @@ export default async function HomePage() {
               <Link
                 key={door.label}
                 href={door.href}
-                className="group flex min-h-[132px] flex-col justify-between border-e border-b border-line bg-surface p-5 transition-colors hover:bg-surface-2"
+                className="group relative flex items-center gap-4 border-e border-b border-line bg-surface p-4 transition-colors hover:bg-surface-2 sm:block sm:min-h-[136px] sm:p-5"
               >
-                <div className="flex items-start justify-between">
-                  <door.icon size={20} strokeWidth={1.6} className="text-ink/70" />
-                  <ArrowUpRight
-                    size={16}
-                    className="text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100"
-                  />
-                </div>
-                <div className="mt-8">
+                <door.icon
+                  size={20}
+                  strokeWidth={1.6}
+                  className="shrink-0 text-ink/70 sm:mb-8"
+                />
+                <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-display text-[24px] font-semibold tracking-[-0.03em]">
+                    <span className="font-display text-[22px] font-semibold tracking-[-0.03em] sm:text-[24px]">
                       {door.label}
                     </span>
                     {door.count !== null ? (
@@ -242,8 +242,12 @@ export default async function HomePage() {
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-1 text-[12px] text-muted">{door.note}</p>
+                  <p className="mt-0.5 text-[13px] text-muted sm:mt-1">{door.note}</p>
                 </div>
+                <ArrowUpRight
+                  size={16}
+                  className="shrink-0 text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100 sm:absolute sm:end-5 sm:top-5"
+                />
               </Link>
             ))}
           </div>
@@ -254,7 +258,7 @@ export default async function HomePage() {
           <section className="field-ink mt-16 border-y border-line lg:mt-24">
             <div className="container-wassl grid gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 lg:py-16">
               <div>
-                <p className="text-[12px] font-medium text-saffron">
+                <p className="text-[13px] font-medium text-saffron">
                   {t("Wassl Grocery")}
                 </p>
                 <h2 className="display-sm mt-3 max-w-[18ch] text-[clamp(2.1rem,1.5rem+2vw,3.4rem)]">
@@ -275,7 +279,7 @@ export default async function HomePage() {
                       <dt className="tnum font-display text-[24px] font-semibold leading-none">
                         {item.value}
                       </dt>
-                      <dd className="mt-1.5 text-[10px] leading-4 opacity-50">
+                      <dd className="mt-1.5 text-[11px] leading-4 opacity-50">
                         {item.label}
                       </dd>
                     </div>
@@ -314,7 +318,7 @@ export default async function HomePage() {
                     <div className="text-[13px] font-medium">
                       {t("Open overnight")}
                     </div>
-                    <div className="mt-1 text-[10px] leading-4 opacity-50">
+                    <div className="mt-1 text-[11px] leading-4 opacity-50">
                       {t("Delivery only with overnight staff and a driver online.")}
                     </div>
                   </div>
@@ -325,9 +329,19 @@ export default async function HomePage() {
                     <div className="text-[13px] font-medium">
                       {t("Pickup or delivery")}
                     </div>
-                    <div className="mt-1 text-[10px] leading-4 opacity-50">
+                    <div className="mt-1 text-[11px] leading-4 opacity-50">
                       {t("Pay cash at collection or on arrival.")}
                     </div>
+                    <div className="mt-3 text-[11px] opacity-50 tnum">
+                      {t("Ready in {min} min", { min: featuredGrocery.prepTime })}
+                    </div>
+                    <Link
+                      href={`/store/${featuredGrocery.slug}`}
+                      className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-saffron"
+                    >
+                      {t("Order pickup")}
+                      <ArrowRight size={11} className="rtl:-scale-x-100" />
+                    </Link>
                   </div>
                 </div>
                 <div className="relative col-span-3 row-span-2 overflow-hidden rounded-[8px]">
@@ -409,7 +423,7 @@ export default async function HomePage() {
                           {city.nameAr}
                         </span>
                       </span>
-                      <span className="flex shrink-0 items-baseline gap-6 text-[12px] text-muted tnum">
+                      <span className="flex shrink-0 items-baseline gap-6 text-[13px] text-muted tnum">
                         <span>
                           {count
                             ? t("{count} stores", { count })
@@ -430,13 +444,13 @@ export default async function HomePage() {
 
         {/* Business: a real order row as the visual. */}
         <section className="container-wassl mt-16 lg:mt-24">
-          <div className="grid overflow-hidden rounded-[10px] border border-line bg-surface lg:grid-cols-[1fr_0.85fr]">
-            <div className="p-7 sm:p-10">
-              <p className="text-[12px] font-medium text-brand">
+          <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+            <div className="rounded-[10px] border border-line bg-surface p-7 sm:p-10">
+              <p className="text-[13px] font-medium text-brand">
                 {t("For local businesses")}
               </p>
               <h2 className="headline mt-3 max-w-[20ch]">
-                {t("Your store. Your drivers. One dashboard.")}
+                {t("Your store. One dashboard.")}
               </h2>
               <p className="mt-4 max-w-[48ch] text-[14px] leading-6 text-muted">
                 {t(
@@ -452,7 +466,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="border-t border-line p-7 sm:p-10 lg:border-s lg:border-t-0">
+            <div className="rounded-[10px] border border-line bg-surface p-7 sm:p-10">
               <div className="flex items-center justify-between text-[11px] text-muted">
                 <span>{t("Order board preview")}</span>
                 <span className="tnum">14:32</span>
@@ -472,15 +486,33 @@ export default async function HomePage() {
                       <div className="text-[13px] font-semibold tnum">
                         {money(row.amount)}
                       </div>
-                      <div className="text-[10px] text-muted">{row.state}</div>
+                      <div className="text-[11px] text-muted">{row.state}</div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex items-center gap-2 text-[11px] text-muted">
-                <MapPin size={13} />
-                {t("Cash collected is reconciled at the end of each shift.")}
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[11px] text-muted">
+                  <MapPin size={13} />
+                  {t("Cash collected is reconciled at the end of each shift.")}
+                </div>
+                <Link
+                  href="/login?next=merchant"
+                  className="shrink-0 text-[11px] font-medium text-brand"
+                >
+                  {t("Open the board")}
+                </Link>
               </div>
+              <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-line pt-3">
+                <div>
+                  <dt className="text-[11px] text-muted">{t("Orders in flight")}</dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold tnum">{stats.liveOrders}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] text-muted">{t("Delivered GMV")}</dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold tnum">{money(stats.gmv)}</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </section>

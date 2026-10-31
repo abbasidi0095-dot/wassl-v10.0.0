@@ -173,7 +173,7 @@ export default async function AccountPage() {
                           <span className="block truncate text-sm font-extrabold">
                             {order.store?.name || "Store"}
                           </span>
-                          <span className="block text-[10px] text-ink/40">
+                          <span className="block text-[11px] text-ink/40">
                             {order.code} · {timeAgo(order.createdAt)}
                           </span>
                         </span>
@@ -182,7 +182,7 @@ export default async function AccountPage() {
                             {money(order.total)}
                           </span>
                           <span
-                            className={`mt-0.5 block text-[9px] font-extrabold uppercase ${
+                            className={`mt-0.5 block text-[11px] font-extrabold uppercase ${
                               order.status === "delivered"
                                 ? "text-teal"
                                 : order.status === "cancelled"

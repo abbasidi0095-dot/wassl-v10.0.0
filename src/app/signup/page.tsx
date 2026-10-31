@@ -60,7 +60,7 @@ export default async function SignupPage({
             ].map(([value, label]) => (
               <div key={label}>
                 <dt className="tnum font-display text-[22px] font-semibold leading-none">{value}</dt>
-                <dd className="mt-1.5 text-[10px] leading-4 opacity-50">{label}</dd>
+                <dd className="mt-1.5 text-[11px] leading-4 opacity-50">{label}</dd>
               </div>
             ))}
           </dl>

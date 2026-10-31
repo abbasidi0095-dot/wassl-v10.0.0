@@ -40,8 +40,8 @@ Roles, not a swatch menu. Light is the default; dark mirrors the roles.
 
 | Role | Light | Dark | Job |
 | --- | --- | --- | --- |
-| `--paper` | `#F3EEE3` | `#0A1211` | Page ground |
-| `--surface` | `#FBF8F1` | `#111B19` | Cards, fields, sheets |
+| `--paper` | `#EFEDE8` | `#0A1211` | Page ground (limestone bone) |
+| `--surface` | `#FAF9F6` | `#111B19` | Cards, fields, sheets |
 | `--surface-2` | `#E9E1D2` | `#17231F` | Sunken bands, image placeholders |
 | `--ink` | `#0C1A17` | `#E9F0EA` | Text, figures, primary button ground |
 | `--muted` | `#5C6A64` | `#94A59E` | Secondary text |
@@ -59,7 +59,7 @@ carried by data and state, not by chrome.
 
 | Token | Size | Use |
 | --- | --- | --- |
-| `--text-xs` | 12px | metadata, table headers (sentence case) |
+| `--text-xs` | 11–12px | metadata, table headers (sentence case); never below 11px |
 | `--text-sm` | 14px | controls, dense lists |
 | `--text-base` | 16px | body |
 | `--text-lg` | 18px | lead paragraph |
@@ -74,7 +74,7 @@ uppercase kickers); the largest figure on a screen answers the screen's question
 ## 5. Space, grid, radius, depth
 
 - Scale: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96.
-- Container: `min(1280px, 100% - 32px)`; 24px gutters desktop, 16px mobile.
+- Container: `min(1280px, 100% - 64px)`; 32px gutters desktop, 16px mobile.
 - Grid: 12 columns, 24px gutters; customer pages use 7/5 and 8/4 splits, staff
   screens use a 232px rail + fluid canvas.
 - Radius: 2 (tags), 6 (controls), 10 (panels), 16 (sheets), 999 only for status

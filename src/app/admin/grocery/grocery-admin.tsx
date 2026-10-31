@@ -114,7 +114,7 @@ export function GroceryAdmin({
         ))}
       </div>
 
-      {message ? <div className="border-s-2 border-brand ps-3 text-[12px] text-brand">{message}</div> : null}
+      {message ? <div className="border-s-2 border-brand ps-3 text-[13px] text-brand">{message}</div> : null}
 
       <section>
         <div className="flex items-center justify-between">
@@ -132,11 +132,11 @@ export function GroceryAdmin({
                 <div key={product.id} className="flex flex-wrap items-center gap-3 p-3">
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-extrabold">{product.name}</div>
-                    <div className="text-[10px] font-bold text-ink/40">
+                    <div className="text-[11px] font-bold text-ink/40">
                       {storeName.get(product.storeId)} · {product.sku || t("No SKU")} · {money(product.price)}
                     </div>
                   </div>
-                  <span className="rounded-full bg-saffron/20 px-2 py-1 text-[9px] font-extrabold uppercase text-saffron-deep">
+                  <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-extrabold uppercase text-saffron-deep">
                     {badge.tone === "low"
                               ? t("Only {count} left", { count: stock ?? 0 })
                               : badge.tone === "out"
@@ -144,7 +144,7 @@ export function GroceryAdmin({
                                 : t("In stock")}
                   </span>
                   {product.variants?.length ? (
-                    <span className="text-[10px] font-bold text-ink/35">
+                    <span className="text-[11px] font-bold text-ink/35">
                       {product.variants.length} {t("variants")}
                     </span>
                   ) : (
@@ -192,7 +192,7 @@ export function GroceryAdmin({
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="text-[13px] font-extrabold">{refund.orderId}</div>
-                  <div className="text-[10px] font-bold text-ink/35">
+                  <div className="text-[11px] font-bold text-ink/35">
                     {timeAgo(refund.createdAt)} · {refund.lines.length} {t("lines")}
                   </div>
                 </div>

@@ -55,6 +55,7 @@ export function SiteHeader({
   const { count } = useCart();
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  const [hideTabs, setHideTabs] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null | undefined>(undefined);
 
   useEffect(() => {
@@ -75,6 +76,17 @@ export function SiteHeader({
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setHideTabs(y > 160 && y > last + 6);
+      last = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const southern = cities.filter((city) => city.priority);
   const others = cities.filter((city) => !city.priority);
@@ -142,7 +154,7 @@ export function SiteHeader({
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 pt-[env(safe-area-inset-top)]">
+      <header className="relative z-40 border-b border-line bg-paper/95 pt-[env(safe-area-inset-top)] lg:sticky lg:top-0">
         <div className="container-wassl flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-7">
             <Logo />
@@ -173,7 +185,7 @@ export function SiteHeader({
               <select
                 value={selected}
                 onChange={(event) => router.push(`/city/${event.target.value}`)}
-                className="h-9 max-w-[190px] appearance-none rounded-[6px] border border-line bg-transparent ps-8 pe-7 text-[12px] font-medium text-ink outline-none transition-colors hover:border-line-strong focus:border-brand"
+                className="h-9 max-w-[190px] appearance-none rounded-[6px] border border-line bg-transparent ps-8 pe-7 text-[13px] font-medium text-ink outline-none transition-colors hover:border-line-strong focus:border-brand"
                 aria-label={t("Choose city")}
               >
                 {cityOptions}
@@ -200,7 +212,7 @@ export function SiteHeader({
             >
               <ShoppingBag size={18} />
               {count > 0 ? (
-                <span className="absolute -end-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-signal px-1 text-[10px] font-semibold text-[#fffaf1] tnum">
+                <span className="absolute -end-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-signal px-1 text-[11px] font-semibold text-[#fffaf1] tnum">
                   {count}
                 </span>
               ) : null}
@@ -208,7 +220,7 @@ export function SiteHeader({
 
             <Link
               href={account ? accountHref(account) : "/login"}
-              className="hidden h-9 items-center gap-2 rounded-[6px] bg-ink px-3 text-[12px] font-semibold text-on-dark transition-colors hover:bg-brand sm:flex"
+              className="hidden h-9 items-center gap-2 rounded-[6px] bg-ink px-3 text-[13px] font-semibold text-on-dark transition-colors hover:bg-brand sm:flex"
             >
               {account?.role === "customer" ? (
                 <UserRound size={14} />
@@ -317,7 +329,9 @@ export function SiteHeader({
       </header>
 
       <nav
-        className="tabbar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line bg-surface md:hidden"
+        className={`tabbar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line bg-surface transition-transform duration-200 md:hidden ${
+          hideTabs ? "translate-y-full" : "translate-y-0"
+        }`}
         aria-label="Sections"
       >
         {mobileNav.map((item) => (

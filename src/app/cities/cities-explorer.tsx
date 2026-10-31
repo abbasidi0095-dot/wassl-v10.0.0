@@ -84,7 +84,7 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
         <p className="text-xs font-bold text-ink/45">
           {t(filtered.length === 1 ? "{count} city" : "{count} cities", { count: filtered.length })}
         </p>
-        <span className="text-[10px] font-bold text-ink/30">
+        <span className="text-[11px] font-bold text-ink/30">
           {filter === "priority" ? t("Priority operations") : t("Full national directory")}
         </span>
       </div>
@@ -103,12 +103,12 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
                 </span>
                 <div className="min-w-0">
                   <div className="truncate text-[13px] font-extrabold">{city.name}</div>
-                  <div className="arabic truncate text-[10px] text-ink/35">{city.nameAr}</div>
+                  <div className="arabic truncate text-[11px] text-ink/35">{city.nameAr}</div>
                 </div>
               </div>
               <div className="ms-3 flex shrink-0 items-center gap-2">
                 <span
-                  className={`rounded-full px-2 py-1 text-[10px] font-medium ${
+                  className={`rounded-full px-2 py-1 text-[11px] font-medium ${
                     city.launchStatus === "live"
                       ? "bg-teal/10 text-teal"
                       : "bg-ink/5 text-ink/35"

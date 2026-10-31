@@ -47,13 +47,13 @@ export default async function PendingPage() {
 
           <dl className="mt-6 grid grid-cols-2 gap-3 rounded-2xl bg-cream/80 p-4 text-sm">
             <div>
-              <dt className="text-[10px] font-bold uppercase tracking-wider text-ink/40">
+              <dt className="text-[11px] font-bold uppercase tracking-wider text-ink/40">
                 Account
               </dt>
               <dd className="mt-1 font-bold">{session.name}</dd>
             </div>
             <div>
-              <dt className="text-[10px] font-bold uppercase tracking-wider text-ink/40">
+              <dt className="text-[11px] font-bold uppercase tracking-wider text-ink/40">
                 Requested role
               </dt>
               <dd className="mt-1 font-bold">

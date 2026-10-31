@@ -24,7 +24,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         value={locale}
         onChange={(event) => setLocale(event.target.value as Locale)}
         aria-label={t("Language")}
-        className="h-full appearance-none bg-transparent ps-8 pe-6 text-[12px] font-medium text-ink outline-none"
+        className="h-full appearance-none bg-transparent ps-8 pe-6 text-[13px] font-medium text-ink outline-none"
       >
         {LOCALES.map((code) => (
           <option key={code} value={code} lang={code} title={LOCALE_META[code].native}>

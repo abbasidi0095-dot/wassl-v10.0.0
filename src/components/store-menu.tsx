@@ -102,7 +102,7 @@ export function StoreMenu({
           </p>
         </div>
         {store.locked ? (
-          <span className="inline-flex items-center gap-1.5 text-[10px] text-muted">
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
             <Lock size={10} /> {t("Locked menu · demo prices")}
           </span>
         ) : null}
@@ -131,7 +131,7 @@ export function StoreMenu({
                 setActive(category);
                 setQuery("");
               }}
-              className={`relative whitespace-nowrap px-2.5 py-2 text-[12px] transition-colors ${
+              className={`relative whitespace-nowrap px-2.5 py-2 text-[13px] transition-colors ${
                 active === category && !query
                   ? "font-semibold text-ink after:absolute after:inset-x-2.5 after:bottom-0 after:h-[2px] after:bg-brand"
                   : "text-muted hover:text-ink"
@@ -169,7 +169,7 @@ export function StoreMenu({
                   <span className="block truncate text-[11px] font-medium">
                     {product.name}
                   </span>
-                  <span className="text-[10px] text-muted tnum">
+                  <span className="text-[11px] text-muted tnum">
                     {money(product.price)}
                   </span>
                 </span>
@@ -223,7 +223,7 @@ export function StoreMenu({
                         </p>
                       </div>
                       {product.popular ? (
-                        <span className="shrink-0 text-[10px] text-signal">
+                        <span className="shrink-0 text-[11px] text-signal">
                           {t("Popular")}
                         </span>
                       ) : null}
@@ -232,7 +232,7 @@ export function StoreMenu({
                       <span className="text-[14px] font-semibold tnum">
                         {money(product.price)}
                         {product.modifiers?.length ? (
-                          <span className="ms-1 text-[10px] font-normal text-muted">
+                          <span className="ms-1 text-[11px] font-normal text-muted">
                             {t("+ options")}
                           </span>
                         ) : null}
@@ -278,11 +278,11 @@ export function StoreMenu({
             href="/cart"
             className="flex items-center justify-between gap-3 rounded-[8px] bg-ink px-4 py-3 text-on-dark shadow-lg"
           >
-            <span className="text-[12px] font-medium tnum">
+            <span className="text-[13px] font-medium tnum">
               {t(count === 1 ? "{count} item" : "{count} items", { count })} ·{" "}
               {money(items.reduce((sum, item) => sum + item.price * item.qty, 0))}
             </span>
-            <span className="flex items-center gap-1 text-[12px] font-semibold text-saffron">
+            <span className="flex items-center gap-1 text-[13px] font-semibold text-saffron">
               {t("View cart")}
             </span>
           </a>

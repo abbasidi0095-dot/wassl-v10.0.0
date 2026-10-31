@@ -164,13 +164,13 @@ export function ProductSheet({
             {product.tags?.map((tag) => (
               <span
                 key={tag}
-                className="rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-ink"
+                className="rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium text-ink"
               >
                 {tag}
               </span>
             ))}
             {product.calories ? (
-              <span className="rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-muted">
+              <span className="rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium text-muted">
                 {product.calories} kcal
               </span>
             ) : null}
@@ -187,7 +187,7 @@ export function ProductSheet({
                 <fieldset key={group.id}>
                   <legend className="flex w-full items-baseline justify-between gap-2">
                     <span className="text-[13px] font-extrabold">{group.name}</span>
-                    <span className="text-[9px] font-bold uppercase tracking-wide text-ink/35">
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-ink/35">
                       {group.required ? t("Required") : t("Optional")}
                       {group.max > 1 ? ` · ${t("up to {max}", { max: group.max })}` : ""}
                     </span>
@@ -218,10 +218,10 @@ export function ProductSheet({
                           >
                             {checked ? <Check size={10} strokeWidth={3} /> : null}
                           </span>
-                          <span className="flex-1 text-[12px] font-bold">
+                          <span className="flex-1 text-[13px] font-bold">
                             {option.name}
                             {option.soldOut ? (
-                              <span className="ms-2 text-[10px] text-danger">{t("Sold out")}</span>
+                              <span className="ms-2 text-[11px] text-danger">{t("Sold out")}</span>
                             ) : null}
                           </span>
                           <span className="text-[11px] font-extrabold text-ink/45">
@@ -268,7 +268,7 @@ export function ProductSheet({
             </button>
           </div>
           {incomplete ? (
-            <p className="mt-2 text-center text-[10px] font-bold text-ink/35">
+            <p className="mt-2 text-center text-[11px] font-bold text-ink/35">
               Choose the required options to continue.
             </p>
           ) : null}

@@ -110,7 +110,7 @@ export function TaxiRequest({
       <div className="space-y-4">
         <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
-            <span className="inline-flex items-center gap-2 text-[12px] font-medium">
+            <span className="inline-flex items-center gap-2 text-[13px] font-medium">
               <span className="status-dot live-dot text-success" />
               {t(TAXI_STATUS_TEXT[activeRide.status])}
             </span>
@@ -139,7 +139,7 @@ export function TaxiRequest({
             </div>
             <div className="flex flex-col justify-end gap-2">
               {activeRide.driverName ? (
-                <div className="rounded-[6px] bg-surface-2 p-3 text-[12px]">
+                <div className="rounded-[6px] bg-surface-2 p-3 text-[13px]">
                   <div className="text-[11px] text-muted">
                     {t("Your driver")}
                   </div>
@@ -220,13 +220,13 @@ export function TaxiRequest({
                 key={item}
                 type="button"
                 onClick={() => setTarget(item)}
-                className={`rounded-[6px] border px-3 py-2 text-start text-[12px] transition-colors ${
+                className={`rounded-[6px] border px-3 py-2 text-start text-[13px] transition-colors ${
                   target === item
                     ? "border-ink bg-surface-2 font-medium text-ink"
                     : "border-line text-muted hover:text-ink"
                 }`}
               >
-                <span className="block text-[10px] text-muted">
+                <span className="block text-[11px] text-muted">
                   {item === "pickup" ? t("Pickup") : t("Drop-off")}
                 </span>
                 {item === "pickup" ? pickupLabel || t("Pickup point") : dropoffLabel || t("Destination")}
@@ -261,13 +261,13 @@ export function TaxiRequest({
 
           <div className="mt-4 flex items-end justify-between rounded-xl bg-cream p-3">
             <div>
-              <div className="text-[10px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-ink/40">
                 {t("Distance")}
               </div>
               <div className="text-sm font-extrabold">{distance.toFixed(1)} km</div>
             </div>
             <div className="text-end">
-              <div className="text-[10px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-ink/40">
                 {t("Estimated fare")}
               </div>
               <div className="text-2xl font-extrabold tracking-[-0.04em]">{money(fare)}</div>
@@ -289,7 +289,7 @@ export function TaxiRequest({
             {submitting ? <Loader2 size={16} className="animate-spin" /> : <Navigation size={16} />}
             {submitting ? t("Requesting…") : t("Request taxi")}
           </button>
-          <p className="mt-2 text-center text-[10px] font-bold text-ink/35">
+          <p className="mt-2 text-center text-[11px] font-bold text-ink/35">
             {t("Cash to driver")} · {t("No card needed")}
           </p>
         </div>
@@ -318,13 +318,13 @@ function TaxiHistory({ rides }: { rides: TaxiRide[] }) {
               <span className="block truncate font-extrabold">
                 {ride.pickupLabel} → {ride.dropoffLabel}
               </span>
-              <span className="text-[10px] text-ink/40">
+              <span className="text-[11px] text-ink/40">
                 {new Date(ride.createdAt).toLocaleDateString()} · {ride.distanceKm.toFixed(1)} km
               </span>
             </span>
             <span className="shrink-0 text-end">
               <span className="block font-extrabold">{money(ride.fare)}</span>
-              <span className="text-[10px] text-ink/40">{t(TAXI_STATUS_TEXT[ride.status])}</span>
+              <span className="text-[11px] text-ink/40">{t(TAXI_STATUS_TEXT[ride.status])}</span>
             </span>
           </Link>
         ))}

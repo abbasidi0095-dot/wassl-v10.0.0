@@ -42,7 +42,7 @@ export default async function GroceryPage() {
         <section className="container-wassl">
           <div className="grid gap-8 border-b border-line py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-12 lg:py-12">
             <div>
-              <div className="flex items-center gap-2 text-[12px] text-muted">
+              <div className="flex items-center gap-2 text-[13px] text-muted">
                 <span className="status-dot live-dot text-success" />
                 {t("{count} supermarkets open now", { count: openNow })}
               </div>
@@ -82,7 +82,7 @@ export default async function GroceryPage() {
                 <Link href="/grocery/lists" className="btn btn-ghost btn-sm h-9">
                   <ListChecks size={13} /> {t("Shopping lists")}
                 </Link>
-                <Link href="/cities" className="text-[12px] text-muted hover:text-ink">
+                <Link href="/cities" className="text-[13px] text-muted hover:text-ink">
                   {t("Change city")}
                 </Link>
               </div>
@@ -102,10 +102,10 @@ export default async function GroceryPage() {
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="truncate text-[12px] font-semibold">
+                    <div className="truncate text-[13px] font-semibold">
                       {featured.store.name}
                     </div>
-                    <div className="text-[10px] text-muted">
+                    <div className="text-[11px] text-muted">
                       {featured.store.landmark}
                     </div>
                   </div>
@@ -121,7 +121,7 @@ export default async function GroceryPage() {
             ) : null}
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] text-muted">
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-muted">
             <span className="inline-flex items-center gap-1.5">
               <Clock3 size={13} className="text-brand" />
               {t("Scheduled windows and express")}

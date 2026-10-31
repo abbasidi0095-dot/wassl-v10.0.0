@@ -74,7 +74,7 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
               key={item.id}
               type="button"
               onClick={() => setFilter(item.id)}
-              className={`min-h-9 whitespace-nowrap px-2.5 py-2 text-[12px] transition-colors ${
+              className={`min-h-9 whitespace-nowrap px-2.5 py-2 text-[13px] transition-colors ${
                 filter === item.id
                   ? "bg-ink font-semibold text-paper"
                   : "text-muted hover:text-ink"
@@ -86,7 +86,7 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
           <select
             value={sort}
             onChange={(event) => setSort(event.target.value as "rating" | "name")}
-            className="ms-1 h-9 shrink-0 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand md:w-40"
+            className="ms-1 h-9 shrink-0 rounded-[6px] border border-line bg-surface px-2.5 text-[13px] font-medium text-muted outline-none focus:border-brand md:w-40"
             aria-label={t("Sort stores")}
           >
             <option value="rating">{t("Top rated")}</option>
@@ -95,7 +95,7 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
         </div>
       </div>
 
-      <p className="mt-4 text-[12px] text-muted tnum">
+      <p className="mt-4 text-[13px] text-muted tnum">
         {visible.length} {visible.length === 1 ? t("supermarket") : t("supermarkets")}
       </p>
 
@@ -160,7 +160,7 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
                     </span>
                   </div>
 
-                  <p className="mt-1 max-w-[58ch] text-[12px] leading-5 text-muted" dir="auto">
+                  <p className="mt-1 max-w-[58ch] text-[13px] leading-5 text-muted" dir="auto">
                     {store.tagline}
                   </p>
 
@@ -194,7 +194,7 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
                       )}
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[12px] font-medium text-brand">
+                  <span className="inline-flex items-center gap-1 text-[13px] font-medium text-brand">
                     {t("Shop")}
                     <ArrowRight
                       size={13}

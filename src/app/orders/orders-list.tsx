@@ -370,7 +370,7 @@ export function OrdersList() {
           <div key={item.label} className="rounded-2xl border border-ink/10 bg-white/45 p-4">
             <item.icon size={16} className="text-teal" />
             <div className="mt-2 text-[11px] font-extrabold">{item.label}</div>
-            <div className="mt-0.5 text-[10px] text-ink/40">{item.text}</div>
+            <div className="mt-0.5 text-[11px] text-ink/40">{item.text}</div>
           </div>
         ))}
       </div>

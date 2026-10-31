@@ -22,7 +22,7 @@ export function PageHeader({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           {label ? (
-            <p className="text-[12px] font-medium text-muted">{label}</p>
+            <p className="text-[13px] font-medium text-muted">{label}</p>
           ) : null}
           <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">
             {title}

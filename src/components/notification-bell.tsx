@@ -66,7 +66,7 @@ export function NotificationBell() {
       >
         {unread ? <BellRing size={18} /> : <Bell size={18} />}
         {unread ? (
-          <span className="absolute -end-0.5 -top-0.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-signal px-1 text-[9px] font-semibold text-[#fffaf1]">
+          <span className="absolute -end-0.5 -top-0.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-signal px-1 text-[11px] font-semibold text-[#fffaf1]">
             {unread > 9 ? "9+" : unread}
           </span>
         ) : null}
@@ -84,7 +84,7 @@ export function NotificationBell() {
             <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
               <div>
                 <div className="text-[13px] font-semibold">{t("Notifications")}</div>
-                <div className="text-[10px] text-muted">
+                <div className="text-[11px] text-muted">
                   {pushState === "subscribed" || pushState === "granted"
                     ? t("Live updates are on")
                     : t("Turn on alerts for orders and rides")}
@@ -119,20 +119,20 @@ export function NotificationBell() {
                       )}
                     />
                     <span className="min-w-0">
-                      <span className="block truncate text-[12px] font-semibold">
+                      <span className="block truncate text-[13px] font-semibold">
                         {item.title}
                       </span>
                       <span className="mt-0.5 block text-[11px] leading-4 text-muted">
                         {item.body}
                       </span>
-                      <span className="mt-1 block text-[9px] font-bold uppercase tracking-wider text-ink/30">
+                      <span className="mt-1 block text-[11px] font-bold uppercase tracking-wider text-ink/30">
                         {timeAgo(item.at)}
                       </span>
                     </span>
                   </Link>
                 ))
               ) : (
-                <div className="px-4 py-10 text-center text-[12px] text-muted">
+                <div className="px-4 py-10 text-center text-[13px] text-muted">
                   {t("No notifications yet")}
                 </div>
               )}
@@ -188,12 +188,12 @@ export function NotificationBell() {
             </div>
 
             {pushState === "unsupported" ? (
-              <p className="border-t border-ink/8 px-4 py-2 text-[10px] font-bold text-ink/40">
+              <p className="border-t border-ink/8 px-4 py-2 text-[11px] font-bold text-ink/40">
                 {t("This browser does not support web notifications.")}
               </p>
             ) : null}
             {pushState === "denied" ? (
-              <p className="border-t border-ink/8 px-4 py-2 text-[10px] font-bold text-ink/40">
+              <p className="border-t border-ink/8 px-4 py-2 text-[11px] font-bold text-ink/40">
                 {t("Allow notifications in your browser settings to receive alerts.")}
               </p>
             ) : null}

@@ -155,7 +155,7 @@ export default async function StorePage({
                 {store.description}
               </p>
 
-              <dl className="mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[12px]">
+              <dl className="mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[13px]">
                 <div>
                   <dt className="inline text-muted">Delivery </dt>
                   <dd className="inline font-medium tnum">
@@ -243,7 +243,7 @@ export default async function StorePage({
               />
               <div className="border-t border-line p-3.5">
                 <div className="text-[11px] text-muted">Pickup location</div>
-                <div className="mt-1 text-[12px] font-medium">{store.address}</div>
+                <div className="mt-1 text-[13px] font-medium">{store.address}</div>
                 <div className="text-[11px] text-muted">{store.landmark}</div>
               </div>
             </div>
@@ -257,7 +257,7 @@ export default async function StorePage({
                   {store.openingHours.map((entry) => (
                     <div
                       key={`${entry.days}-${entry.open}`}
-                      className="flex items-center justify-between text-[12px]"
+                      className="flex items-center justify-between text-[13px]"
                     >
                       <span className="text-muted">{entry.days}</span>
                       <span className="tnum">
@@ -266,7 +266,7 @@ export default async function StorePage({
                     </div>
                   ))}
                 </div>
-                <p className="mt-2.5 text-[10px] leading-4 text-muted">
+                <p className="mt-2.5 text-[11px] leading-4 text-muted">
                   Hours are local (Africa/Casablanca). Delivery hours may differ during
                   Ramadan.
                 </p>
@@ -274,7 +274,7 @@ export default async function StorePage({
             ) : null}
 
             <div className="border-s-2 border-brand ps-3.5">
-              <div className="flex items-center gap-1.5 text-[12px] font-medium">
+              <div className="flex items-center gap-1.5 text-[13px] font-medium">
                 <ShieldCheck size={13} className="text-brand" /> Cash on delivery
               </div>
               <p className="mt-1 text-[11px] leading-5 text-muted">
@@ -288,7 +288,7 @@ export default async function StorePage({
                 <div className="flex items-center gap-1.5 text-[11px] text-muted">
                   <Database size={12} /> About this listing
                 </div>
-                <p className="mt-1.5 text-[10px] leading-4 text-muted">
+                <p className="mt-1.5 text-[11px] leading-4 text-muted">
                   Establishment details and hours come from Maroc APIs and Google Maps
                   (via SerpApi), locked on{" "}
                   {store.verifiedAt

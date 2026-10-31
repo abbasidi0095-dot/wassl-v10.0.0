@@ -416,7 +416,7 @@ export function DriverDashboard({
       </div>
 
       {driver.cashOnHand >= driver.cashLimit ? (
-        <div className="mt-3 border-s-2 border-danger ps-3 text-[12px] text-danger">
+        <div className="mt-3 border-s-2 border-danger ps-3 text-[13px] text-danger">
           You reached your cash limit. Hand over {money(driver.cashOnHand)} to dispatch before
           taking new COD orders.
         </div>
@@ -440,7 +440,7 @@ export function DriverDashboard({
                   <div className="text-[11px] font-extrabold">
                     {sharing ? "Live GPS sharing" : simulating ? "Simulating route" : "GPS idle"}
                   </div>
-                  <div className="text-[9px] font-bold text-ink/35">
+                  <div className="text-[11px] font-bold text-ink/35">
                     {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
                     {current ? ` · ${distance.toFixed(1)} km to next stop` : ""}
                   </div>
@@ -481,13 +481,13 @@ export function DriverDashboard({
                             <span className="text-[13px] font-extrabold">{order.code}</span>
                             <span className="pill">{meta.label}</span>
                           </div>
-                          <div className="mt-1 text-[10px] font-bold text-ink/35">
+                          <div className="mt-1 text-[11px] font-bold text-ink/35">
                             {timeAgo(order.createdAt)} · {order.customerName}
                           </div>
                         </div>
                         <div className="text-end">
                           <div className="text-base font-extrabold">{money(order.total)}</div>
-                          <div className="text-[10px] font-medium text-teal">
+                          <div className="text-[11px] font-medium text-teal">
                             collect cash
                           </div>
                         </div>
@@ -565,7 +565,7 @@ export function DriverDashboard({
               <Banknote size={19} className="text-teal" />
             </div>
             <div className="mt-4 rounded-2xl bg-ink p-4 text-on-dark">
-              <div className="text-[10px] font-medium text-on-dark/40">
+              <div className="text-[11px] font-medium text-on-dark/40">
                 Cash currently with you
               </div>
               <div className="mt-1 text-3xl font-extrabold tracking-[-0.05em]">
@@ -579,7 +579,7 @@ export function DriverDashboard({
                   }}
                 />
               </div>
-              <div className="mt-1.5 flex justify-between text-[9px] font-bold text-on-dark/40">
+              <div className="mt-1.5 flex justify-between text-[11px] font-bold text-on-dark/40">
                 <span>Limit {money(driver.cashLimit)}</span>
                 <span>{money(cashLeft)} left</span>
               </div>
@@ -598,7 +598,7 @@ export function DriverDashboard({
                 <span>{money(earnings - driver.cashOnHand)}</span>
               </div>
             </div>
-            <div className="mt-3 rounded-xl bg-saffron/15 p-3 text-[10px] leading-5 font-bold text-ink/55">
+            <div className="mt-3 rounded-xl bg-saffron/15 p-3 text-[11px] leading-5 font-bold text-ink/55">
               Cash is settled with dispatch at the end of your shift. Earnings are
               separate from the cash you carry.
             </div>
@@ -607,11 +607,11 @@ export function DriverDashboard({
           <div className="card p-5">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-extrabold">Live city queue</h2>
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-teal">
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-teal">
                 <span className="status-dot live-dot text-teal" /> Live
               </span>
             </div>
-            <p className="mt-1 text-[10px] text-ink/40">
+            <p className="mt-1 text-[11px] text-ink/40">
               Orders in {driver.citySlug}. Accept a ready order to start your route.
             </p>
             <div className="mt-3 space-y-2">
@@ -627,7 +627,7 @@ export function DriverDashboard({
                         <div className="truncate font-extrabold">
                           {order.store?.name || "Store"}
                         </div>
-                        <div className="text-[9px] text-ink/35">
+                        <div className="text-[11px] text-ink/35">
                           {order.code} · {STATUS_META[order.status].label} ·{" "}
                           {timeAgo(order.createdAt)}
                         </div>
@@ -653,7 +653,7 @@ export function DriverDashboard({
                               : "Go online to accept"}
                       </button>
                     ) : (
-                      <div className="mt-2 text-[9px] font-bold text-ink/30">
+                      <div className="mt-2 text-[11px] font-bold text-ink/30">
                         Waiting for the store to mark it ready
                       </div>
                     )}
@@ -679,7 +679,7 @@ export function DriverDashboard({
                   <div key={order.id} className="flex items-center justify-between gap-2 text-[11px]">
                     <div className="min-w-0">
                       <div className="truncate font-bold text-ink/65">{order.store?.name}</div>
-                      <div className="text-[9px] text-ink/35">
+                      <div className="text-[11px] text-ink/35">
                         {order.deliveredAt ? clock(order.deliveredAt) : ""} · {order.code}
                       </div>
                     </div>

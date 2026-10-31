@@ -135,19 +135,19 @@ export function OngoingTracker() {
             <span className="absolute -end-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-surface bg-signal" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="flex items-center gap-1.5 text-[10px] text-muted">
+            <span className="flex items-center gap-1.5 text-[11px] text-muted">
               <span className="status-dot live-dot text-success" />
               {current.kind === "taxi" ? t("Taxi in progress") : t("Order in progress")}
             </span>
             <span className="mt-0.5 block truncate text-[13px] font-semibold">
               {current.title}
             </span>
-            <span className="block truncate text-[10px] text-muted">
+            <span className="block truncate text-[11px] text-muted">
               {label} · {money(current.amount)}
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-1">
-            <span className="text-[10px] text-muted">{timeAgo(current.createdAt)}</span>
+            <span className="text-[11px] text-muted">{timeAgo(current.createdAt)}</span>
             {open ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
           </span>
         </button>
@@ -170,14 +170,14 @@ export function OngoingTracker() {
                   <Link
                     key={`${item.kind}-${item.id}`}
                     href={item.href}
-                    className="flex items-center gap-2 rounded-[4px] px-1 py-2 text-[12px] transition-colors hover:bg-surface-2"
+                    className="flex items-center gap-2 rounded-[4px] px-1 py-2 text-[13px] transition-colors hover:bg-surface-2"
                   >
                     <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[4px] bg-surface-2 text-ink">
                       {item.kind === "taxi" ? <CarTaxiFront size={14} /> : <Bike size={14} />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{item.title}</span>
-                      <span className="block truncate text-[10px] text-muted">{item.subtitle}</span>
+                      <span className="block truncate text-[11px] text-muted">{item.subtitle}</span>
                     </span>
                     <ArrowRight size={13} className="shrink-0 text-muted rtl:-scale-x-100" />
                   </Link>

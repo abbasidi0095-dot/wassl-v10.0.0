@@ -326,7 +326,7 @@ export function GroceryCheckout() {
               />
             </div>
           ) : (
-            <div className="mt-4 rounded-[6px] bg-surface-2 p-3 text-[12px] text-muted">
+            <div className="mt-4 rounded-[6px] bg-surface-2 p-3 text-[13px] text-muted">
               <div className="flex items-start gap-2">
                 <MapPin size={14} className="mt-0.5 shrink-0 text-teal" />
                 <span>
@@ -382,7 +382,7 @@ export function GroceryCheckout() {
               }}
               className={`rounded-[6px] border p-3 text-start transition-colors ${!windowSlot ? "border-ink bg-surface-2" : "border-line"}`}
             >
-              <div className="text-[12px] font-semibold">{t("As soon as possible")}</div>
+              <div className="text-[13px] font-semibold">{t("As soon as possible")}</div>
               <div className="mt-0.5 text-[11px] text-muted">
                 {t("Usually {min}–{max} minutes", {
                   min: store.prepTime,
@@ -391,7 +391,7 @@ export function GroceryCheckout() {
               </div>
             </button>
             <label className={`rounded-[6px] border p-3 transition-colors ${windowSlot ? "border-ink bg-surface-2" : "border-line"}`}>
-              <div className="text-[12px] font-semibold">{t("Schedule for later")}</div>
+              <div className="text-[13px] font-semibold">{t("Schedule for later")}</div>
               <select
                 className="mt-1 w-full bg-transparent text-[11px] text-muted outline-none"
                 value={windowSlot}
@@ -411,10 +411,10 @@ export function GroceryCheckout() {
 
           {fulfillment === "delivery" ? (
             <label className="mt-3 flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 p-3">
-              <span className="flex flex-wrap items-center gap-2 text-[12px] font-medium">
+              <span className="flex flex-wrap items-center gap-2 text-[13px] font-medium">
                 <Sparkles size={13} className="text-signal" />
                 {t("Express delivery")}
-                <span className="text-[10px] text-muted">
+                <span className="text-[11px] text-muted">
                   +{money(settings?.expressFee ?? 0)} · {settings?.expressMinutes ?? 30} min
                 </span>
               </span>
@@ -447,7 +447,7 @@ export function GroceryCheckout() {
                 key={option.id}
                 type="button"
                 onClick={() => setSubstitution(option.id)}
-                className={`rounded-[6px] border p-3 text-[12px] font-medium ${
+                className={`rounded-[6px] border p-3 text-[13px] font-medium ${
                   substitution === option.id
                     ? "border-ink bg-surface-2 text-ink"
                     : "border-line text-muted"
@@ -467,7 +467,7 @@ export function GroceryCheckout() {
             <div key={item.lineId} className="flex items-start justify-between gap-2 text-xs">
               <div className="min-w-0">
                 <div className="truncate font-medium">{item.name}</div>
-                <div className="text-[10px] text-ink/40">
+                <div className="text-[11px] text-ink/40">
                   {item.variantLabel || item.unit || ""} · ×{item.qty}
                 </div>
               </div>
@@ -476,7 +476,7 @@ export function GroceryCheckout() {
           ))}
         </div>
 
-        <div className="mt-4 border-t border-line pt-3 text-[12px]">
+        <div className="mt-4 border-t border-line pt-3 text-[13px]">
           <div className="flex justify-between text-muted">
             <span>{t("Subtotal")}</span>
             <span className="font-medium text-ink tnum">{money(subtotal)}</span>
@@ -517,11 +517,11 @@ export function GroceryCheckout() {
             {t("Apply")}
           </button>
         </div>
-        {promoError ? <p className="mt-1 text-[10px] text-danger">{promoError}</p> : null}
+        {promoError ? <p className="mt-1 text-[11px] text-danger">{promoError}</p> : null}
 
         {account.loyaltyPoints > 0 ? (
           <label className="mt-3 block rounded-[6px] bg-surface-2 p-3">
-            <span className="flex items-center justify-between text-[10px] font-medium text-muted">
+            <span className="flex items-center justify-between text-[11px] font-medium text-muted">
               {t("Use loyalty points")} · {account.loyaltyPoints}
               <span>{usablePoints} pts = {money(loyaltyDiscount)}</span>
             </span>
@@ -563,7 +563,7 @@ export function GroceryCheckout() {
             ? t("Placing order…")
             : `${fulfillment === "pickup" ? t("Place pickup order") : t("Place COD order")} · ${money(total)}`}
         </button>
-        <p className="mt-2 flex items-center justify-center gap-1 text-[10px] text-muted">
+        <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted">
           <CheckCircle2 size={10} /> {t("Stock reserved when you order")}
         </p>
       </aside>

@@ -233,7 +233,7 @@ export function GroceryStore({
             {store.description}
           </p>
 
-          <dl className="mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[12px]">
+          <dl className="mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[13px]">
             {availability.delivery ? (
               <div>
                 <dt className="inline text-muted">{t("Delivery")} </dt>
@@ -285,7 +285,7 @@ export function GroceryStore({
           </dl>
 
           {!availability.open || !availability.delivery ? (
-            <p className="mt-4 max-w-[58ch] border-s-2 border-signal ps-3 text-[12px] leading-5 text-muted">
+            <p className="mt-4 max-w-[58ch] border-s-2 border-signal ps-3 text-[13px] leading-5 text-muted">
               {availability.reason ||
                 (availability.pickup
                   ? t("Delivery is unavailable — pickup is still available.")
@@ -307,7 +307,7 @@ export function GroceryStore({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-[calc(84px+env(safe-area-inset-bottom))] start-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2 text-[12px] font-medium text-on-dark shadow-lg rtl:translate-x-1/2">
+        <div className="fixed bottom-[calc(84px+env(safe-area-inset-bottom))] start-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2 text-[13px] font-medium text-on-dark shadow-lg rtl:translate-x-1/2">
           {toast}
         </div>
       ) : null}
@@ -363,7 +363,7 @@ export function GroceryStore({
               <select
                 value={sort}
                 onChange={(event) => setSort(event.target.value as typeof sort)}
-                className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand"
+                className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[13px] font-medium text-muted outline-none focus:border-brand"
                 aria-label={t("Sort products")}
               >
                 <option value="popular">{t("Popular first")}</option>
@@ -371,7 +371,7 @@ export function GroceryStore({
                 <option value="price-desc">{t("Price: high to low")}</option>
                 <option value="name">{t("Name A–Z")}</option>
               </select>
-              <label className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-line px-3 text-[12px] font-medium text-muted">
+              <label className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-line px-3 text-[13px] font-medium text-muted">
                 <input
                   type="checkbox"
                   checked={onlyAvailable}
@@ -392,7 +392,7 @@ export function GroceryStore({
             <button
               type="button"
               onClick={() => setCategory("all")}
-              className={`min-h-9 whitespace-nowrap rounded-[2px] px-2.5 py-2 text-[12px] transition-colors ${
+              className={`min-h-9 whitespace-nowrap rounded-[2px] px-2.5 py-2 text-[13px] transition-colors ${
                 category === "all"
                   ? "bg-ink font-semibold text-paper"
                   : "text-muted hover:text-ink"
@@ -405,7 +405,7 @@ export function GroceryStore({
                 key={name}
                 type="button"
                 onClick={() => setCategory(name)}
-                className={`min-h-9 whitespace-nowrap rounded-[2px] px-2.5 py-2 text-[12px] transition-colors ${
+                className={`min-h-9 whitespace-nowrap rounded-[2px] px-2.5 py-2 text-[13px] transition-colors ${
                   category === name
                     ? "bg-ink font-semibold text-paper"
                     : "text-muted hover:text-ink"
@@ -461,7 +461,7 @@ export function GroceryStore({
                       <div className="flex items-start justify-between gap-1">
                         <div className="min-w-0">
                           {product.brand ? (
-                            <div className="text-[10px] text-muted">
+                            <div className="text-[11px] text-muted">
                               {product.brand}
                             </div>
                           ) : null}
@@ -499,7 +499,7 @@ export function GroceryStore({
                             {money(product.price)}
                           </div>
                           <div
-                            className={`mt-0.5 text-[10px] ${
+                            className={`mt-0.5 text-[11px] ${
                               badge.tone === "out"
                                 ? "text-danger"
                                 : badge.tone === "low"
@@ -539,7 +539,7 @@ export function GroceryStore({
               <h3 className="mt-3 font-display text-lg font-semibold">
                 {t("No products match")}
               </h3>
-              <p className="mt-1 text-[12px] text-muted">
+              <p className="mt-1 text-[13px] text-muted">
                 {t("Try a different department, search or filter.")}
               </p>
             </div>
@@ -628,7 +628,7 @@ function GrocerySheet({
         <div className="max-h-[55vh] overflow-y-auto p-4">
           <p className="text-[13px] leading-6 text-muted">{product.description}</p>
           {product.sku ? (
-            <div className="mt-2 text-[10px] text-muted tnum">
+            <div className="mt-2 text-[11px] text-muted tnum">
               {t("SKU")} {product.sku}
               {product.barcode ? ` · ${product.barcode}` : ""}
             </div>
@@ -644,7 +644,7 @@ function GrocerySheet({
                     type="button"
                     disabled={item.stock <= 0}
                     onClick={() => setVariantId(item.id)}
-                    className={`flex items-center justify-between rounded-[6px] border px-3 py-2.5 text-start text-[12px] transition-colors ${
+                    className={`flex items-center justify-between rounded-[6px] border px-3 py-2.5 text-start text-[13px] transition-colors ${
                       variantId === item.id
                         ? "border-ink bg-surface-2"
                         : "border-line hover:border-line-strong"
@@ -655,7 +655,7 @@ function GrocerySheet({
                       <span className="font-semibold tnum">
                         {money(item.price)}
                       </span>
-                      <span className="text-[10px] text-muted tnum">
+                      <span className="text-[11px] text-muted tnum">
                         {item.stock > 0
                           ? t("{count} left", { count: item.stock })
                           : t("Sold out")}
@@ -669,7 +669,7 @@ function GrocerySheet({
           ) : null}
 
           <div className="mt-5 flex items-center justify-between border-y border-line py-3">
-            <span className="text-[12px] font-medium">{t("Quantity")}</span>
+            <span className="text-[13px] font-medium">{t("Quantity")}</span>
             <div className="flex items-center gap-1">
               <button
                 type="button"

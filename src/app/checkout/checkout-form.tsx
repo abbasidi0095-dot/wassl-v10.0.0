@@ -319,7 +319,7 @@ export function CheckoutForm({
                       <span className="block text-[11px] font-semibold text-brand">
                         {entry.label}
                       </span>
-                      <span className="mt-0.5 block max-w-[160px] truncate text-[10px] text-muted">
+                      <span className="mt-0.5 block max-w-[160px] truncate text-[11px] text-muted">
                         {entry.landmark}
                       </span>
                     </button>
@@ -435,7 +435,7 @@ export function CheckoutForm({
                 !scheduled ? "border-ink bg-surface-2" : "border-line hover:border-line-strong"
               }`}
             >
-              <div className="text-[12px] font-semibold">{t("As soon as possible")}</div>
+              <div className="text-[13px] font-semibold">{t("As soon as possible")}</div>
               <div className="mt-0.5 text-[11px] text-muted">{t("Usually 25–45 minutes")}</div>
             </button>
             <label
@@ -443,12 +443,12 @@ export function CheckoutForm({
                 scheduled ? "border-ink bg-surface-2" : "border-line hover:border-line-strong"
               }`}
             >
-              <div className="text-[12px] font-semibold">{t("Schedule for later")}</div>
+              <div className="text-[13px] font-semibold">{t("Schedule for later")}</div>
               <input
                 type="datetime-local"
                 value={scheduled}
                 onChange={(event) => setScheduled(event.target.value)}
-                className="mt-1 w-full bg-transparent text-[10px] font-bold text-ink/50 outline-none"
+                className="mt-1 w-full bg-transparent text-[11px] font-bold text-ink/50 outline-none"
               />
             </label>
           </div>
@@ -470,7 +470,7 @@ export function CheckoutForm({
               <span className="min-w-0 flex-1 truncate font-medium">
                 {item.qty}× {item.name}
                 {item.options.length ? (
-                  <span className="block truncate text-[9px] font-bold text-ink/35">
+                  <span className="block truncate text-[11px] font-bold text-ink/35">
                     {item.options.map((option) => option.optionName).join(" · ")}
                   </span>
                 ) : null}
@@ -490,7 +490,7 @@ export function CheckoutForm({
               <button
                 type="button"
                 onClick={removePromo}
-                className="shrink-0 text-[10px] text-muted hover:text-danger"
+                className="shrink-0 text-[11px] text-muted hover:text-danger"
               >
                 Remove
               </button>
@@ -522,12 +522,12 @@ export function CheckoutForm({
             </div>
           )}
           {promoError || promoInvalid ? (
-            <p className="mt-1.5 text-[10px] font-bold text-red-600">
+            <p className="mt-1.5 text-[11px] font-bold text-red-600">
               {promoError || promoInvalid}
             </p>
           ) : null}
         </div>
-        <div className="mt-4 space-y-2 border-t border-line pt-4 text-[12px]">
+        <div className="mt-4 space-y-2 border-t border-line pt-4 text-[13px]">
           <div className="flex justify-between text-muted">
             <span>{t("Subtotal")}</span>
             <span className="font-medium text-ink tnum">{money(subtotal)}</span>
@@ -560,14 +560,14 @@ export function CheckoutForm({
         <div className="mt-4 flex items-start gap-2 border-s-2 border-signal ps-3">
           <Banknote size={15} className="mt-0.5 shrink-0 text-signal" />
           <div>
-            <div className="text-[12px] font-medium">{t("Cash on delivery")}</div>
+            <div className="text-[13px] font-medium">{t("Cash on delivery")}</div>
             <div className="mt-0.5 text-[11px] leading-5 text-muted">
               {t("Pay {amount} to the driver.", { amount: money(total) })}
             </div>
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 text-[10px] text-muted">
+        <div className="mt-3 flex items-center gap-2 text-[11px] text-muted">
           <ShieldCheck size={12} />
           Your number is shared only with the driver.
         </div>
@@ -591,7 +591,7 @@ export function CheckoutForm({
           {loading ? t("Placing order…") : t("Place COD order · {price}", { price: money(total) })}
           {!loading ? <CheckCircle2 size={15} /> : null}
         </button>
-        <p className="mt-3 text-center text-[10px] text-muted">
+        <p className="mt-3 text-center text-[11px] text-muted">
           No account needed · Confirm by phone if we need you
         </p>
       </aside>

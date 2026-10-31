@@ -79,7 +79,7 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
           <div className="flex items-center justify-between border-b border-ink/8 px-4 py-3">
             <div>
               <div className="text-sm font-extrabold">{list.name}</div>
-              <div className="text-[10px] font-bold text-ink/35">
+              <div className="text-[11px] font-bold text-ink/35">
                 {list.items.length} {t("items")}
               </div>
             </div>
@@ -98,10 +98,10 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
                   aria-label={t("Mark {item}", { item: item.name })}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className={`truncate text-[12px] font-extrabold ${item.checked ? "line-through opacity-50" : ""}`}>
+                  <div className={`truncate text-[13px] font-extrabold ${item.checked ? "line-through opacity-50" : ""}`}>
                     {item.name}
                   </div>
-                  <div className="text-[10px] font-bold text-ink/35">
+                  <div className="text-[11px] font-bold text-ink/35">
                     {item.storeName} · {item.unit || "each"} · ×{item.qty}
                   </div>
                 </div>
@@ -114,7 +114,7 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
                 >
                   <Trash2 size={13} />
                 </button>
-                <Link href={`/store/${item.storeSlug}`} className="text-[10px] font-extrabold text-teal">
+                <Link href={`/store/${item.storeSlug}`} className="text-[11px] font-extrabold text-teal">
                   {t("Shop")}
                 </Link>
               </div>

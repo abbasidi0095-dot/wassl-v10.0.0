@@ -225,7 +225,7 @@ export function GroceryManager({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="text-[12px] text-muted">{store.citySlug} · {t("Grocery")}</div>
+          <div className="text-[13px] text-muted">{store.citySlug} · {t("Grocery")}</div>
           <h1 className="display mt-2 text-[clamp(1.8rem,1.5rem+1.2vw,2.4rem)]">{store.name}</h1>
           <p className="mt-1 text-sm text-ink/45">
             {t("Catalog, stock, delivery zones and 24/7 availability.")}
@@ -275,7 +275,7 @@ export function GroceryManager({
         <section className="mt-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <label className="inline-flex items-center gap-1.5 rounded-xl border border-ink/10 bg-white/60 px-3 py-2 text-[10px] font-extrabold text-ink/55">
+              <label className="inline-flex items-center gap-1.5 rounded-xl border border-ink/10 bg-white/60 px-3 py-2 text-[11px] font-extrabold text-ink/55">
                 <input
                   type="checkbox"
                   checked={lowOnly}
@@ -317,7 +317,7 @@ export function GroceryManager({
                         ) : null}
                         {product.popular ? <span className="pill pill-warm">{t("Popular")}</span> : null}
                       </div>
-                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-bold text-ink/40">
+                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-ink/40">
                         <span>{product.category}</span>
                         <span>{product.sku || t("No SKU")}</span>
                         <span>{product.unit || "each"}</span>
@@ -325,7 +325,7 @@ export function GroceryManager({
                       </div>
                     </div>
                     <span
-                      className={`shrink-0 px-1.5 py-0.5 text-[10px] font-medium ${
+                      className={`shrink-0 px-1.5 py-0.5 text-[11px] font-medium ${
                         badge.tone === "out"
                           ? "text-danger"
                           : badge.tone === "low"

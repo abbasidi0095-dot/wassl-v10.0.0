@@ -50,7 +50,7 @@ export default async function CityPage({
         <section className="container-wassl">
           <div className="grid gap-8 border-b border-line pb-8 pt-8 lg:grid-cols-[1fr_0.9fr] lg:items-end lg:gap-12 lg:pt-12">
             <div>
-              <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted">
+              <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
                 <span className="inline-flex items-center gap-1.5">
                   <span className={`status-dot ${city.launchStatus === "live" ? "live-dot" : ""} ${city.launchStatus === "live" ? "text-success" : ""}`} />
                   {city.launchStatus === "live" ? "Live now" : "Coming soon"}
@@ -76,7 +76,7 @@ export default async function CityPage({
                   : `Wassl is preparing ${city.name}. Join the waitlist or apply as a local store and help us launch.`}
               </p>
 
-              <dl className="mt-7 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-5 text-[12px]">
+              <dl className="mt-7 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-5 text-[13px]">
                 <div>
                   <dt className="text-muted">Stores open</dt>
                   <dd className="mt-0.5 font-medium tnum">{stores.length}</dd>
@@ -113,10 +113,10 @@ export default async function CityPage({
               />
               <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3">
                 <div>
-                  <div className="text-[12px] font-medium">
+                  <div className="text-[13px] font-medium">
                     {city.name} · {city.region}
                   </div>
-                  <div className="text-[10px] text-muted tnum">
+                  <div className="text-[11px] text-muted tnum">
                     {stores.length} partner stores visible
                   </div>
                 </div>
