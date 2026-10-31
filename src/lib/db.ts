@@ -160,6 +160,8 @@ export async function createAccount(input: {
   citySlug?: string;
   requestedStoreName?: string;
   requestedVehicle?: string;
+  requestedKind?: User["requestedKind"];
+  requestedPlate?: string;
 }): Promise<User> {
   return mutate((db) => {
     const email = input.email.trim().toLowerCase();
@@ -177,6 +179,8 @@ export async function createAccount(input: {
       citySlug: input.citySlug || undefined,
       requestedStoreName: input.requestedStoreName?.trim() || undefined,
       requestedVehicle: input.requestedVehicle?.trim() || undefined,
+      requestedKind: input.requestedKind,
+      requestedPlate: input.requestedPlate?.trim() || undefined,
       accountStatus: input.role === "customer" ? "active" : "pending",
       // New self-service accounts must confirm the address before a session.
       emailVerified: false,
@@ -604,6 +608,13 @@ export async function updateUserAccess(input: {
     }
 
     if (input.role) {
+      if (
+        user.role === "admin" &&
+        input.role !== "admin" &&
+        db.users.filter((candidate) => candidate.role === "admin").length <= 1
+      ) {
+        throw new Error("You cannot remove the last admin account");
+      }
       user.role = input.role;
       if (input.role === "admin" || input.role === "customer") {
         delete user.storeId;
@@ -727,7 +738,8 @@ export async function approveUser(input: {
         email: user.email,
         citySlug: city?.slug || "dakhla",
         vehicle: user.requestedVehicle || "Motorbike",
-        plate: "",
+        plate: user.requestedPlate || "",
+        kind: user.requestedKind || "delivery",
         status: "offline",
         lat: city?.lat ?? 23.6848,
         lng: city?.lng ?? -15.958,

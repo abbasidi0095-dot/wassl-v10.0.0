@@ -46,13 +46,17 @@ type CityOption = { slug: string; name: string; priority: boolean };
 
 export function SignupForm({
   initialRole,
+  lockedRole = false,
   cities,
 }: {
   initialRole: Role;
+  lockedRole?: boolean;
   cities: CityOption[];
 }) {
   const router = useRouter();
   const [role, setRole] = useState<Role>(initialRole);
+  const [kind, setKind] = useState<"delivery" | "taxi" | "both">("delivery");
+  const [plate, setPlate] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -78,7 +82,8 @@ export function SignupForm({
     passwordValid &&
     matches &&
     (role === "customer" || phone.trim().length > 0) &&
-    (role !== "merchant" || storeName.trim().length > 0);
+    (role !== "merchant" || storeName.trim().length > 0) &&
+    (role !== "driver" || kind === "delivery" || plate.trim().length > 0);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -98,6 +103,8 @@ export function SignupForm({
           citySlug,
           storeName: role === "merchant" ? storeName : undefined,
           vehicle: role === "driver" ? vehicle : undefined,
+          kind: role === "driver" ? kind : undefined,
+          plate: role === "driver" ? plate : undefined,
         }),
       });
       const data = (await response.json()) as {
@@ -129,9 +136,19 @@ export function SignupForm({
 
   return (
     <div className="card p-6 sm:p-8">
-      <div className="eyebrow">Create an account</div>
+      <div className="eyebrow">
+        {role === "merchant"
+          ? "Store partner"
+          : role === "driver"
+            ? "Driver partner"
+            : "Customer account"}
+      </div>
       <h2 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
-        Join Wassl
+        {role === "merchant"
+          ? "Open your store"
+          : role === "driver"
+            ? "Drive with Wassl"
+            : "Join Wassl"}
       </h2>
       <p className="mt-2 text-sm leading-6 text-muted">
         Already have an account?{" "}
@@ -141,6 +158,8 @@ export function SignupForm({
         .
       </p>
 
+      {!lockedRole ? (
+        <>
       <div className="mt-5 grid grid-cols-3 gap-2">
         {ROLES.map((item) => {
           const Icon = item.icon;
@@ -167,6 +186,12 @@ export function SignupForm({
       <p className="mt-2 text-[11px] font-semibold text-muted">
         {selectedRole.hint}
       </p>
+        </>
+      ) : (
+        <p className="mt-3 text-[11px] font-semibold text-muted">
+          {selectedRole.hint}
+        </p>
+      )}
 
       <form onSubmit={submit} className="mt-5 space-y-4">
         <label className="block">
@@ -259,19 +284,51 @@ export function SignupForm({
         ) : null}
 
         {role === "driver" ? (
-          <label className="block">
-            <span className="label">Vehicle</span>
-            <select
-              value={vehicle}
-              onChange={(event) => setVehicle(event.target.value)}
-              className="input"
-            >
-              <option>Motorbike</option>
-              <option>Car</option>
-              <option>Bicycle</option>
-              <option>On foot</option>
-            </select>
-          </label>
+          <>
+            <label className="block">
+              <span className="label">Works as</span>
+              <select
+                value={kind}
+                onChange={(event) =>
+                  setKind(event.target.value as "delivery" | "taxi" | "both")
+                }
+                className="input"
+              >
+                <option value="delivery">Delivery courier</option>
+                <option value="taxi">Taxi driver</option>
+                <option value="both">Delivery + taxi</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="label">Vehicle</span>
+              <select
+                value={vehicle}
+                onChange={(event) => setVehicle(event.target.value)}
+                className="input"
+              >
+                <option>Motorbike</option>
+                <option>Bicycle</option>
+                <option>Dacia Logan</option>
+                <option>Renault Clio</option>
+                <option>Peugeot 208</option>
+                <option>Mercedes W123</option>
+                <option>Toyota Prius</option>
+                <option>Other</option>
+              </select>
+            </label>
+            {kind !== "delivery" ? (
+              <label className="block">
+                <span className="label">Plate number</span>
+                <input
+                  value={plate}
+                  onChange={(event) => setPlate(event.target.value)}
+                  className="input uppercase"
+                  placeholder="12345-A-6"
+                  required
+                />
+              </label>
+            ) : null}
+          </>
         ) : null}
 
         <label className="block">

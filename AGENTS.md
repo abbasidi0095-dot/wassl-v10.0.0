@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.5.0** (31 October 2026; Aero glass and live branding)
+- Release: **10.6.0** (31 October 2026; fleet panels, signup split, analytics and access)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -30,7 +30,7 @@ the architecture, hard constraints and the full change history.
 npm install
 npm run dev              # local dev
 npm run typecheck        # tsc --noEmit
-npm test                 # 71 Vitest tests
+npm test                 # 72 Vitest tests
 npm run test:pg          # Postgres integration tests
 npm run build            # production build
 PLAYWRIGHT_PORT=3510 npx playwright test   # 10 e2e tests
@@ -90,6 +90,19 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.6.0 — fleet, signup separation, analytics and access
+- Admin Fleet is two side-by-side panels, `DriverPanel` for delivery and taxi,
+  each provisioning via `AccountProvisionModal` with a preselected kind.
+- `/signup` is customer-only; `/signup/store` and `/signup/driver` reuse
+  `SignupShell`. `/login` remains the single login for every role. Driver
+  applications capture `requestedKind` and `requestedPlate`.
+- `src/lib/analytics.ts` computes delivery (5 MAD), taxi (2 MAD) and grocery
+  (5%) margin, 14-day bars, top stores and signup counts. Admin state now
+  includes taxi rides.
+- `AccountsManager` has a Grant admin action; `updateUserAccess` refuses to
+  remove the last admin.
+- Overview adds a Wassl profit KPI.
 
 ### 10.5.0 — Aero glass and live branding
 - `themeStyle()` turns `PlatformSettings.primaryColor`, `accentColor` and the

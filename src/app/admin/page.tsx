@@ -36,6 +36,7 @@ export default async function AdminPage() {
       <main className="container-wassl py-6">
         <AdminConsole
           initialOrders={orders}
+          initialTaxiRides={db.taxiRides ?? []}
           initialStores={db.stores}
           initialDrivers={db.drivers}
           initialUsers={users}

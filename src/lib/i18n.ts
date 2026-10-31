@@ -647,6 +647,22 @@ const fr: Record<string, string> = {
   "4-digit handover": "Remise à 4 chiffres",
   "Book a taxi": "Réserver un taxi",
   "Drive with Wassl": "Conduire avec Wassl",
+  "Partner with Wassl": "Devenir partenaire Wassl",
+  "Bring your store online.": "Mettez votre boutique en ligne.",
+  "Work the city on your terms.": "Travaillez en ville à votre rythme.",
+  "Join Wassl.": "Rejoignez Wassl.",
+  "Joining as a store or driver?": "Vous êtes un commerce ou un chauffeur ?",
+  "Store partner": "Partenaire boutique",
+  "Driver partner": "Partenaire chauffeur",
+  "Looking to order instead?": "Vous souhaitez commander ?",
+  "Customer sign up": "Inscription client",
+  "Driver / taxi": "Chauffeur / taxi",
+  "Create your store account, then operations verifies your details and opens your dashboard. You keep your own menu, stock and payout view.":
+    "Créez votre compte boutique, puis nos opérations vérifient vos informations et ouvrent votre tableau de bord. Vous gardez votre carte, votre stock et vos paiements.",
+  "Apply as a delivery courier or taxi driver. Operations reviews your vehicle and documents, then unlocks your route and cash tools.":
+    "Postulez comme livreur ou chauffeur de taxi. Nos opérations vérifient votre véhicule et vos documents, puis débloquent votre tournée et vos outils d'encaissement.",
+  "Order from local stores in a minute. Save addresses, track deliveries live and keep every receipt in one place.":
+    "Commandez auprès de commerces locaux en une minute. Enregistrez vos adresses, suivez les livraisons en direct et gardez tous vos reçus au même endroit.",
   "Ride handover code": "Code de remise du trajet",
   "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.":
     "Ne partagez ces quatre chiffres avec le chauffeur qu'à votre arrivée. La course ne peut pas être clôturée sans eux.",
@@ -1280,6 +1296,22 @@ const es: Record<string, string> = {
   "4-digit handover": "Entrega con código de 4 dígitos",
   "Book a taxi": "Pedir un taxi",
   "Drive with Wassl": "Conduce con Wassl",
+  "Partner with Wassl": "Hazte socio de Wassl",
+  "Bring your store online.": "Pon tu tienda online.",
+  "Work the city on your terms.": "Trabaja en la ciudad a tu ritmo.",
+  "Join Wassl.": "Únete a Wassl.",
+  "Joining as a store or driver?": "¿Eres un comercio o un conductor?",
+  "Store partner": "Socio comercio",
+  "Driver partner": "Socio conductor",
+  "Looking to order instead?": "¿Prefieres pedir?",
+  "Customer sign up": "Registro de cliente",
+  "Driver / taxi": "Conductor / taxi",
+  "Create your store account, then operations verifies your details and opens your dashboard. You keep your own menu, stock and payout view.":
+    "Crea tu cuenta de tienda; operaciones verificará tus datos y abrirá tu panel. Mantienes tu carta, stock y pagos.",
+  "Apply as a delivery courier or taxi driver. Operations reviews your vehicle and documents, then unlocks your route and cash tools.":
+    "Solicita ser repartidor o taxista. Operaciones revisa tu vehículo y documentos, y desbloquea tu ruta y herramientas de cobro.",
+  "Order from local stores in a minute. Save addresses, track deliveries live and keep every receipt in one place.":
+    "Pide en tiendas locales en un minuto. Guarda direcciones, sigue entregas en directo y conserva todos los recibos.",
   "Ride handover code": "Código de entrega del viaje",
   "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.":
     "Comparte estos cuatro dígitos con el conductor solo al llegar. El viaje no se puede cerrar sin ellos.",
@@ -1912,6 +1944,22 @@ const ar: Record<string, string> = {
   "4-digit handover": "تسليم برمز من 4 أرقام",
   "Book a taxi": "اطلب تاكسي",
   "Drive with Wassl": "قد مع وصل",
+  "Partner with Wassl": "كن شريكاً مع وصل",
+  "Bring your store online.": "اجعل متجرك متاحاً على الإنترنت.",
+  "Work the city on your terms.": "اعمل في المدينة وفق وقتك.",
+  "Join Wassl.": "انضم إلى وصل.",
+  "Joining as a store or driver?": "هل أنت متجر أو سائق؟",
+  "Store partner": "شريك متجر",
+  "Driver partner": "شريك سائق",
+  "Looking to order instead?": "تفضل الطلب بدلاً من ذلك؟",
+  "Customer sign up": "تسجيل عميل",
+  "Driver / taxi": "سائق / تاكسي",
+  "Create your store account, then operations verifies your details and opens your dashboard. You keep your own menu, stock and payout view.":
+    "أنشئ حساب متجرك، ثم تتحقق العمليات من بياناتك وتفتح لوحتك. تحتفظ بقائمتك ومخزونك ومدفوعاتك.",
+  "Apply as a delivery courier or taxi driver. Operations reviews your vehicle and documents, then unlocks your route and cash tools.":
+    "تقدم كموصّل أو سائق تاكسي. تراجع العمليات مركبتك ووثائقك ثم تفتح مسارك وأدوات التحصيل.",
+  "Order from local stores in a minute. Save addresses, track deliveries live and keep every receipt in one place.":
+    "اطلب من متاجر محلية في دقيقة. احفظ العناوين وتابع التوصيل مباشرة واحتفظ بكل الإيصالات في مكان واحد.",
   "Ride handover code": "رمز تسليم الرحلة",
   "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.":
     "شارك هذه الأرقام الأربعة مع السائق عند وصولك فقط. لا يمكن إغلاق الرحلة دونها.",

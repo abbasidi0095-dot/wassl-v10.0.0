@@ -95,7 +95,7 @@ export function SiteHeader({
       active: pathname.startsWith("/orders"),
     },
     {
-      href: "/login?next=merchant",
+      href: "/signup/store",
       label: t("For business"),
       active: false,
     },
@@ -287,7 +287,7 @@ export function SiteHeader({
                       },
                     ]),
                 {
-                  href: "/login?next=merchant",
+                  href: "/signup/store",
                   label: t("Sell on Wassl"),
                   icon: Store,
                 },

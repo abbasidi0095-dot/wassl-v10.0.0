@@ -62,6 +62,7 @@ export function AccountProvisionModal({
   cities,
   stores,
   defaultRole = "driver",
+  defaultKind = "delivery",
   defaultStoreId,
   onClose,
   onCreated,
@@ -69,6 +70,7 @@ export function AccountProvisionModal({
   cities: City[];
   stores: StoreType[];
   defaultRole?: "driver" | "merchant";
+  defaultKind?: "delivery" | "taxi" | "both";
   defaultStoreId?: string;
   onClose: () => void;
   onCreated: () => void | Promise<void>;
@@ -79,8 +81,10 @@ export function AccountProvisionModal({
   const [citySlug, setCitySlug] = useState(
     cities.find((city) => city.priority)?.slug ?? cities[0]?.slug ?? "dakhla",
   );
-  const [kind, setKind] = useState<"delivery" | "taxi" | "both">("delivery");
-  const [vehicle, setVehicle] = useState("Motorbike");
+  const [kind, setKind] = useState<"delivery" | "taxi" | "both">(defaultKind);
+  const [vehicle, setVehicle] = useState(
+    defaultKind === "taxi" ? "Dacia Logan" : "Motorbike",
+  );
   const [plate, setPlate] = useState("");
   const [photo, setPhoto] = useState("");
   const [email, setEmail] = useState("");

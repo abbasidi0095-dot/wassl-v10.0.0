@@ -16,6 +16,7 @@ export async function GET(request: Request) {
     products: db.products,
     drivers: db.drivers,
     orders: db.orders,
+    taxiRides: db.taxiRides ?? [],
     users: await getUsers(),
     settings: db.settings,
     auditLogs: await getAuditLogs({ limit: 150 }),

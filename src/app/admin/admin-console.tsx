@@ -28,6 +28,7 @@ import {
   Search,
   Settings2,
   ShieldCheck,
+  ShoppingBasket as ShoppingBasketIcon,
   Star,
   Store as StoreIcon,
   Truck,
@@ -40,6 +41,7 @@ import {
 import { AccountProvisionModal, resizePhoto } from "./account-provision-modal";
 import { AdminMenuModal } from "./admin-menu-modal";
 import { THEME_PRESETS } from "@/lib/theme";
+import { computeAnalytics } from "@/lib/analytics";
 import type { AdminUserView, OrderView } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
 import type {
@@ -48,6 +50,7 @@ import type {
   Driver,
   OrderStatus,
   PlatformSettings,
+  TaxiRide,
   Store,
   StoreCategory,
 } from "@/lib/types";
@@ -73,6 +76,7 @@ type Stats = {
 
 type Tab =
   | "overview"
+  | "analytics"
   | "orders"
   | "stores"
   | "drivers"
@@ -101,9 +105,10 @@ type StoreDraft = {
 
 const TABS: { id: Tab; label: string; icon: typeof MapPin }[] = [
   { id: "overview", label: "Live", icon: Zap },
+  { id: "analytics", label: "Analytics", icon: CircleDollarSign },
   { id: "orders", label: "Orders", icon: PackageCheck },
   { id: "stores", label: "Stores", icon: StoreIcon },
-  { id: "drivers", label: "Drivers", icon: Bike },
+  { id: "drivers", label: "Fleet", icon: Bike },
   { id: "cities", label: "Cities", icon: Building2 },
   { id: "activity", label: "Activity", icon: History },
   { id: "data", label: "Data sources", icon: Database },
@@ -112,6 +117,7 @@ const TABS: { id: Tab; label: string; icon: typeof MapPin }[] = [
 
 export function AdminConsole({
   initialOrders,
+  initialTaxiRides,
   initialStores,
   initialDrivers,
   initialUsers,
@@ -122,6 +128,7 @@ export function AdminConsole({
   initialDataSource,
 }: {
   initialOrders: OrderView[];
+  initialTaxiRides: TaxiRide[];
   initialStores: Store[];
   initialDrivers: Driver[];
   initialUsers: AdminUserView[];
@@ -132,6 +139,7 @@ export function AdminConsole({
   initialDataSource: DataSourceStatus;
 }) {
   const [orders, setOrders] = useState(initialOrders);
+  const [taxiRides, setTaxiRides] = useState(initialTaxiRides);
   const [stores, setStores] = useState(initialStores);
   const [drivers, setDrivers] = useState(initialDrivers);
   const [users, setUsers] = useState(initialUsers);
@@ -156,23 +164,22 @@ export function AdminConsole({
   const [provision, setProvision] = useState<{
     role: "driver" | "merchant";
     storeId?: string;
+    kind?: "delivery" | "taxi" | "both";
   } | null>(null);
   const [menuStore, setMenuStore] = useState<Store | null>(null);
-  const [driverFilter, setDriverFilter] = useState<"all" | "delivery" | "taxi">("all");
   const router = useRouter();
 
   const pendingUsers = useMemo(
     () => users.filter((user) => (user.accountStatus ?? "active") === "pending"),
     [users],
   );
-  const visibleDrivers = useMemo(
-    () =>
-      drivers.filter((driver) => {
-        if (driverFilter === "all") return true;
-        if (driverFilter === "taxi") return driver.kind === "taxi" || driver.kind === "both";
-        return driver.kind !== "taxi";
-      }),
-    [driverFilter, drivers],
+  const deliveryDrivers = useMemo(
+    () => drivers.filter((driver) => driver.kind !== "taxi"),
+    [drivers],
+  );
+  const taxiDrivers = useMemo(
+    () => drivers.filter((driver) => driver.kind === "taxi" || driver.kind === "both"),
+    [drivers],
   );
 
   const refresh = useCallback(async (silent = false) => {
@@ -182,6 +189,7 @@ export function AdminConsole({
       if (response.ok) {
         const data = (await response.json()) as {
           orders: OrderView[];
+          taxiRides?: TaxiRide[];
           stores: Store[];
           drivers: Driver[];
           users: AdminUserView[];
@@ -540,9 +548,15 @@ export function AdminConsole({
       .slice(0, 60);
   }, [cities, cityQuery, cityFilter]);
 
+  const analytics = useMemo(
+    () => computeAnalytics(orders, taxiRides, stores, users),
+    [orders, taxiRides, stores, users],
+  );
+
   const statsCards = [
     { label: "Live orders", value: `${stats.liveOrders}` },
     { label: "Delivered GMV", value: money(stats.gmv) },
+    { label: "Wassl profit", value: money(analytics.profit.total) },
     { label: "Online drivers", value: `${stats.onlineDrivers}/${stats.drivers}` },
     { label: "Live cities", value: `${stats.liveCities}/${stats.cities}` },
   ];
@@ -606,7 +620,7 @@ export function AdminConsole({
         </div>
       ) : null}
 
-      <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-4">
+      <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-5">
         {statsCards.map((item) => (
           <div key={item.label}>
             <div className="text-[11px] text-muted">{item.label}</div>
@@ -717,6 +731,7 @@ export function AdminConsole({
           cities={cities}
           stores={stores}
           defaultRole={provision.role}
+          defaultKind={provision.kind}
           defaultStoreId={provision.storeId}
           onClose={() => setProvision(null)}
           onCreated={async () => {
@@ -785,6 +800,174 @@ export function AdminConsole({
                 <p className="mt-1 text-sm text-muted">No live orders right now.</p>
               </div>
             ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "analytics" ? (
+        <section className="mt-4 space-y-4" id="analytics">
+          <div>
+            <h2 className="text-xl font-semibold tracking-[-0.04em]">Profit & growth</h2>
+            <p className="mt-1 text-[11px] text-muted">
+              Wassl margin: 5 MAD per delivered order, 2 MAD per completed taxi
+              ride and 5% of grocery goods. Store commission stays separate.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                label: "Total profit",
+                value: money(analytics.profit.total),
+                note: `${analytics.deliveredOrders + analytics.completedRides} fulfilled jobs`,
+                icon: CircleDollarSign,
+              },
+              {
+                label: "Delivery margin",
+                value: money(analytics.profit.delivery),
+                note: `${analytics.deliveredOrders} delivered · 5 MAD each`,
+                icon: Truck,
+              },
+              {
+                label: "Taxi margin",
+                value: money(analytics.profit.taxi),
+                note: `${analytics.completedRides} trips · 2 MAD each`,
+                icon: CarTaxiFront,
+              },
+              {
+                label: "Grocery margin",
+                value: money(analytics.profit.grocery),
+                note: `${money(analytics.profit.grocerySales)} goods · 5%`,
+                icon: ShoppingBasketIcon,
+              },
+            ].map((item) => (
+              <div key={item.label} className="card p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-medium text-muted">{item.label}</span>
+                  <item.icon size={15} className="text-brand" />
+                </div>
+                <div className="mt-2 font-display text-[26px] font-semibold tracking-[-0.03em] tnum">
+                  {item.value}
+                </div>
+                <div className="mt-1 text-[10px] leading-4 text-muted">{item.note}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.45fr_0.55fr]">
+            <div className="card p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-[15px] font-semibold">Profit, last 14 days</h3>
+                  <p className="mt-0.5 text-[10px] text-muted">
+                    Delivered orders, completed rides and grocery margin.
+                  </p>
+                </div>
+                <span className="pill">{money(analytics.gmv)} GMV</span>
+              </div>
+              <div className="mt-6 flex h-44 items-end gap-1 border-b border-line pb-1">
+                {analytics.days.map((day, index) => {
+                  const max = Math.max(...analytics.days.map((item) => item.profit), 1);
+                  const height = day.profit ? Math.max(6, Math.round((day.profit / max) * 120)) : 2;
+                  return (
+                    <div key={day.key} className="group flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
+                      <div
+                        className={`w-full rounded-t-[3px] transition-colors ${
+                          day.profit ? "bg-brand/80 group-hover:bg-brand" : "bg-surface-2"
+                        }`}
+                        style={{ height: `${height}px` }}
+                        title={`${day.label}: ${money(day.profit)}`}
+                      />
+                      {index % 2 === 0 ? (
+                        <span className="truncate text-[8px] text-muted">{day.label}</span>
+                      ) : (
+                        <span className="text-[8px] text-transparent">·</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-3 flex items-center justify-between text-[10px] text-muted">
+                <span>{analytics.days[0]?.label}</span>
+                <span>{analytics.days[analytics.days.length - 1]?.label}</span>
+              </div>
+            </div>
+
+            <div className="card p-5">
+              <h3 className="text-[15px] font-semibold">Volume</h3>
+              <dl className="mt-4 space-y-3 text-[12px]">
+                {[
+                  { label: "Delivered orders", value: String(analytics.deliveredOrders) },
+                  { label: "Completed rides", value: String(analytics.completedRides) },
+                  { label: "Grocery orders", value: String(analytics.groceryOrders) },
+                  { label: "Average order", value: money(analytics.averageOrder) },
+                  { label: "Signed-in customers", value: String(analytics.signups.customers) },
+                  { label: "Partner accounts", value: String(analytics.signups.merchants + analytics.signups.drivers) },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-center justify-between gap-2">
+                    <dt className="text-muted">{row.label}</dt>
+                    <dd className="font-semibold tnum">{row.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="card p-5">
+              <h3 className="text-[15px] font-semibold">Top stores by GMV</h3>
+              <div className="mt-3 divide-y divide-line border-t border-line">
+                {analytics.topStores.length ? (
+                  analytics.topStores.map((store, index) => (
+                    <div key={store.id} className="flex items-center gap-3 py-2.5">
+                      <span className="w-5 text-[11px] font-semibold text-muted tnum">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[12px] font-semibold">{store.name}</div>
+                        <div className="text-[10px] text-muted">{store.citySlug}</div>
+                      </div>
+                      <div className="text-end">
+                        <div className="text-[12px] font-semibold tnum">{money(store.gmv)}</div>
+                        <div className="text-[10px] text-muted">{store.orders} orders</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="py-6 text-center text-[12px] text-muted">No delivered orders yet.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="card p-5">
+              <h3 className="text-[15px] font-semibold">Recent margin</h3>
+              <div className="mt-3 divide-y divide-line border-t border-line">
+                {analytics.recent.length ? (
+                  analytics.recent.map((event) => (
+                    <div key={event.id} className="flex items-center gap-3 py-2.5">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[4px] bg-brand-soft text-brand">
+                        {event.kind === "taxi" ? (
+                          <CarTaxiFront size={13} />
+                        ) : event.kind === "grocery" ? (
+                          <ShoppingBasketIcon size={13} />
+                        ) : (
+                          <Truck size={13} />
+                        )}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[12px] font-semibold">{event.label}</div>
+                        <div className="truncate text-[10px] text-muted">{event.note}</div>
+                      </div>
+                      <span className="text-[12px] font-semibold text-brand tnum">
+                        +{money(event.profit)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="py-6 text-center text-[12px] text-muted">No margin recorded yet.</p>
+                )}
+              </div>
+            </div>
           </div>
         </section>
       ) : null}
@@ -949,126 +1132,36 @@ export function AdminConsole({
 
       {tab === "drivers" ? (
         <section className="mt-4" id="drivers">
-          <div className="flex items-end justify-between">
+          <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-semibold tracking-[-0.04em]">Driver fleet</h2>
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">Fleet & credentials</h2>
               <p className="mt-1 text-[11px] text-muted">
-                Cash on hand is COD liability. Drivers at their limit cannot be assigned.
+                Delivery couriers and taxi drivers are separate teams. Each panel
+                provisions a login and shows the credentials once.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="pill">{stats.onlineDrivers} online</span>
-              <div className="flex rounded-[6px] border border-line p-0.5">
-                {[
-                  { id: "all" as const, label: "All" },
-                  { id: "delivery" as const, label: "Delivery" },
-                  { id: "taxi" as const, label: "Taxi" },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setDriverFilter(item.id)}
-                    className={`rounded-[4px] px-2 py-1 text-[10px] font-semibold ${
-                      driverFilter === item.id
-                        ? "bg-ink text-on-dark"
-                        : "text-muted hover:text-ink"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setProvision({ role: "driver" })}
-                className="btn btn-primary btn-sm"
-              >
-                <Plus size={13} /> Add driver
-              </button>
-            </div>
+            <span className="pill">{deliveryDrivers.length + taxiDrivers.length} profiles</span>
           </div>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {visibleDrivers.map((driver) => {
-              const ratio = Math.min(100, Math.round((driver.cashOnHand / driver.cashLimit) * 100));
-              return (
-                <article key={driver.id} className="card p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      {driver.photo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={driver.photo}
-                          alt=""
-                          className="h-10 w-10 shrink-0 rounded-[6px] object-cover"
-                        />
-                      ) : (
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-brand-soft text-brand">
-                          {driver.kind === "taxi" ? (
-                            <CarTaxiFront size={17} />
-                          ) : (
-                            <Bike size={17} />
-                          )}
-                        </span>
-                      )}
-                      <div className="min-w-0">
-                        <div className="truncate text-[13px] font-semibold">{driver.name}</div>
-                        <div className="truncate text-[11px] font-bold text-muted">
-                          {driver.citySlug} · {driver.vehicle} ·{" "}
-                          {driver.kind === "taxi"
-                            ? "taxi"
-                            : driver.kind === "both"
-                              ? "delivery + taxi"
-                              : "delivery"}
-                        </div>
-                      </div>
-                    </div>
-                    <span
-                      className={`rounded-full px-2 py-1 text-[11px] font-semibold uppercase ${
-                        !driver.active
-                          ? "bg-danger-soft text-danger"
-                          : driver.status === "available"
-                            ? "bg-brand-soft text-brand"
-                            : driver.status === "busy"
-                              ? "bg-saffron/20 text-ink"
-                              : "bg-surface-2 text-muted"
-                      }`}
-                    >
-                      {driver.active ? driver.status : "inactive"}
-                    </span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-muted">
-                    <span>{driver.deliveries} deliveries</span>
-                    <span className="inline-flex items-center gap-1"><Star size={11} className="fill-saffron text-saffron" /> {driver.rating}</span>
-                  </div>
-                  <div className="mt-3">
-                    <div className="flex justify-between text-[11px] font-semibold">
-                      <span className="text-muted">Cash on hand</span>
-                      <span className={ratio > 85 ? "text-danger" : "text-ink"}>
-                        {money(driver.cashOnHand)} / {money(driver.cashLimit)}
-                      </span>
-                    </div>
-                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-ink/8">
-                      <div
-                        className={`h-full rounded-full ${ratio > 85 ? "bg-danger-soft0" : "bg-brand"}`}
-                        style={{ width: `${ratio}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-muted">
-                      <MapPin size={10} /> {driver.lat.toFixed(4)}, {driver.lng.toFixed(4)}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setEditingDriver(driver)}
-                      className="btn btn-ghost btn-sm"
-                    >
-                      <Pencil size={11} /> Manage
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <DriverPanel
+              title="Delivery boys"
+              subtitle="Store-to-door couriers, COD and handover codes."
+              icon="delivery"
+              drivers={deliveryDrivers}
+              busy={busy}
+              onAdd={() => setProvision({ role: "driver", kind: "delivery" })}
+              onManage={(driver) => setEditingDriver(driver)}
+            />
+            <DriverPanel
+              title="Taxi drivers"
+              subtitle="Ride-hailing fleet, vehicles, plates and photos."
+              icon="taxi"
+              drivers={taxiDrivers}
+              busy={busy}
+              onAdd={() => setProvision({ role: "driver", kind: "taxi" })}
+              onManage={(driver) => setEditingDriver(driver)}
+            />
           </div>
         </section>
       ) : null}
@@ -2253,6 +2346,107 @@ function DriverEditModal({
         </div>
       </form>
     </div>
+  );
+}
+
+function DriverPanel({
+  title,
+  subtitle,
+  icon,
+  drivers,
+  busy,
+  onAdd,
+  onManage,
+}: {
+  title: string;
+  subtitle: string;
+  icon: "delivery" | "taxi";
+  drivers: Driver[];
+  busy: string;
+  onAdd: () => void;
+  onManage: (driver: Driver) => void;
+}) {
+  const Icon = icon === "taxi" ? CarTaxiFront : Bike;
+  return (
+    <section className="card p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-start gap-2.5">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-brand-soft text-brand">
+            <Icon size={17} />
+          </span>
+          <div>
+            <h3 className="text-[15px] font-semibold">{title}</h3>
+            <p className="mt-0.5 max-w-[36ch] text-[11px] leading-4 text-muted">
+              {subtitle}
+            </p>
+          </div>
+        </div>
+        <button type="button" onClick={onAdd} className="btn btn-primary btn-sm">
+          <Plus size={12} /> Generate credentials
+        </button>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {drivers.length ? (
+          drivers.map((driver) => (
+            <article key={driver.id} className="aero-tile flex flex-wrap items-center gap-3 rounded-[8px] border p-3">
+              {driver.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={driver.photo}
+                  alt=""
+                  className="h-10 w-10 shrink-0 rounded-[6px] object-cover"
+                />
+              ) : (
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-brand-soft text-brand">
+                  <Icon size={17} />
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="truncate text-[13px] font-semibold">{driver.name}</span>
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase ${
+                      !driver.active
+                        ? "bg-danger-soft text-danger"
+                        : driver.status === "available"
+                          ? "bg-brand-soft text-brand"
+                          : driver.status === "busy"
+                            ? "bg-saffron/20 text-ink"
+                            : "bg-surface-2 text-muted"
+                    }`}
+                  >
+                    {driver.active ? driver.status : "inactive"}
+                  </span>
+                </div>
+                <div className="truncate text-[10px] text-muted">
+                  {driver.citySlug} · {driver.vehicle}
+                  {driver.plate ? ` · ${driver.plate}` : ""}
+                  {driver.kind === "both" ? " · both" : ""}
+                </div>
+                <div className="mt-1 flex items-center gap-3 text-[10px] text-muted">
+                  <span>{driver.deliveries} trips</span>
+                  <span className="tnum">{money(driver.cashOnHand)} cash</span>
+                  <span>{driver.email}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => onManage(driver)}
+                disabled={busy === driver.id}
+                className="btn btn-ghost btn-sm shrink-0"
+              >
+                <Pencil size={11} /> Manage
+              </button>
+            </article>
+          ))
+        ) : (
+          <div className="rounded-[8px] border border-dashed border-line px-4 py-8 text-center text-[12px] text-muted">
+            No {icon === "taxi" ? "taxi drivers" : "delivery couriers"} yet.
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

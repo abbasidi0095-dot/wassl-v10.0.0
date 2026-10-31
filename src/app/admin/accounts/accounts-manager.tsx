@@ -87,6 +87,9 @@ export function AccountsManager({
   }, [users, query, pendingOnly]);
 
   const pendingCount = users.filter((user) => statusOf(user) === "pending").length;
+  const adminCount = users.filter(
+    (user) => user.role === "admin" && statusOf(user) === "active",
+  ).length;
 
   function updateDraft(userId: string, patch: Partial<Draft>) {
     setDrafts((current) => ({
@@ -155,6 +158,22 @@ export function AccountsManager({
     } else {
       setToast(`${result.name} approved.`);
     }
+  }
+
+  async function grantAdmin(user: AdminUserView) {
+    if (
+      !window.confirm(
+        `Grant full operations access to ${user.name}? They will see every store, driver, order and account.`,
+      )
+    ) {
+      return;
+    }
+    const result = await callApi(user, {
+      role: "admin",
+      storeId: null,
+      driverId: null,
+    });
+    if (result) setToast(`${result.name} now has admin access.`);
   }
 
   async function reject(user: AdminUserView) {
@@ -356,6 +375,19 @@ export function AccountsManager({
                             )}
                             Approve
                           </button>
+                        ) : null}
+                        {user.role !== "admin" ? (
+                          <button
+                            type="button"
+                            onClick={() => void grantAdmin(user)}
+                            disabled={working}
+                            className="btn btn-ghost btn-sm"
+                            title="Grant full operations access"
+                          >
+                            <ShieldCheck size={13} /> Grant admin
+                          </button>
+                        ) : adminCount > 1 ? (
+                          <span className="text-[10px] font-medium text-muted">Admin</span>
                         ) : null}
                         {dirty ? (
                           <button

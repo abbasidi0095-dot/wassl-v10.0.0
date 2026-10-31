@@ -29,6 +29,22 @@ and dark themes.
 
 ## Release history
 
+### 10.6.0 — 31 October 2026 — fleet, analytics and access
+- Admin Fleet now shows **Delivery boys** and **Taxi drivers** side by side,
+  each with its own “Generate credentials” action and driver profile list.
+- Driver sign-up is split from customer sign-up: `/signup` is customer-only,
+  `/signup/store` is the store partner application and `/signup/driver` covers
+  delivery, taxi and both. Customers, stores and drivers all use `/login`.
+- Taxi and delivery sign-up captures role, vehicle and plate; approval creates
+  the matching driver profile.
+- Admin Analytics shows total Wassl profit, delivery margin (5 MAD per
+  delivered order), taxi margin (2 MAD per completed ride), grocery margin
+  (5% of grocery goods), a 14-day profit chart, volume, top stores and a recent
+  margin ledger.
+- Accounts can be granted admin access directly from the account list. The last
+  admin cannot be removed.
+- Overview now includes a live Wassl profit card.
+
 ### 10.5.0 — 31 October 2026 — Aero glass and live branding
 - The mobile bottom bar is now a floating Aero-glass dock with a highlight,
   blur, active pill and safe-area spacing; the footer reserves its height.
@@ -683,7 +699,7 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 71 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 72 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three

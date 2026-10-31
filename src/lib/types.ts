@@ -37,6 +37,8 @@ export interface User {
   requestedStoreName?: string;
   /** Driver sign-up detail; used to provision the courier profile. */
   requestedVehicle?: string;
+  requestedKind?: DriverKind;
+  requestedPlate?: string;
   loyaltyPoints?: number;
   favorites?: string[];
   shoppingLists?: ShoppingList[];

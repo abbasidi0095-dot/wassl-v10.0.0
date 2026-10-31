@@ -32,6 +32,8 @@ export async function POST(request: Request) {
         citySlug?: string;
         storeName?: string;
         vehicle?: string;
+        kind?: string;
+        plate?: string;
       }
     | null;
 
@@ -47,6 +49,13 @@ export async function POST(request: Request) {
   const citySlug = body.citySlug?.trim() || "";
   const storeName = body.storeName?.trim() || "";
   const vehicle = body.vehicle?.trim() || "";
+  const kind =
+    body.kind === "taxi" || body.kind === "both"
+      ? body.kind
+      : body.kind === "delivery"
+        ? "delivery"
+        : undefined;
+  const plate = body.plate?.trim() || "";
 
   if (name.length < 2) {
     return NextResponse.json({ error: "Enter your full name" }, { status: 400 });
@@ -84,6 +93,12 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+  if (role === "driver" && kind && kind !== "delivery" && !plate) {
+    return NextResponse.json(
+      { error: "A plate number is required for taxi drivers" },
+      { status: 400 },
+    );
+  }
 
   const cities = await getCities();
   const city = citySlug ? cities.find((candidate) => candidate.slug === citySlug) : undefined;
@@ -113,6 +128,8 @@ export async function POST(request: Request) {
       citySlug: city?.slug,
       requestedStoreName: storeName || undefined,
       requestedVehicle: vehicle || undefined,
+      requestedKind: kind,
+      requestedPlate: plate || undefined,
     });
   } catch (error) {
     return NextResponse.json(

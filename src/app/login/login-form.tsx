@@ -221,9 +221,9 @@ export function LoginForm({
             <p className="text-[13px] text-muted">{t("New to Wassl?")}</p>
             <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
               {[
-                { href: "/signup?role=customer", label: t("Customer") },
-                { href: "/signup?role=merchant", label: t("Store owner") },
-                { href: "/signup?role=driver", label: t("Driver") },
+                { href: "/signup", label: t("Customer") },
+                { href: "/signup/store", label: t("Store owner") },
+                { href: "/signup/driver", label: t("Driver / taxi") },
               ].map((item) => (
                 <Link
                   key={item.href}
