@@ -29,6 +29,29 @@ and dark themes.
 
 ## Release history
 
+### 10.3.0 — 31 October 2026 — editorial pass
+- Home shows a curated nine-store directory with a counted category rail and a
+  “Show all” expansion instead of dumping all 43 stores at once.
+- Grocery feature rebuilt as a two-column photo mosaic; hero type and stats were
+  tightened on mobile and the live map panel kept as the only right-column card.
+- Account rebuilt around a greeter, recent orders, quick access and a compact
+  profile panel with verification state; cart, checkout and order-history empty
+  states now use the same single ruled card.
+- Storefront mobile gets a sticky aisle rail, compact product rows, 44px stock
+  controls and low/out stock labels only; desktop menu and grocery storefront
+  share one border treatment.
+- Merchant dashboard, grocery manager, dispatch console and driver surfaces
+  moved off legacy rounded cards and `text-ink/xx` tokens onto the Coastal
+  Manifest system; staff navigation is consolidated to one row per workspace.
+- Order-code search has a real label and example, tab counts are badges, and
+  order/taxi history cards carry translated status labels.
+- FR/ES/AR copy added for every new customer string; Arabic display leading was
+  increased so large headings no longer clip their ascenders.
+- Verified: 69 unit tests, 10 Playwright e2e, `tsc` and production build clean;
+  TasteCheck gate audit CLEAN on grocery, store, taxi, auth, checkout, orders,
+  favourites and lists (home's store directory grid is accepted as content, not
+  a generic feature grid).
+
 ### 10.2.0 — 31 October 2026 — verified email accounts (Brevo OTP)
 - New self-service accounts must confirm a six-digit code before a session is
   opened; password sign-in for an unverified address sends a fresh code.
@@ -593,12 +616,12 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 60 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 69 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three
   concurrent writers, rollback, durable audit trail)
-- Playwright suite covers password sign-in, new-account review and admin
+- Playwright suite (10 tests) covers password sign-in, new-account review and admin
   approval against the production build
 - API flow tested against a production build: create order with modifiers and a
   promo → server repriced options and discount → merchant accept/prepare/ready →

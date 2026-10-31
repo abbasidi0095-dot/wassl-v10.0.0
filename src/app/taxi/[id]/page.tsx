@@ -39,7 +39,7 @@ export default async function TaxiRidePage({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/taxi"
-            className="inline-flex items-center gap-1.5 text-xs font-extrabold text-ink/50 hover:text-ink"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-ink"
           >
             <ArrowLeft size={14} className="rtl:-scale-x-100" />
             {t("Back")} · {t("Taxi")}

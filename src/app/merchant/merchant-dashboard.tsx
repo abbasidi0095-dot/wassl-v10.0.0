@@ -62,10 +62,10 @@ export function MerchantDashboard({
   const commission = Math.round((gmv * store.commissionRate) / 100);
 
   const stats = [
-    { label: "New orders", value: `${newOrders.length}`, icon: Bell, tone: "bg-saffron/20 text-ink" },
-    { label: "In progress", value: `${active.length}`, icon: ChefHat, tone: "bg-teal/10 text-teal" },
-    { label: "Delivered", value: `${delivered.length}`, icon: PackageCheck, tone: "bg-green-100 text-green-700" },
-    { label: "Revenue", value: money(gmv), icon: Banknote, tone: "bg-ink/5 text-ink" },
+    { label: "New orders", value: `${newOrders.length}`, icon: Bell },
+    { label: "In progress", value: `${active.length}`, icon: ChefHat },
+    { label: "Delivered", value: `${delivered.length}`, icon: PackageCheck },
+    { label: "Revenue", value: money(gmv), icon: Banknote },
   ];
 
   async function refreshOrders(silent = false) {
@@ -210,35 +210,37 @@ export function MerchantDashboard({
         <div>
           <div className="eyebrow">{store.citySlug} · live store</div>
           <h1 className="display mt-2 text-[clamp(1.9rem,1.5rem+1.4vw,2.7rem)]">{store.name}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-bold text-ink/45">
-            <span className="inline-flex items-center gap-1">
-              <Star size={12} className="fill-saffron text-saffron" />
-              {store.rating} · {store.reviews} reviews
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <Star size={12} className="fill-signal text-signal" />
+              <span className="tnum">
+                {store.rating} · {store.reviews} reviews
+              </span>
             </span>
-            <span className="inline-flex items-center gap-1">
-              <Clock3 size={12} className="text-teal" />
+            <span className="inline-flex items-center gap-1.5">
+              <Clock3 size={12} className="text-brand" />
               Prep {store.prepTime} min
             </span>
-            <span className="inline-flex items-center gap-1">
-              <MapPin size={12} className="text-teal" />
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin size={12} className="text-brand" />
               {store.landmark}
             </span>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div
-            className={`flex items-center gap-2 rounded-2xl border px-3 py-2 ${
+            className={`flex items-center gap-2.5 rounded-[6px] border px-3 py-2 ${
               store.isOpen
-                ? "border-teal/20 bg-teal/8 text-teal"
-                : "border-eed-200 bg-red-50 text-red-600"
+                ? "border-line bg-success-soft/60 text-success"
+                : "border-line bg-signal-soft text-signal-ink"
             }`}
           >
             <span className={`status-dot ${store.isOpen ? "live-dot" : ""}`} />
             <div>
-              <div className="text-[11px] font-medium opacity-60">
+              <div className="text-[10px] font-medium text-muted">
                 Store status
               </div>
-              <div className="text-[11px] font-extrabold">
+              <div className="text-[11px] font-semibold">
                 {store.isOpen ? "Accepting orders" : "Paused"}
               </div>
             </div>
@@ -258,11 +260,21 @@ export function MerchantDashboard({
         </div>
       </div>
 
-      <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-4">
-        {stats.map((item) => (
-          <div key={item.label}>
-            <div className="text-[11px] text-muted">{item.label}</div>
-            <div className="mt-1.5 font-display text-[28px] font-semibold leading-none tracking-[-0.03em] tnum">
+      <div className="mt-7 grid grid-cols-2 border-t border-line lg:grid-cols-4">
+        {stats.map((item, index) => (
+          <div
+            key={item.label}
+            className={`py-4 ${
+              index % 2 === 1 ? "border-s border-line ps-4" : ""
+            } ${index > 1 ? "border-t border-line lg:border-t-0" : ""} ${
+              index > 1 ? "lg:border-s lg:border-line lg:ps-5" : ""
+            } lg:ps-5 lg:[&:nth-child(1)]:ps-0`}
+          >
+            <div className="flex items-center gap-1.5 text-[11px] text-muted">
+              <item.icon size={12} strokeWidth={1.7} />
+              {item.label}
+            </div>
+            <div className="mt-1.5 font-display text-[26px] font-semibold leading-none tracking-[-0.03em] tnum">
               {item.value}
             </div>
           </div>
@@ -288,7 +300,7 @@ export function MerchantDashboard({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl">
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2.5 text-[12px] font-medium text-on-dark shadow-[var(--shadow-float)]">
           {toast}
         </div>
       ) : null}
@@ -307,7 +319,7 @@ export function MerchantDashboard({
                 {soundOn ? <Bell size={13} /> : <BellOff size={13} />}
                 {soundOn ? "Sound on" : "Sound off"}
               </button>
-              <span className="hidden text-[11px] font-bold text-ink/35 sm:block">
+              <span className="hidden text-[11px] text-muted tnum sm:block">
                 {active.length} active
               </span>
             </div>
@@ -324,13 +336,14 @@ export function MerchantDashboard({
               ))}
             </div>
           ) : (
-            <div className="card mt-3 grid place-items-center px-6 py-14 text-center">
-              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-teal/10 text-teal">
-                <ShoppingBag size={24} />
-              </span>
-              <h3 className="mt-3 text-lg font-extrabold">No orders yet</h3>
-              <p className="mt-1 text-sm text-ink/45">
-                New orders will appear here automatically with a sound.
+            <div className="mt-3 grid place-items-center rounded-[10px] border border-dashed border-line px-6 py-16 text-center">
+              <ShoppingBag size={26} strokeWidth={1.4} className="text-muted" />
+              <h3 className="mt-4 font-display text-[19px] font-semibold tracking-[-0.02em]">
+                No orders yet
+              </h3>
+              <p className="mt-1.5 max-w-[36ch] text-[12px] leading-5 text-muted">
+                New orders appear here automatically, with a sound when the board is
+                quiet.
               </p>
             </div>
           )}
@@ -341,10 +354,12 @@ export function MerchantDashboard({
         <section className="mt-4" id="menu">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">Menu & stock</h2>
-              <p className="mt-1 max-w-[46ch] text-[11px] text-ink/40">
-                Add dishes, set prices, and toggle an item off when it sells out. Customers
-                see sold-out items as unavailable.
+              <h2 className="font-display text-[22px] font-semibold tracking-[-0.025em]">
+                Menu & stock
+              </h2>
+              <p className="mt-1 max-w-[46ch] text-[12px] leading-5 text-muted">
+                Add dishes, set prices, and toggle an item off when it sells out.
+                Customers see sold-out items as unavailable.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -363,32 +378,32 @@ export function MerchantDashboard({
           {products.length ? (
             <div className="card mt-3 overflow-hidden">
               {/* Mobile: stacked rows so every control fits without sideways scrolling */}
-              <div className="divide-y divide-ink/5 md:hidden">
+              <div className="divide-y divide-line md:hidden">
                 {products.map((product) => (
                   <div key={product.id} className="flex items-start gap-3 p-3">
                     <ProductTile
                       name={product.name}
                       category={product.category}
-                      className="h-11 w-11 shrink-0 rounded-xl"
+                      className="h-11 w-11 shrink-0 rounded-[6px]"
                       iconSize={20}
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <div className="truncate text-[13px] font-extrabold">
+                          <div className="truncate text-[13px] font-semibold">
                             {product.name}
                           </div>
-                          <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-ink/40">
+                          <div className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-muted">
                             {product.description}
                           </div>
                         </div>
-                        <span className="shrink-0 text-sm font-extrabold">
+                        <span className="shrink-0 text-[13px] font-semibold tnum">
                           {money(product.price)}
                         </span>
                       </div>
                       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="max-w-[9rem] truncate rounded-full bg-ink/5 px-2 py-0.5 text-[11px] font-medium text-ink/45">
+                          <span className="max-w-[9rem] truncate rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-muted">
                             {product.category}
                           </span>
                           <span
@@ -433,25 +448,25 @@ export function MerchantDashboard({
                             <ProductTile
                               name={product.name}
                               category={product.category}
-                              className="h-8 w-8 rounded-lg"
+                              className="h-8 w-8 rounded-[4px]"
                               iconSize={15}
                             />
                             <div>
-                              <div className="font-extrabold">{product.name}</div>
-                              <div className="max-w-[220px] truncate text-[11px] text-ink/35">
+                              <div className="font-semibold">{product.name}</div>
+                              <div className="max-w-[220px] truncate text-[11px] text-muted">
                                 {product.description}
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="text-ink/45">{product.category}</td>
-                        <td className="font-extrabold">{money(product.price)}</td>
+                        <td className="text-muted">{product.category}</td>
+                        <td className="font-semibold tnum">{money(product.price)}</td>
                         <td>
                           <span
-                            className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
+                            className={`rounded-[2px] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] ${
                               product.available
-                                ? "bg-teal/10 text-teal"
-                                : "bg-red-50 text-red-500"
+                                ? "bg-success-soft text-success"
+                                : "bg-danger-soft text-danger"
                             }`}
                           >
                             {product.available ? "Available" : "Sold out"}
@@ -474,12 +489,12 @@ export function MerchantDashboard({
               </div>
             </div>
           ) : (
-            <div className="card mt-3 grid place-items-center px-6 py-12 text-center">
-              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-teal/10 text-teal">
-                <Utensils size={24} />
-              </span>
-              <h3 className="mt-3 text-lg font-extrabold">Your menu is empty</h3>
-              <p className="mt-1 max-w-sm text-sm text-ink/45">
+            <div className="mt-3 grid place-items-center rounded-[10px] border border-dashed border-line px-6 py-14 text-center">
+              <Utensils size={26} strokeWidth={1.4} className="text-muted" />
+              <h3 className="mt-4 font-display text-[19px] font-semibold tracking-[-0.02em]">
+                Your menu is empty
+              </h3>
+              <p className="mt-1.5 max-w-[38ch] text-[12px] leading-5 text-muted">
                 Add your first item so customers can start ordering from {store.name}.
               </p>
               <button
@@ -498,7 +513,9 @@ export function MerchantDashboard({
       {tab === "store" ? (
         <section className="mt-4 grid gap-4 lg:grid-cols-2" id="store">
           <div className="card p-5">
-            <h2 className="text-xl font-extrabold tracking-[-0.04em]">Store profile</h2>
+            <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
+              Store profile
+            </h2>
             <div className="mt-4 space-y-3 text-[13px]">
               {[
                 ["Store name", store.name],
@@ -511,14 +528,14 @@ export function MerchantDashboard({
                 ["Minimum order", money(store.minOrder)],
                 ["Commission", `${store.commissionRate}%`],
               ].map(([label, value]) => (
-                <div key={label} className="flex items-start justify-between gap-4 border-b border-ink/5 pb-2">
-                  <span className="font-bold text-ink/38">{label}</span>
-                  <span className="text-end font-extrabold text-ink/70">{value}</span>
+                <div key={label} className="flex items-start justify-between gap-4 border-b border-line pb-2 last:border-b-0">
+                  <span className="text-muted">{label}</span>
+                  <span className="text-end font-medium">{value}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-cream p-3 text-[11px] font-bold text-ink/45">
-              <MapPin size={13} className="text-teal" />
+            <div className="mt-4 flex items-center gap-2 rounded-[6px] bg-surface-2 px-3 py-2 text-[11px] text-muted tnum">
+              <MapPin size={13} className="text-brand" />
               {store.lat.toFixed(4)}, {store.lng.toFixed(4)}
             </div>
           </div>
@@ -526,37 +543,41 @@ export function MerchantDashboard({
           <div className="space-y-4">
             <div className="card p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-extrabold tracking-[-0.04em]">Settlement</h2>
-                <Banknote size={19} className="text-teal" />
+                <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
+                  Settlement
+                </h2>
+                <Banknote size={18} className="text-brand" />
               </div>
-              <p className="mt-1 text-[11px] text-ink/40">
+              <p className="mt-1 text-[12px] text-muted">
                 Delivered cash orders minus Wassl commission.
               </p>
               <div className="mt-4 space-y-2 text-[13px]">
-                <div className="flex justify-between text-ink/45">
+                <div className="flex justify-between text-muted">
                   <span>Delivered GMV</span>
-                  <span className="font-extrabold text-ink">{money(gmv)}</span>
+                  <span className="font-semibold text-ink tnum">{money(gmv)}</span>
                 </div>
-                <div className="flex justify-between text-ink/45">
+                <div className="flex justify-between text-muted">
                   <span>Commission ({store.commissionRate}%)</span>
-                  <span className="font-extrabold text-red-500">− {money(commission)}</span>
+                  <span className="font-semibold text-danger tnum">− {money(commission)}</span>
                 </div>
-                <div className="flex justify-between border-t border-ink/8 pt-2 text-base font-extrabold">
+                <div className="flex justify-between border-t border-line pt-2 text-[15px] font-semibold">
                   <span>Net payout</span>
-                  <span>{money(gmv - commission)}</span>
+                  <span className="tnum">{money(gmv - commission)}</span>
                 </div>
               </div>
-              <div className="mt-4 rounded-xl bg-saffron/15 p-3 text-[11px] font-bold text-ink/55">
-                Weekly settlement · Next payout on Sunday. COD is collected by the
+              <p className="mt-4 rounded-[6px] bg-signal-soft px-3 py-2.5 text-[11px] leading-5 text-signal-ink">
+                Weekly settlement · next payout on Sunday. COD is collected by the
                 driver and confirmed by dispatch.
-              </div>
+              </p>
             </div>
             <div className="card p-5">
-              <h2 className="text-sm font-extrabold">Operational settings</h2>
-              <div className="mt-3 flex items-center justify-between rounded-xl bg-cream p-3">
+              <h2 className="font-display text-[17px] font-semibold tracking-[-0.02em]">
+                Operational settings
+              </h2>
+              <div className="mt-3 flex items-center justify-between gap-4 rounded-[6px] bg-surface-2 p-3">
                 <div>
-                  <div className="text-[11px] font-extrabold">Accepting orders</div>
-                  <div className="text-[11px] text-ink/40">
+                  <div className="text-[12px] font-semibold">Accepting orders</div>
+                  <div className="mt-0.5 text-[11px] leading-5 text-muted">
                     Customers can browse, but cannot checkout when paused.
                   </div>
                 </div>
@@ -569,7 +590,7 @@ export function MerchantDashboard({
                   aria-label="Toggle store"
                 >
                   <span
-                    className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
+                    className={`absolute top-1 h-5 w-5 rounded-full bg-[#faf9f6] shadow-sm transition ${
                       store.isOpen ? "start-6" : "start-1"
                     }`}
                   />
@@ -646,21 +667,24 @@ function AddItemModal({
             available: true,
           });
         }}
-        className="max-h-[88vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl"
+        className="max-h-[88vh] w-full max-w-md overflow-y-auto rounded-[10px] bg-surface p-5 shadow-[var(--shadow-float)]"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 id="add-item-title" className="text-xl font-extrabold tracking-[-0.04em]">
+            <h2
+              id="add-item-title"
+              className="font-display text-[22px] font-semibold tracking-[-0.025em]"
+            >
               Add item
             </h2>
-            <p className="mt-1 text-[11px] text-ink/45">
+            <p className="mt-1 text-[12px] text-muted">
               It appears on your storefront immediately.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ink/5 text-ink/50 transition hover:text-ink"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-surface-2 text-muted transition-colors hover:text-ink"
             aria-label="Close"
           >
             <X size={16} />
@@ -722,14 +746,14 @@ function AddItemModal({
               rows={3}
             />
           </label>
-          <label className="flex items-center gap-2 rounded-xl bg-cream p-3">
+          <label className="flex items-center gap-2 rounded-[6px] bg-surface-2 p-3">
             <input
               type="checkbox"
               checked={popular}
               onChange={(event) => setPopular(event.target.checked)}
-              className="h-4 w-4 accent-teal"
+              className="h-4 w-4 accent-[var(--brand)]"
             />
-            <span className="text-[11px] font-extrabold">Show a “Popular” badge</span>
+            <span className="text-[12px] font-medium">Show a “Popular” badge</span>
           </label>
         </div>
 
@@ -795,48 +819,50 @@ function MerchantOrderCard({
     <article className="card p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[13px] font-extrabold">{order.code}</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[13px] font-semibold tnum">{order.code}</span>
             <span className="pill">{meta.label}</span>
             {order.status === "placed" ? <span className="pill pill-warm">New</span> : null}
           </div>
-          <div className="mt-1 text-[11px] font-bold text-ink/35">
+          <div className="mt-1 text-[11px] text-muted">
             {timeAgo(order.createdAt)} · {order.customerName}
           </div>
         </div>
         <div className="text-end">
-          <div className="text-lg font-extrabold">{money(order.total)}</div>
-          <div className="text-[11px] font-medium text-teal">COD</div>
+          <div className="text-[15px] font-semibold tnum">{money(order.total)}</div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.05em] text-muted">
+            COD
+          </div>
         </div>
       </div>
 
-      <div className="mt-3 space-y-1.5 rounded-xl bg-cream/70 p-3">
+      <div className="mt-3 space-y-1.5 rounded-[6px] bg-surface-2/70 p-3">
         {order.items.map((item, index) => (
           <div key={`${item.productId}-${index}`} className="flex items-center gap-2 text-[11px]">
-            <ProductTile name={item.name} className="h-5 w-5 rounded-md" iconSize={11} />
-            <span className="min-w-0 flex-1 font-bold text-ink/65">
+            <ProductTile name={item.name} className="h-5 w-5 rounded-[3px]" iconSize={11} />
+            <span className="min-w-0 flex-1 font-medium">
               <span className="block truncate">{item.qty}× {item.name}</span>
               {item.options?.length ? (
-                <span className="block truncate text-[11px] text-ink/35">
+                <span className="block truncate text-[10px] text-muted">
                   {item.options.map((option) => option.optionName).join(" · ")}
                 </span>
               ) : null}
             </span>
-            <span className="font-extrabold">{money(item.price * item.qty)}</span>
+            <span className="font-semibold tnum">{money(item.price * item.qty)}</span>
           </div>
         ))}
       </div>
 
-      <div className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-ink/45">
-        <MapPin size={13} className="mt-0.5 shrink-0 text-teal" />
+      <div className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-muted">
+        <MapPin size={13} className="mt-0.5 shrink-0 text-brand" />
         <span>
           {order.address} · {order.landmark}
-          {order.notes ? <span className="block italic text-ink/30">“{order.notes}”</span> : null}
+          {order.notes ? <span className="mt-0.5 block italic">“{order.notes}”</span> : null}
         </span>
       </div>
 
       {order.fulfillment || order.deliveryWindow || order.express || order.substitutionPreference ? (
-        <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-extrabold">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {order.fulfillment === "pickup" ? (
             <span className="pill">{order.pickupCode} · pickup</span>
           ) : order.express ? (
@@ -853,8 +879,8 @@ function MerchantOrderCard({
       ) : null}
 
       {order.driver ? (
-        <div className="mt-3 flex items-center gap-2 text-[11px] font-bold text-ink/45">
-          <Truck size={13} className="text-teal" />
+        <div className="mt-3 flex items-center gap-2 text-[11px] text-muted">
+          <Truck size={13} className="text-brand" />
           {order.driver.name} · {order.driver.vehicle} · {order.driver.plate}
         </div>
       ) : null}
@@ -905,14 +931,14 @@ function MerchantOrderCard({
       ) : null}
 
       {rejecting ? (
-        <div className="mt-3 rounded-xl border border-eed-200 bg-red-50/60 p-3">
-          <div className="text-[11px] font-medium text-red-700">
+        <div className="mt-3 rounded-[6px] border border-line bg-danger-soft/50 p-3">
+          <div className="text-[11px] font-medium text-danger">
             Why are you rejecting this order?
           </div>
           <textarea
             value={reason}
             onChange={(event) => setReason(event.target.value)}
-            className="input mt-2 min-h-16 resize-none bg-white text-[11px]"
+            className="input mt-2 min-h-16 resize-none text-[11px]"
             placeholder="e.g. Kitchen is out of the main dish"
             autoFocus
           />
@@ -931,7 +957,7 @@ function MerchantOrderCard({
               type="button"
               disabled={busy || reason.trim().length < 3}
               onClick={() => onStatus("cancelled", reason.trim())}
-              className="btn btn-sm bg-red-600 text-on-dark disabled:opacity-40"
+              className="btn btn-sm bg-danger text-[#fffaf1] disabled:opacity-40"
             >
               Confirm rejection
             </button>
@@ -940,7 +966,7 @@ function MerchantOrderCard({
       ) : null}
 
       {order.status === "ready" && order.fulfillment === "pickup" ? (
-        <div className="mt-3 rounded-xl bg-teal/8 px-3 py-2 text-[11px] font-bold text-ink/55">
+        <div className="mt-3 rounded-[6px] bg-brand-soft px-3 py-2.5 text-[11px] text-ink">
           <div className="flex items-center justify-between gap-2">
             <span>Customer pickup · ask for the pickup code.</span>
             <button
@@ -957,7 +983,7 @@ function MerchantOrderCard({
           </div>
         </div>
       ) : order.status === "ready" ? (
-        <div className="mt-3 rounded-xl bg-saffron/15 px-3 py-2 text-[11px] font-bold text-ink/55">
+        <div className="mt-3 rounded-[6px] bg-signal-soft px-3 py-2.5 text-[11px] text-signal-ink">
           Waiting for dispatch to assign a driver.
         </div>
       ) : null}

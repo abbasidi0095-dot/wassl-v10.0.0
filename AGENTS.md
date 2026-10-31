@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.2.0** (31 October 2026; verified email accounts)
+- Release: **10.3.0** (31 October 2026; editorial design pass)
 - Live: <https://wassl-34-preview.fly.dev>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -30,10 +30,10 @@ the architecture, hard constraints and the full change history.
 npm install
 npm run dev              # local dev
 npm run typecheck        # tsc --noEmit
-npm test                 # 60 Vitest tests
+npm test                 # 69 Vitest tests
 npm run test:pg          # Postgres integration tests
 npm run build            # production build
-PLAYWRIGHT_PORT=3510 npx playwright test   # 9 e2e tests
+PLAYWRIGHT_PORT=3510 npx playwright test   # 10 e2e tests
 npm run mobile:sync      # Capacitor sync
 npm run mobile:apk       # debug APK (Android SDK + JDK 21)
 ```
@@ -90,6 +90,35 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.3.0 — editorial design pass
+- Home: `StoreBrowser` accepts `initialLimit`; the landing page shows nine
+  stores, a counted category rail and a “Show all {count} stores” control while
+  city pages keep their full listing. Grocery feature is a two-column photo
+  mosaic; service doors are a 2×2 mobile grid with a route rule on hover.
+- Account: greeter (`Salam, {name}.`), recent-order list with translated status,
+  quick-access tiles, profile panel with initials, city/phone/order counts and
+  verification state, plus a quiet sign-out.
+- Storefront: sticky mobile aisle rail, single rule under search/filters,
+  compact product rows, 44px favourite/add controls, stock copy only for low
+  and out states, consistent stock counts.
+- Empty states: cart, checkout, order history, taxi history, favourites and
+  lists now use one ruled card with an icon chip instead of orphan hairlines.
+- Orders: labelled order-code field with a short example, tab-count badges,
+  translated status labels and a single-line helper strip instead of three
+  identical cards.
+- Staff: `StaffHeader` hides the nav row when a workspace has no links; admin
+  header shows Overview/Accounts/Grocery/Taxi only, merchant header shows the
+  grocery catalog link for grocery stores; the merchant order board, grocery
+  manager, dispatch console and driver surfaces were migrated off legacy
+  rounded cards and `text-ink/xx` tokens.
+- i18n: FR/ES/AR entries added for every new customer string; Arabic display
+  leading raised to 1.32 so the first line of large headings is not clipped.
+- Validation: `tsc` clean, 69 unit tests, 10 Playwright tests, production build
+  clean; TasteCheck gate audit CLEAN on grocery, store, taxi, auth, checkout,
+  orders, favourites and lists. The home store-directory grid still reports the
+  uniform-card warning; it is accepted because the cards are real, photographic
+  store listings rather than a decorative feature grid.
 
 ### 10.2.0 — verified email accounts (Brevo OTP)
 - `src/lib/email-verification.ts`: HMAC code hashing, 10-minute TTL, five

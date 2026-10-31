@@ -255,10 +255,16 @@ export function CheckoutForm({
 
   if (!items.length) {
     return (
-      <div className="mt-8 border-y border-line py-20 text-center">
-        <ShoppingBag size={22} className="mx-auto text-muted" />
-        <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">{t("Nothing to check out")}</h2>
-        <p className="mt-2 text-[13px] text-muted">{t("Add a few items from a local store first.")}</p>
+      <div className="mt-8 rounded-[10px] border border-line bg-surface px-6 py-16 text-center">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-surface-2 text-brand">
+          <ShoppingBag size={20} strokeWidth={1.6} />
+        </div>
+        <h2 className="display-sm mt-4 text-[clamp(1.6rem,1.3rem+1vw,2.2rem)]">
+          {t("Nothing to check out")}
+        </h2>
+        <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted">
+          {t("Add a few items from a local store first.")}
+        </p>
         <Link href="/city/dakhla" className="btn btn-primary mt-5">
           {t("Browse stores")} <ArrowRight size={14} className="rtl:-scale-x-100" />
         </Link>
@@ -327,7 +333,7 @@ export function CheckoutForm({
                       type="button"
                       onClick={() => removeSavedAddress(entry)}
                       aria-label={`Remove ${entry.label}`}
-                      className="grid w-8 place-items-center border-s border-ink/8 text-ink/30 hover:bg-red-50 hover:text-red-500"
+                      className="grid w-8 place-items-center border-s border-line text-muted hover:bg-danger-soft hover:text-danger"
                     >
                       <X size={12} />
                     </button>
@@ -352,7 +358,7 @@ export function CheckoutForm({
               <div className="relative">
                 <Phone
                   size={14}
-                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
                 />
                 <input
                   value={phone}
@@ -367,14 +373,14 @@ export function CheckoutForm({
             <label className="block sm:col-span-2">
               <span className="label">
                 Email{" "}
-                <span className="font-normal text-ink/35">
+                <span className="font-normal text-muted">
                   {lockEmail ? t("(your account email · order updates)") : t("(optional · order updates)")}
                 </span>
               </span>
               <div className="relative">
                 <Mail
                   size={14}
-                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
                 />
                 <input
                   type="email"
@@ -448,7 +454,7 @@ export function CheckoutForm({
                 type="datetime-local"
                 value={scheduled}
                 onChange={(event) => setScheduled(event.target.value)}
-                className="mt-1 w-full bg-transparent text-[11px] font-bold text-ink/50 outline-none"
+                className="mt-1 w-full bg-transparent text-[11px] font-bold text-muted outline-none"
               />
             </label>
           </div>
@@ -466,11 +472,11 @@ export function CheckoutForm({
         <div className="mt-4 max-h-56 space-y-2 overflow-y-auto pe-1">
           {items.map((item) => (
             <div key={item.lineId} className="flex items-center gap-2 text-[11px]">
-              <ProductTile name={item.name} className="h-7 w-7 rounded-lg" iconSize={14} />
+              <ProductTile name={item.name} className="h-7 w-7 rounded-[6px]" iconSize={14} />
               <span className="min-w-0 flex-1 truncate font-medium">
                 {item.qty}× {item.name}
                 {item.options.length ? (
-                  <span className="block truncate text-[11px] font-bold text-ink/35">
+                  <span className="block truncate text-[11px] font-bold text-muted">
                     {item.options.map((option) => option.optionName).join(" · ")}
                   </span>
                 ) : null}
@@ -479,7 +485,7 @@ export function CheckoutForm({
             </div>
           ))}
         </div>
-        <div className="mt-4 border-t border-ink/8 pt-4">
+        <div className="mt-4 border-t border-line pt-4">
           {activePromo ? (
             <div className="flex items-center justify-between gap-2 rounded-[4px] bg-surface-2 px-3 py-2">
               <div className="flex min-w-0 items-center gap-2 text-[11px] font-semibold text-brand">
@@ -500,7 +506,7 @@ export function CheckoutForm({
               <div className="relative flex-1">
                 <Tag
                   size={13}
-                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
                 />
                 <input
                   value={promoInput}
@@ -522,7 +528,7 @@ export function CheckoutForm({
             </div>
           )}
           {promoError || promoInvalid ? (
-            <p className="mt-1.5 text-[11px] font-bold text-red-600">
+            <p className="mt-1.5 text-[11px] font-bold text-danger">
               {promoError || promoInvalid}
             </p>
           ) : null}

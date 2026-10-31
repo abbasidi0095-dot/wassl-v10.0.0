@@ -137,7 +137,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
         <div>
           <Link
             href="/orders"
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-ink/35 hover:text-teal"
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-muted hover:text-brand"
           >
             <ArrowLeft size={13} /> All orders
           </Link>
@@ -147,18 +147,18 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             </h1>
             <span className="pill">{order.code}</span>
           </div>
-          <p className="mt-2 text-sm text-ink/45">
+          <p className="mt-2 text-sm text-muted">
             {order.store?.name} · {timeAgo(order.createdAt)}
-            {refreshing ? <span className="ms-2 text-teal">updating…</span> : null}
+            {refreshing ? <span className="ms-2 text-brand">updating…</span> : null}
           </p>
         </div>
         <div className="flex gap-2">
           {!delivered && !cancelled ? (
-            <div className="rounded-2xl border border-teal/15 bg-teal/8 px-4 py-2.5 text-end">
-              <div className="text-[11px] font-medium text-teal">
+            <div className="rounded-[10px] border border-teal/15 bg-brand-soft px-4 py-2.5 text-end">
+              <div className="text-[11px] font-medium text-brand">
                 Estimated arrival
               </div>
-              <div className="text-lg font-extrabold">{etaMinutes} min</div>
+              <div className="text-lg font-semibold">{etaMinutes} min</div>
             </div>
           ) : null}
           <button type="button" onClick={() => void refresh()} className="btn btn-ghost btn-sm self-center">
@@ -182,7 +182,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                 : "Share this PIN with the driver at handover."}
             </div>
           </div>
-          <div className="flex flex-wrap gap-1.5 text-[11px] font-extrabold">
+          <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold">
             {order.fulfillment === "pickup" ? <span className="pill">Pickup</span> : null}
             {order.express ? <span className="pill pill-warm">Express</span> : null}
             {order.deliveryWindow ? <span className="pill">{order.deliveryWindow}</span> : null}
@@ -204,16 +204,16 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
               route={route}
               followDriverId={order.driver ? "driver" : undefined}
             />
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/8 bg-paper px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-paper px-4 py-3">
               <div className="flex items-center gap-2">
                 <span
                   className={`status-dot ${delivered ? "" : "live-dot"} ${
-                    cancelled ? "text-red-500" : "text-teal"
+                    cancelled ? "text-danger" : "text-brand"
                   }`}
                 />
                 <div>
-                  <div className="text-[11px] font-extrabold">{meta.label}</div>
-                  <div className="text-[11px] font-bold text-ink/35">
+                  <div className="text-[11px] font-semibold">{meta.label}</div>
+                  <div className="text-[11px] font-bold text-muted">
                     {delivered
                       ? `Delivered at ${order.deliveredAt ? clock(order.deliveredAt) : "—"}`
                       : cancelled
@@ -222,8 +222,8 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-[11px] font-bold text-ink/35">
-                <MapPin size={12} className="text-teal" />
+              <div className="flex items-center gap-1 text-[11px] font-bold text-muted">
+                <MapPin size={12} className="text-brand" />
                 {order.address} · {order.landmark}
               </div>
             </div>
@@ -235,8 +235,8 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                 <Bike size={20} />
               </span>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-extrabold">{order.driver.name}</div>
-                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-bold text-ink/40">
+                <div className="text-sm font-semibold">{order.driver.name}</div>
+                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-bold text-muted">
                   <span>{order.driver.vehicle}</span>
                   <span>·</span>
                   <span>{order.driver.plate}</span>
@@ -267,8 +267,8 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             <div className="card flex items-center gap-3 p-4">
               <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-muted"><Bike size={20} /></span>
               <div>
-                <div className="text-sm font-extrabold">Finding your driver</div>
-                <div className="mt-0.5 text-[11px] font-bold text-ink/40">
+                <div className="text-sm font-semibold">Finding your driver</div>
+                <div className="mt-0.5 text-[11px] font-bold text-muted">
                   A local driver will be assigned as soon as the store marks the order ready.
                 </div>
               </div>
@@ -279,7 +279,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">Order timeline</h2>
             <div className="mt-4">
               {cancelled ? (
-                <div className="rounded-xl bg-red-50 p-3 text-xs font-bold text-red-700">
+                <div className="rounded-[6px] bg-danger-soft p-3 text-xs font-bold text-danger">
                   This order was cancelled. If you were charged, contact support.
                 </div>
               ) : (
@@ -311,7 +311,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                             <span className={`text-[13px] ${active ? "font-semibold text-ink" : done ? "font-medium text-ink" : "text-muted/60"}`}>
                               {step.label}
                             </span>
-                            <span className="text-[11px] font-bold text-ink/30">
+                            <span className="text-[11px] font-bold text-muted">
                               {event ? clock(event.at) : ""}
                             </span>
                           </div>
@@ -338,11 +338,11 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             <div className="mt-3 space-y-2">
               {order.items.map((item, index) => (
                 <div key={`${item.productId}-${index}`} className="flex items-center gap-2 text-[11px]">
-                  <ProductTile name={item.name} className="h-7 w-7 rounded-lg" iconSize={14} />
+                  <ProductTile name={item.name} className="h-7 w-7 rounded-[6px]" iconSize={14} />
                   <span className="min-w-0 flex-1 font-medium">
                     <span className="block truncate">{item.qty}× {item.name}</span>
                     {item.options?.length ? (
-                      <span className="block truncate text-[11px] text-ink/35">
+                      <span className="block truncate text-[11px] text-muted">
                         {item.options.map((option) => option.optionName).join(" · ")}
                       </span>
                     ) : null}
@@ -381,19 +381,19 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           <div className="card p-5">
             <h2 className="text-[13px] font-semibold">Delivery address</h2>
             <div className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-muted">
-              <MapPin size={14} className="mt-0.5 shrink-0 text-teal" />
+              <MapPin size={14} className="mt-0.5 shrink-0 text-brand" />
               <div>
                 <div className="font-medium text-ink">{order.address}</div>
                 <div>{order.landmark}</div>
-                {order.notes ? <div className="mt-1 italic text-ink/35">“{order.notes}”</div> : null}
+                {order.notes ? <div className="mt-1 italic text-muted">“{order.notes}”</div> : null}
               </div>
             </div>
-            <div className="mt-3 flex items-center gap-2 text-[11px] text-ink/50">
-              <Phone size={13} className="text-teal" /> {order.customerPhone}
+            <div className="mt-3 flex items-center gap-2 text-[11px] text-muted">
+              <Phone size={13} className="text-brand" /> {order.customerPhone}
             </div>
             {order.scheduledFor ? (
-              <div className="mt-2 flex items-center gap-2 text-[11px] text-ink/50">
-                <Clock3 size={13} className="text-teal" /> Scheduled for{" "}
+              <div className="mt-2 flex items-center gap-2 text-[11px] text-muted">
+                <Clock3 size={13} className="text-brand" /> Scheduled for{" "}
                 {new Date(order.scheduledFor).toLocaleString("en-GB", {
                   weekday: "short",
                   hour: "2-digit",
@@ -403,11 +403,11 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             ) : null}
           </div>
 
-          <div className="rounded-2xl bg-ink p-5 text-on-dark">
+          <div className="rounded-[10px] bg-ink p-5 text-on-dark">
             <div className="flex items-center gap-2 text-[11px] font-medium text-on-dark/40">
               <ShieldCheck size={13} className="text-saffron" /> Wassl support
             </div>
-            <p className="mt-2 text-sm font-extrabold">Something wrong with your order?</p>
+            <p className="mt-2 text-sm font-semibold">Something wrong with your order?</p>
             <p className="mt-1 text-[11px] leading-5 text-on-dark/50">
               Call us and we will contact the store and driver directly.
             </p>
@@ -422,7 +422,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                 <OrderRefundPanel orderId={order.id} />
               ) : null}
               <Link href={`/store/${order.store?.slug}`} className="btn btn-ghost w-full">
-                <CheckCircle2 size={15} className="text-teal" /> Order again
+                <CheckCircle2 size={15} className="text-brand" /> Order again
               </Link>
             </>
           ) : null}

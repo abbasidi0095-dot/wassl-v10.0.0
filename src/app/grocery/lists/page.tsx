@@ -51,7 +51,7 @@ export default async function GroceryListsPage() {
         <div className="max-w-2xl">
           <div className="eyebrow">{t("Wassl Grocery")}</div>
           <h1 className="display mt-2 text-4xl">{t("Shopping lists")}</h1>
-          <p className="mt-2 text-sm text-ink/50">
+          <p className="mt-2 text-sm text-muted">
             {t("Plan your shop, then add products to the cart from the store.")}
           </p>
         </div>

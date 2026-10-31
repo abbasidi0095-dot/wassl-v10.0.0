@@ -17,9 +17,9 @@ export default async function CitiesPage() {
           <h1 className="display mt-3 text-5xl sm:text-6xl">
             All Morocco.
             <br />
-            <span className="text-teal">The South first.</span>
+            <span className="text-brand">The South first.</span>
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-ink/55">
+          <p className="mt-4 max-w-xl text-sm leading-6 text-muted">
             Every city is in the Wassl directory. Priority operations are live in
             Dakhla, Laayoune, Boujdour, Esmara and Tarfaya, with the rest opening as
             local stores and drivers join.

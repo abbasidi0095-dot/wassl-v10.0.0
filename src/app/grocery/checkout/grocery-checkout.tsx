@@ -278,7 +278,7 @@ export function GroceryCheckout() {
                   type="button"
                   disabled={!enabled}
                   onClick={() => setFulfillment(mode)}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-3 text-xs font-extrabold transition ${
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-[6px] border px-3 py-3 text-xs font-semibold transition ${
                     fulfillment === mode
                       ? "border-ink bg-surface-2 text-ink"
                       : "border-line text-muted"
@@ -328,7 +328,7 @@ export function GroceryCheckout() {
           ) : (
             <div className="mt-4 rounded-[6px] bg-surface-2 p-3 text-[13px] text-muted">
               <div className="flex items-start gap-2">
-                <MapPin size={14} className="mt-0.5 shrink-0 text-teal" />
+                <MapPin size={14} className="mt-0.5 shrink-0 text-brand" />
                 <span>
                   {store.name} · {store.address}
                   <br />
@@ -467,7 +467,7 @@ export function GroceryCheckout() {
             <div key={item.lineId} className="flex items-start justify-between gap-2 text-xs">
               <div className="min-w-0">
                 <div className="truncate font-medium">{item.name}</div>
-                <div className="text-[11px] text-ink/40">
+                <div className="text-[11px] text-muted">
                   {item.variantLabel || item.unit || ""} · ×{item.qty}
                 </div>
               </div>

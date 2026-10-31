@@ -30,13 +30,6 @@ export default async function AdminPage() {
           { href: "/admin/accounts", label: "Accounts" },
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
-          { href: "/admin#orders", label: "Orders" },
-          { href: "/admin#stores", label: "Stores" },
-          { href: "/admin#drivers", label: "Drivers" },
-          { href: "/admin#cities", label: "Cities" },
-          { href: "/admin#activity", label: "Activity" },
-          { href: "/admin#data", label: "Data" },
-          { href: "/admin#settings", label: "Settings" },
         ]}
         accent="ink"
       />

@@ -175,9 +175,9 @@ export function ProductSheet({
               </span>
             ) : null}
           </div>
-          <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.04em]">{product.name}</h2>
+          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">{product.name}</h2>
           <p className="mt-1 text-[13px] leading-6 text-muted">{product.description}</p>
-          <div className="mt-2 text-base font-extrabold">{money(product.price)}</div>
+          <div className="mt-2 text-base font-semibold">{money(product.price)}</div>
 
           <div className="mt-5 space-y-5">
             {(product.modifiers ?? []).map((group) => {
@@ -186,8 +186,8 @@ export function ProductSheet({
               return (
                 <fieldset key={group.id}>
                   <legend className="flex w-full items-baseline justify-between gap-2">
-                    <span className="text-[13px] font-extrabold">{group.name}</span>
-                    <span className="text-[11px] font-bold uppercase tracking-wide text-ink/35">
+                    <span className="text-[13px] font-semibold">{group.name}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
                       {group.required ? t("Required") : t("Optional")}
                       {group.max > 1 ? ` · ${t("up to {max}", { max: group.max })}` : ""}
                     </span>
@@ -205,16 +205,16 @@ export function ProductSheet({
                           onClick={() => toggle(group.id, option.id, group.max)}
                           className={`flex w-full items-center gap-3 rounded-[6px] border px-3 py-2.5 text-start transition-colors ${
                             checked
-                              ? "border-teal bg-teal/6"
+                              ? "border-teal bg-brand-soft"
                               : dimmed
-                                ? "border-ink/8 bg-white opacity-45"
-                                : "border-ink/10 bg-white hover:border-teal/40"
+                                ? "border-line bg-surface opacity-45"
+                                : "border-line bg-surface hover:border-teal/40"
                           }`}
                         >
                           <span
                             className={`grid h-4 w-4 shrink-0 place-items-center border ${
                               group.max === 1 ? "rounded-full" : "rounded-[4px]"
-                            } ${checked ? "border-teal bg-teal text-on-dark" : "border-ink/25"}`}
+                            } ${checked ? "border-teal bg-brand text-on-dark" : "border-line"}`}
                           >
                             {checked ? <Check size={10} strokeWidth={3} /> : null}
                           </span>
@@ -224,7 +224,7 @@ export function ProductSheet({
                               <span className="ms-2 text-[11px] text-danger">{t("Sold out")}</span>
                             ) : null}
                           </span>
-                          <span className="text-[11px] font-extrabold text-ink/45">
+                          <span className="text-[11px] font-semibold text-muted">
                             {option.priceDelta === 0 ? t("Free") : `+${money(option.priceDelta)}`}
                           </span>
                         </button>
@@ -237,7 +237,7 @@ export function ProductSheet({
           </div>
         </div>
 
-        <div className="shrink-0 border-t border-ink/8 bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="shrink-0 border-t border-line bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 rounded-[4px] border border-line p-1">
               <button
@@ -248,7 +248,7 @@ export function ProductSheet({
               >
                 <Minus size={15} />
               </button>
-              <span className="w-6 text-center text-sm font-extrabold">{qty}</span>
+              <span className="w-6 text-center text-sm font-semibold">{qty}</span>
               <button
                 type="button"
                 onClick={() => setQty((value) => Math.min(20, value + 1))}
@@ -268,7 +268,7 @@ export function ProductSheet({
             </button>
           </div>
           {incomplete ? (
-            <p className="mt-2 text-center text-[11px] font-bold text-ink/35">
+            <p className="mt-2 text-center text-[11px] font-bold text-muted">
               Choose the required options to continue.
             </p>
           ) : null}

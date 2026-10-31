@@ -107,7 +107,7 @@ export function NativeShell() {
   return (
     <div
       role="status"
-      className="fixed inset-x-0 top-0 z-[100] flex items-center justify-center gap-2 bg-ink px-3 py-2 text-[11px] font-extrabold text-on-dark"
+      className="fixed inset-x-0 top-0 z-[100] flex items-center justify-center gap-2 bg-ink px-3 py-2 text-[11px] font-semibold text-on-dark"
     >
       <WifiOff size={13} className="text-saffron" />
       No connection — waiting for the network

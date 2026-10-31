@@ -33,7 +33,7 @@ export default async function CheckoutPage() {
             </p>
           ) : session.role === "customer" ? (
             <p className="mt-3 text-[13px] text-muted">
-              Signed in as <strong className="text-ink/70">{session.email}</strong>. Your
+              Signed in as <strong className="text-muted">{session.email}</strong>. Your
               order will appear in{" "}
               <Link href="/account" className="font-medium text-brand">
                 your account

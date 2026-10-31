@@ -94,7 +94,7 @@ type StoreDraft = {
 };
 
 const TABS: { id: Tab; label: string; icon: typeof MapPin }[] = [
-  { id: "overview", label: "Live overview", icon: Zap },
+  { id: "overview", label: "Live", icon: Zap },
   { id: "orders", label: "Orders", icon: PackageCheck },
   { id: "stores", label: "Stores", icon: StoreIcon },
   { id: "drivers", label: "Drivers", icon: Bike },
@@ -530,13 +530,13 @@ export function AdminConsole({
           <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">Dispatch control room.</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted">
             <span className="inline-flex items-center gap-1">
-              <span className="status-dot live-dot text-teal" /> Live across {stats.liveCities} cities
+              <span className="status-dot live-dot text-brand" /> Live across {stats.liveCities} cities
             </span>
             <span className="inline-flex items-center gap-1">
-              <Users size={12} className="text-teal" /> {stats.stores} stores
+              <Users size={12} className="text-brand" /> {stats.stores} stores
             </span>
             <span className="inline-flex items-center gap-1">
-              <Truck size={12} className="text-teal" /> {activeOrders.length} orders in flight
+              <Truck size={12} className="text-brand" /> {activeOrders.length} orders in flight
             </span>
           </div>
         </div>
@@ -547,7 +547,7 @@ export function AdminConsole({
           >
             <Users size={14} /> Accounts
             {pendingUsers.length ? (
-              <span className="ms-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[11px] font-extrabold text-on-dark">
+              <span className="ms-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[11px] font-semibold text-on-dark">
                 {pendingUsers.length}
               </span>
             ) : null}
@@ -555,29 +555,21 @@ export function AdminConsole({
           <button type="button" onClick={() => refresh()} className="btn btn-ghost">
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} /> Refresh
           </button>
-          <button
-            type="button"
-            onClick={resetDemo}
-            disabled={busy === "reset"}
-            className="btn btn-danger"
-          >
-            <RotateCcw size={14} /> Reset demo
-          </button>
         </div>
       </div>
 
       {pendingUsers.length ? (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-saffron/30 bg-saffron/10 px-4 py-3">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-saffron/30 bg-saffron/10 px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-saffron/25 text-saffron-deep">
+            <span className="grid h-9 w-9 place-items-center rounded-[6px] bg-saffron/25 text-saffron-deep">
               <Users size={16} />
             </span>
             <div>
-              <div className="text-[13px] font-extrabold">
+              <div className="text-[13px] font-semibold">
                 {pendingUsers.length} account{pendingUsers.length === 1 ? "" : "s"} waiting
                 for approval
               </div>
-              <div className="text-[11px] font-bold text-ink/45">
+              <div className="text-[11px] font-bold text-muted">
                 Approving a store owner provisions a storefront. Approving a driver
                 provisions a courier profile.
               </div>
@@ -626,7 +618,7 @@ export function AdminConsole({
 
       {cancelTarget ? (
         <div
-          className="fixed inset-0 z-[70] grid place-items-center bg-ink/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] grid place-items-center bg-surface-20 p-4 backdrop-blur-sm"
           role="presentation"
           onClick={() => setCancelTarget(null)}
         >
@@ -634,16 +626,16 @@ export function AdminConsole({
             role="dialog"
             aria-modal="true"
             aria-label="Cancel order"
-            className="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl"
+            className="w-full max-w-md rounded-[10px] bg-surface p-5 shadow-[var(--shadow-float)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-red-50 text-red-500">
+              <span className="grid h-9 w-9 place-items-center rounded-[6px] bg-danger-soft text-danger">
                 <AlertTriangle size={17} />
               </span>
               <div>
-                <h2 className="text-base font-extrabold">Cancel {cancelTarget.code}?</h2>
-                <p className="text-[11px] font-bold text-ink/40">
+                <h2 className="text-base font-semibold">Cancel {cancelTarget.code}?</h2>
+                <p className="text-[11px] font-bold text-muted">
                   The reason is saved on the order and in the activity trail.
                 </p>
               </div>
@@ -667,7 +659,7 @@ export function AdminConsole({
                 type="button"
                 onClick={confirmCancel}
                 disabled={cancelReason.trim().length < 3 || busy === cancelTarget.id}
-                className="btn btn-sm bg-red-600 text-on-dark disabled:opacity-40"
+                className="btn btn-sm bg-danger text-[#fffaf1] disabled:opacity-40"
               >
                 Cancel order
               </button>
@@ -708,12 +700,12 @@ export function AdminConsole({
         <section className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="card overflow-hidden">
             <MapView points={mapPoints} zoom={12} height={420} />
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/8 bg-paper px-4 py-3">
-              <div className="flex items-center gap-2 text-[11px] font-bold text-ink/45">
-                <span className="status-dot live-dot text-teal" />
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-paper px-4 py-3">
+              <div className="flex items-center gap-2 text-[11px] font-bold text-muted">
+                <span className="status-dot live-dot text-brand" />
                 {mapPoints.length} live markers · updated in real time
               </div>
-              <div className="flex flex-wrap gap-3 text-[11px] font-medium text-ink/35">
+              <div className="flex flex-wrap gap-3 text-[11px] font-medium text-muted">
                 <span className="inline-flex items-center gap-1">
                   <StoreIcon size={10} /> store
                 </span>
@@ -746,9 +738,9 @@ export function AdminConsole({
             ))}
             {!activeOrders.length ? (
               <div className="card grid place-items-center px-6 py-14 text-center">
-                <CheckCircle2 size={28} className="text-teal" />
-                <h3 className="mt-3 text-lg font-extrabold">All clear</h3>
-                <p className="mt-1 text-sm text-ink/45">No live orders right now.</p>
+                <CheckCircle2 size={28} className="text-brand" />
+                <h3 className="mt-3 text-lg font-semibold">All clear</h3>
+                <p className="mt-1 text-sm text-muted">No live orders right now.</p>
               </div>
             ) : null}
           </div>
@@ -758,8 +750,8 @@ export function AdminConsole({
       {tab === "orders" ? (
         <section className="mt-4" id="orders">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-extrabold tracking-[-0.04em]">All orders</h2>
-            <span className="text-[11px] font-bold text-ink/35">{orders.length} total</span>
+            <h2 className="text-xl font-semibold tracking-[-0.04em]">All orders</h2>
+            <span className="text-[11px] font-bold text-muted">{orders.length} total</span>
           </div>
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             {orders.map((order) => (
@@ -785,8 +777,8 @@ export function AdminConsole({
         <section className="mt-4" id="stores">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">Stores & supply</h2>
-              <p className="mt-1 text-[11px] text-ink/40">
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">Stores & supply</h2>
+              <p className="mt-1 text-[11px] text-muted">
                 Add a partner, edit its details or toggle it open and closed.
                 Merchants keep their own dashboard.
               </p>
@@ -826,7 +818,7 @@ export function AdminConsole({
                       <tr key={store.id}>
                       <td>
                         <div className="flex items-center gap-2">
-                          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-cream">
+                          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-[6px] bg-surface-2">
                             <Image
                               src={storePhoto(store)}
                               alt=""
@@ -836,24 +828,24 @@ export function AdminConsole({
                             />
                           </span>
                           <div>
-                            <div className="font-extrabold">{store.name}</div>
-                            <div className="text-[11px] text-ink/35">{store.landmark}</div>
+                            <div className="font-semibold">{store.name}</div>
+                            <div className="text-[11px] text-muted">{store.landmark}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="text-ink/50">{store.citySlug}</td>
-                      <td className="text-ink/50">{categoryLabel(store.category)}</td>
-                      <td className="font-extrabold">{store.rating}</td>
-                      <td className="font-extrabold">{money(store.deliveryFee)}</td>
+                      <td className="text-muted">{store.citySlug}</td>
+                      <td className="text-muted">{categoryLabel(store.category)}</td>
+                      <td className="font-semibold">{store.rating}</td>
+                      <td className="font-semibold">{money(store.deliveryFee)}</td>
                       <td>
                         <span
-                          className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
-                            openState.open ? "bg-teal/10 text-teal" : "bg-red-50 text-red-500"
+                          className={`rounded-full px-2 py-1 text-[11px] font-semibold uppercase ${
+                            openState.open ? "bg-brand-soft text-brand" : "bg-danger-soft text-danger"
                           }`}
                         >
                           {openState.open ? "Open" : "Closed"}
                         </span>
-                        <div className="mt-1 text-[11px] font-bold text-ink/35">
+                        <div className="mt-1 text-[11px] font-bold text-muted">
                           {openState.detail}
                         </div>
                       </td>
@@ -894,8 +886,8 @@ export function AdminConsole({
         <section className="mt-4" id="drivers">
           <div className="flex items-end justify-between">
             <div>
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">Driver fleet</h2>
-              <p className="mt-1 text-[11px] text-ink/40">
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">Driver fleet</h2>
+              <p className="mt-1 text-[11px] text-muted">
                 Cash on hand is COD liability. Drivers at their limit cannot be assigned.
               </p>
             </div>
@@ -908,50 +900,50 @@ export function AdminConsole({
                 <article key={driver.id} className="card p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal/10 text-teal">
+                      <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-brand-soft text-brand">
                         <Bike size={17} />
                       </span>
                       <div>
-                        <div className="text-[13px] font-extrabold">{driver.name}</div>
-                        <div className="text-[11px] font-bold text-ink/35">
+                        <div className="text-[13px] font-semibold">{driver.name}</div>
+                        <div className="text-[11px] font-bold text-muted">
                           {driver.citySlug} · {driver.vehicle}
                         </div>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
+                      className={`rounded-full px-2 py-1 text-[11px] font-semibold uppercase ${
                         !driver.active
-                          ? "bg-red-50 text-red-500"
+                          ? "bg-danger-soft text-danger"
                           : driver.status === "available"
-                            ? "bg-teal/10 text-teal"
+                            ? "bg-brand-soft text-brand"
                             : driver.status === "busy"
                               ? "bg-saffron/20 text-ink"
-                              : "bg-ink/5 text-ink/40"
+                              : "bg-surface-2 text-muted"
                       }`}
                     >
                       {driver.active ? driver.status : "inactive"}
                     </span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-ink/40">
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-muted">
                     <span>{driver.deliveries} deliveries</span>
                     <span className="inline-flex items-center gap-1"><Star size={11} className="fill-saffron text-saffron" /> {driver.rating}</span>
                   </div>
                   <div className="mt-3">
-                    <div className="flex justify-between text-[11px] font-extrabold">
-                      <span className="text-ink/40">Cash on hand</span>
-                      <span className={ratio > 85 ? "text-red-500" : "text-ink"}>
+                    <div className="flex justify-between text-[11px] font-semibold">
+                      <span className="text-muted">Cash on hand</span>
+                      <span className={ratio > 85 ? "text-danger" : "text-ink"}>
                         {money(driver.cashOnHand)} / {money(driver.cashLimit)}
                       </span>
                     </div>
                     <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-ink/8">
                       <div
-                        className={`h-full rounded-full ${ratio > 85 ? "bg-red-500" : "bg-teal"}`}
+                        className={`h-full rounded-full ${ratio > 85 ? "bg-danger-soft0" : "bg-brand"}`}
                         style={{ width: `${ratio}%` }}
                       />
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-ink/30">
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-muted">
                       <MapPin size={10} /> {driver.lat.toFixed(4)}, {driver.lng.toFixed(4)}
                     </div>
                     <button
@@ -973,8 +965,8 @@ export function AdminConsole({
         <section className="mt-4" id="cities">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">City activation</h2>
-              <p className="mt-1 text-[11px] text-ink/40">
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">City activation</h2>
+              <p className="mt-1 text-[11px] text-muted">
                 Every Moroccan city is listed. Switch a city live when supply is ready.
               </p>
             </div>
@@ -982,7 +974,7 @@ export function AdminConsole({
               <div className="relative">
                 <Search
                   size={14}
-                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
                 />
                 <input
                   value={cityQuery}
@@ -1000,10 +992,10 @@ export function AdminConsole({
                   key={item.value}
                   type="button"
                   onClick={() => setCityFilter(item.value)}
-                  className={`rounded-xl border px-3 py-1.5 text-[11px] font-extrabold transition ${
+                  className={`rounded-[6px] border px-3 py-1.5 text-[11px] font-semibold transition ${
                     cityFilter === item.value
                       ? "border-ink bg-ink text-on-dark"
-                      : "border-ink/10 bg-white/60 text-ink/50"
+                      : "border-line bg-surface text-muted"
                   }`}
                 >
                   {item.label}
@@ -1029,26 +1021,26 @@ export function AdminConsole({
                   {cityList.map((city) => (
                     <tr key={city.id}>
                       <td>
-                        <div className="font-extrabold">{city.name}</div>
-                        <div className="arabic text-[11px] text-ink/35">{city.nameAr}</div>
+                        <div className="font-semibold">{city.name}</div>
+                        <div className="arabic text-[11px] text-muted">{city.nameAr}</div>
                       </td>
-                      <td className="text-ink/45">{city.region}</td>
-                      <td className="text-ink/45">
+                      <td className="text-muted">{city.region}</td>
+                      <td className="text-muted">
                         {city.population ? city.population.toLocaleString("en-US") : "—"}
                       </td>
                       <td>
                         {city.priority ? (
                           <span className="pill pill-warm">Priority</span>
                         ) : (
-                          <span className="text-[11px] text-ink/25">—</span>
+                          <span className="text-[11px] text-muted">—</span>
                         )}
                       </td>
                       <td>
                         <span
-                          className={`rounded-full px-2 py-1 text-[11px] font-extrabold uppercase ${
+                          className={`rounded-full px-2 py-1 text-[11px] font-semibold uppercase ${
                             city.launchStatus === "live"
-                              ? "bg-teal/10 text-teal"
-                              : "bg-ink/5 text-ink/40"
+                              ? "bg-brand-soft text-brand"
+                              : "bg-surface-2 text-muted"
                           }`}
                         >
                           {city.launchStatus}
@@ -1070,7 +1062,7 @@ export function AdminConsole({
               </table>
             </div>
             {!cityList.length ? (
-              <div className="px-4 py-10 text-center text-sm text-ink/40">No cities match.</div>
+              <div className="px-4 py-10 text-center text-sm text-muted">No cities match.</div>
             ) : null}
           </div>
         </section>
@@ -1080,8 +1072,8 @@ export function AdminConsole({
         <section className="mt-4" id="activity">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">Activity trail</h2>
-              <p className="mt-1 text-[11px] text-ink/40">
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">Activity trail</h2>
+              <p className="mt-1 text-[11px] text-muted">
                 Every status change, assignment and configuration edit is attributed to
                 the signed-in actor and kept for the last {auditLogs.length} events.
               </p>
@@ -1089,7 +1081,7 @@ export function AdminConsole({
             <select
               value={activityEntity}
               onChange={(event) => setActivityEntity(event.target.value)}
-              className="h-9 rounded-xl border border-ink/10 bg-white px-3 text-[11px] font-bold"
+              className="h-9 rounded-[6px] border border-line bg-surface px-3 text-[11px] font-bold"
               aria-label="Filter activity"
             >
               {["all", "order", "store", "product", "driver", "city", "settings"].map(
@@ -1110,20 +1102,20 @@ export function AdminConsole({
                 )
                 .map((entry) => (
                   <div key={entry.id} className="flex gap-3 p-4">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-cream text-teal">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-surface-2 text-brand">
                       <EntityIcon entity={entry.entity} />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[13px] font-extrabold">{entry.summary}</span>
+                        <span className="text-[13px] font-semibold">{entry.summary}</span>
                         {entry.before || entry.after ? (
-                          <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-[11px] font-bold text-ink/40">
+                          <span className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-bold text-muted">
                             {entry.before} → {entry.after}
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-bold text-ink/35">
-                        <span className="rounded-full bg-teal/8 px-2 py-0.5 uppercase tracking-wide text-teal">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-bold text-muted">
+                        <span className="rounded-full bg-brand-soft px-2 py-0.5 uppercase tracking-wide text-brand">
                           {entry.actorRole}
                         </span>
                         <span>{entry.actorName || entry.actorId || "system"}</span>
@@ -1133,7 +1125,7 @@ export function AdminConsole({
                         <span>{timeAgo(entry.at)}</span>
                       </div>
                       {entry.note ? (
-                        <p className="mt-1 text-[11px] italic text-ink/40">“{entry.note}”</p>
+                        <p className="mt-1 text-[11px] italic text-muted">“{entry.note}”</p>
                       ) : null}
                     </div>
                   </div>
@@ -1141,7 +1133,7 @@ export function AdminConsole({
               {!auditLogs.filter((entry) =>
                 activityEntity === "all" ? true : entry.entity === activityEntity,
               ).length ? (
-                <div className="px-4 py-12 text-center text-sm text-ink/40">
+                <div className="px-4 py-12 text-center text-sm text-muted">
                   No activity recorded for this entity yet.
                 </div>
               ) : null}
@@ -1155,60 +1147,60 @@ export function AdminConsole({
           <div className="card p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-xl font-extrabold tracking-[-0.04em]">Restaurant data</h2>
-                <p className="mt-1 text-[11px] leading-5 text-ink/40">
+                <h2 className="text-xl font-semibold tracking-[-0.04em]">Restaurant data</h2>
+                <p className="mt-1 text-[11px] leading-5 text-muted">
                   The directory is a sealed snapshot. Menus and prices are authored demo
                   content and cannot be edited at runtime.
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-[11px] font-medium text-ink/50">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-[11px] font-medium text-muted">
                 <Lock size={10} /> {dataSource.locked ? "Locked" : "Live"}
               </span>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[11px] font-medium text-ink/35">
+              <div className="rounded-[10px] bg-surface-2/70 p-3">
+                <div className="text-[11px] font-medium text-muted">
                   Restaurants
                 </div>
-                <div className="mt-1 text-2xl font-extrabold">{dataSource.restaurantCount}</div>
+                <div className="mt-1 text-2xl font-semibold">{dataSource.restaurantCount}</div>
               </div>
-              <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[11px] font-medium text-ink/35">
+              <div className="rounded-[10px] bg-surface-2/70 p-3">
+                <div className="text-[11px] font-medium text-muted">
                   Menu items
                 </div>
-                <div className="mt-1 text-2xl font-extrabold">{dataSource.menuItemCount}</div>
+                <div className="mt-1 text-2xl font-semibold">{dataSource.menuItemCount}</div>
               </div>
-              <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[11px] font-medium text-ink/35">
+              <div className="rounded-[10px] bg-surface-2/70 p-3">
+                <div className="text-[11px] font-medium text-muted">
                   Cities
                 </div>
-                <div className="mt-1 text-2xl font-extrabold">
+                <div className="mt-1 text-2xl font-semibold">
                   {Object.keys(dataSource.cityCounts).length}
                 </div>
               </div>
             </div>
 
             <div
-              className={`mt-4 rounded-2xl border p-4 ${
+              className={`mt-4 rounded-[10px] border p-4 ${
                 dataSource.integrity.ok
-                  ? "border-teal/20 bg-teal/5"
-                  : "border-eed-200 bg-red-50"
+                  ? "border-teal/20 bg-brand-soft"
+                  : "border-eed-200 bg-danger-soft"
               }`}
             >
-              <div className="flex items-center gap-2 text-[11px] font-extrabold">
+              <div className="flex items-center gap-2 text-[11px] font-semibold">
                 <ShieldCheck
                   size={14}
-                  className={dataSource.integrity.ok ? "text-teal" : "text-red-500"}
+                  className={dataSource.integrity.ok ? "text-brand" : "text-danger"}
                 />
                 {dataSource.integrity.ok
                   ? "Snapshot checksum verified"
                   : "Snapshot checksum mismatch"}
               </div>
-              <div className="mt-1 break-all font-mono text-[11px] text-ink/40">
+              <div className="mt-1 break-all font-mono text-[11px] text-muted">
                 sha256:{dataSource.integrity.actual}
               </div>
-              <div className="mt-1 text-[11px] text-ink/40">
+              <div className="mt-1 text-[11px] text-muted">
                 Generated{" "}
                 {new Date(dataSource.generatedAt).toLocaleString("en-GB", {
                   dateStyle: "medium",
@@ -1223,7 +1215,7 @@ export function AdminConsole({
               </div>
             </div>
 
-            <p className="mt-4 rounded-xl bg-saffron/10 p-3 text-[11px] leading-5 text-ink/50">
+            <p className="mt-4 rounded-[6px] bg-saffron/10 p-3 text-[11px] leading-5 text-muted">
               {dataSource.notice}
             </p>
 
@@ -1249,46 +1241,46 @@ export function AdminConsole({
 
           <div className="space-y-4">
             <div className="card p-5">
-              <h3 className="text-sm font-extrabold">Sources & licences</h3>
+              <h3 className="text-sm font-semibold">Sources & licences</h3>
               <div className="mt-3 space-y-3">
                 {dataSource.sources.map((source) => (
-                  <div key={source.id} className="rounded-xl border border-ink/8 p-3">
+                  <div key={source.id} className="rounded-[6px] border border-line p-3">
                     <div className="flex items-center justify-between gap-2">
                       <a
                         href={source.url}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="text-[11px] font-extrabold text-teal hover:underline"
+                        className="text-[11px] font-semibold text-brand hover:underline"
                       >
                         {source.name} ↗
                       </a>
-                      <span className="text-[11px] font-bold uppercase tracking-wide text-ink/30">
+                      <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
                         {source.id}
                       </span>
                     </div>
-                    <div className="mt-1 text-[11px] font-bold text-ink/50">{source.role}</div>
-                    <div className="mt-0.5 text-[11px] text-ink/35">{source.license}</div>
+                    <div className="mt-1 text-[11px] font-bold text-muted">{source.role}</div>
+                    <div className="mt-0.5 text-[11px] text-muted">{source.license}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="card p-5">
-              <h3 className="text-sm font-extrabold">Coverage by city</h3>
+              <h3 className="text-sm font-semibold">Coverage by city</h3>
               <div className="mt-3 space-y-1.5">
                 {Object.entries(dataSource.cityCounts).map(([city, count]) => (
                   <div
                     key={city}
                     className="flex items-center justify-between text-[11px] font-bold"
                   >
-                    <span className="capitalize text-ink/60">{city}</span>
-                    <span className="rounded-lg bg-cream px-2 py-0.5 text-ink/50">
+                    <span className="capitalize text-muted">{city}</span>
+                    <span className="rounded-[6px] bg-surface-2 px-2 py-0.5 text-muted">
                       {count} restaurants
                     </span>
                   </div>
                 ))}
               </div>
-              <p className="mt-3 text-[11px] leading-4 text-ink/35">
+              <p className="mt-3 text-[11px] leading-4 text-muted">
                 Esmara has no restaurant records in the directory yet, so only preset
                 partner stores are available there.
               </p>
@@ -1301,10 +1293,10 @@ export function AdminConsole({
         <section className="mt-4 grid gap-4 lg:grid-cols-2" id="settings">
           <form onSubmit={saveSettings} className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">Platform settings</h2>
-              <Settings2 size={18} className="text-teal" />
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">Platform settings</h2>
+              <Settings2 size={18} className="text-brand" />
             </div>
-            <p className="mt-1 text-[11px] text-ink/40">
+            <p className="mt-1 text-[11px] text-muted">
               Brand, support and default economics. Store-level values override these.
             </p>
             <div className="mt-4 grid gap-3">
@@ -1364,10 +1356,10 @@ export function AdminConsole({
                   />
                 </label>
               </div>
-              <div className="flex items-center justify-between rounded-xl bg-cream p-3">
+              <div className="flex items-center justify-between rounded-[6px] bg-surface-2 p-3">
                 <div>
-                  <div className="text-[11px] font-extrabold">City waitlist</div>
-                  <div className="text-[11px] text-ink/40">
+                  <div className="text-[11px] font-semibold">City waitlist</div>
+                  <div className="text-[11px] text-muted">
                     Accept store and driver applications in coming-soon cities.
                   </div>
                 </div>
@@ -1380,12 +1372,12 @@ export function AdminConsole({
                     })
                   }
                   className={`relative h-7 w-12 rounded-full transition ${
-                    settings.cityWaitlistEnabled ? "bg-teal" : "bg-ink/20"
+                    settings.cityWaitlistEnabled ? "bg-brand" : "bg-ink/20"
                   }`}
                   aria-label="Toggle waitlist"
                 >
                   <span
-                    className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
+                    className={`absolute top-1 h-5 w-5 rounded-full bg-surface shadow transition ${
                       settings.cityWaitlistEnabled ? "start-6" : "start-1"
                     }`}
                   />
@@ -1404,27 +1396,27 @@ export function AdminConsole({
           <div className="space-y-4">
             <div className="card p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-extrabold tracking-[-0.04em]">COD reconciliation</h2>
-                <Banknote size={18} className="text-teal" />
+                <h2 className="text-lg font-semibold tracking-[-0.04em]">COD reconciliation</h2>
+                <Banknote size={18} className="text-brand" />
               </div>
               <div className="mt-4 space-y-2 text-[13px]">
-                <div className="flex justify-between text-ink/45">
+                <div className="flex justify-between text-muted">
                   <span>Cash held by drivers</span>
-                  <span className="font-extrabold text-ink">
+                  <span className="font-semibold text-ink">
                     {money(drivers.reduce((sum, driver) => sum + driver.cashOnHand, 0))}
                   </span>
                 </div>
-                <div className="flex justify-between text-ink/45">
+                <div className="flex justify-between text-muted">
                   <span>Delivered GMV</span>
-                  <span className="font-extrabold text-ink">{money(stats.gmv)}</span>
+                  <span className="font-semibold text-ink">{money(stats.gmv)}</span>
                 </div>
-                <div className="flex justify-between text-ink/45">
+                <div className="flex justify-between text-muted">
                   <span>Platform commission ({settings.commissionRate}%)</span>
-                  <span className="font-extrabold text-teal">
+                  <span className="font-semibold text-brand">
                     {money(Math.round((stats.gmv * settings.commissionRate) / 100))}
                   </span>
                 </div>
-                <div className="flex justify-between border-t border-ink/8 pt-2 text-base font-extrabold">
+                <div className="flex justify-between border-t border-line pt-2 text-base font-semibold">
                   <span>Store payouts due</span>
                   <span>
                     {money(
@@ -1433,7 +1425,7 @@ export function AdminConsole({
                   </span>
                 </div>
               </div>
-              <div className="mt-4 flex items-start gap-2 rounded-xl bg-saffron/15 p-3 text-[11px] leading-5 font-bold text-ink/55">
+              <div className="mt-4 flex items-start gap-2 rounded-[6px] bg-saffron/15 p-3 text-[11px] leading-5 font-bold text-muted">
                 <AlertTriangle size={13} className="mt-0.5 shrink-0" />
                 Weekly settlement run. A driver at their cash limit is blocked from new COD
                 orders until they hand over cash.
@@ -1441,8 +1433,8 @@ export function AdminConsole({
             </div>
 
             <div className="card p-5">
-              <h2 className="text-sm font-extrabold">Danger zone</h2>
-              <p className="mt-1 text-[11px] leading-5 text-ink/40">
+              <h2 className="text-sm font-semibold">Danger zone</h2>
+              <p className="mt-1 text-[11px] leading-5 text-muted">
                 Reset restores the seeded stores, drivers, demo orders and settings. Use it
                 before a demo run.
               </p>
@@ -1520,7 +1512,7 @@ function StoreFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-ink/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-surface-20 p-4 backdrop-blur-sm"
       role="presentation"
       onClick={onClose}
     >
@@ -1528,23 +1520,23 @@ function StoreFormModal({
         role="dialog"
         aria-modal="true"
         aria-label={store ? "Edit store" : "Add store"}
-        className="my-6 w-full max-w-2xl rounded-3xl bg-white p-5 shadow-2xl"
+        className="my-6 w-full max-w-2xl rounded-[10px] bg-surface p-5 shadow-[var(--shadow-float)]"
         onClick={(event) => event.stopPropagation()}
         onSubmit={submit}
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-extrabold tracking-[-0.04em]">
+            <h2 className="text-xl font-semibold tracking-[-0.04em]">
               {store ? "Edit store" : "Add a partner store"}
             </h2>
-            <p className="mt-1 text-[11px] text-ink/40">
+            <p className="mt-1 text-[11px] text-muted">
               The store is created closed so you can finish the setup before it goes live.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-xl border border-ink/10 text-ink/40 hover:text-ink"
+            className="grid h-9 w-9 place-items-center rounded-[6px] border border-line text-muted hover:text-ink"
             aria-label="Close"
           >
             <X size={16} />
@@ -1700,10 +1692,10 @@ function StoreFormModal({
               className="input"
             />
           </label>
-          <label className="flex items-center justify-between gap-3 rounded-xl bg-cream px-3 py-2 sm:col-span-2">
+          <label className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 px-3 py-2 sm:col-span-2">
             <span>
-              <span className="block text-[11px] font-extrabold">Open for orders</span>
-              <span className="block text-[11px] text-ink/40">
+              <span className="block text-[11px] font-semibold">Open for orders</span>
+              <span className="block text-[11px] text-muted">
                 Leave closed while you add the menu.
               </span>
             </span>
@@ -1717,7 +1709,7 @@ function StoreFormModal({
         </div>
 
         {error ? (
-          <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700">
+          <p className="mt-3 rounded-[6px] bg-danger-soft px-3 py-2 text-[11px] font-bold text-danger">
             {error}
           </p>
         ) : null}
@@ -1765,7 +1757,7 @@ function DriverEditModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] grid place-items-center bg-ink/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[70] grid place-items-center bg-surface-20 p-4 backdrop-blur-sm"
       role="presentation"
       onClick={onClose}
     >
@@ -1773,7 +1765,7 @@ function DriverEditModal({
         role="dialog"
         aria-modal="true"
         aria-label={`Manage ${driver.name}`}
-        className="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl"
+        className="w-full max-w-md rounded-[10px] bg-surface p-5 shadow-[var(--shadow-float)]"
         onClick={(event) => event.stopPropagation()}
         onSubmit={(event) => {
           event.preventDefault();
@@ -1790,8 +1782,8 @@ function DriverEditModal({
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-extrabold">{driver.name}</h2>
-            <p className="flex items-center gap-1 text-[11px] font-bold text-ink/40">
+            <h2 className="text-lg font-semibold">{driver.name}</h2>
+            <p className="flex items-center gap-1 text-[11px] font-bold text-muted">
               {driver.citySlug} · {driver.deliveries} deliveries ·
               <Star size={10} className="fill-saffron text-saffron" />
               {driver.rating}
@@ -1800,7 +1792,7 @@ function DriverEditModal({
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-xl border border-ink/10 text-ink/40 hover:text-ink"
+            className="grid h-9 w-9 place-items-center rounded-[6px] border border-line text-muted hover:text-ink"
             aria-label="Close"
           >
             <X size={16} />
@@ -1859,8 +1851,8 @@ function DriverEditModal({
               </select>
             </label>
           </div>
-          <label className="flex items-center justify-between gap-3 rounded-xl bg-cream px-3 py-2">
-            <span className="text-[11px] font-extrabold">Active courier</span>
+          <label className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 px-3 py-2">
+            <span className="text-[11px] font-semibold">Active courier</span>
             <input
               type="checkbox"
               checked={active}
@@ -1868,10 +1860,10 @@ function DriverEditModal({
               className="h-4 w-4 accent-teal"
             />
           </label>
-          <label className="flex items-center justify-between gap-3 rounded-xl bg-cream px-3 py-2">
+          <label className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 px-3 py-2">
             <span>
-              <span className="block text-[11px] font-extrabold">Reset cash on hand</span>
-              <span className="block text-[11px] text-ink/40">
+              <span className="block text-[11px] font-semibold">Reset cash on hand</span>
+              <span className="block text-[11px] text-muted">
                 Currently {money(driver.cashOnHand)} collected.
               </span>
             </span>
@@ -1932,7 +1924,7 @@ function AdminOrderCard({
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[13px] font-extrabold">{order.code}</span>
+            <span className="text-[13px] font-semibold">{order.code}</span>
             <span className="pill">{meta.label}</span>
             {order.status === "ready" ? (
               <span className="pill pill-warm">
@@ -1940,20 +1932,20 @@ function AdminOrderCard({
               </span>
             ) : null}
           </div>
-          <div className="mt-1 text-[11px] font-bold text-ink/35">
+          <div className="mt-1 text-[11px] font-bold text-muted">
             {order.citySlug} · {timeAgo(order.createdAt)} · {order.customerName}
           </div>
         </div>
         <div className="text-end">
-          <div className="text-base font-extrabold">{money(order.total)}</div>
-          <div className="text-[11px] font-medium text-teal">COD</div>
+          <div className="text-base font-semibold">{money(order.total)}</div>
+          <div className="text-[11px] font-medium text-brand">COD</div>
         </div>
       </div>
 
-      <div className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-ink/45">
-        <MapPin size={12} className="mt-0.5 shrink-0 text-teal" />
+      <div className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-muted">
+        <MapPin size={12} className="mt-0.5 shrink-0 text-brand" />
         <span>
-          <span className="font-extrabold text-ink/65">{order.store?.name}</span> ·{" "}
+          <span className="font-semibold text-muted">{order.store?.name}</span> ·{" "}
           {order.address}, {order.landmark}
         </span>
       </div>
@@ -1961,20 +1953,20 @@ function AdminOrderCard({
       {!compact ? (
         <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
           {order.items.map((item) => (
-            <span key={item.productId} className="rounded-lg bg-cream px-2 py-1 font-bold text-ink/55">
+            <span key={item.productId} className="rounded-[6px] bg-surface-2 px-2 py-1 font-bold text-muted">
               {item.qty}× {item.name}
             </span>
           ))}
         </div>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink/5 pt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
         {order.driver ? (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-teal/8 px-2 py-1 text-[11px] font-extrabold text-teal">
+          <span className="inline-flex items-center gap-1 rounded-[6px] bg-brand-soft px-2 py-1 text-[11px] font-semibold text-brand">
             <Bike size={11} /> {order.driver.name}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-ink/5 px-2 py-1 text-[11px] font-bold text-ink/40">
+          <span className="inline-flex items-center gap-1 rounded-[6px] bg-surface-2 px-2 py-1 text-[11px] font-bold text-muted">
             <Bike size={11} /> no driver
           </span>
         )}
@@ -1984,7 +1976,7 @@ function AdminOrderCard({
             <select
               value={chosenDriver || ""}
               onChange={(event) => onChooseDriver(event.target.value)}
-              className="h-8 rounded-lg border border-ink/10 bg-white px-2 text-[11px] font-bold"
+              className="h-8 rounded-[6px] border border-line bg-surface px-2 text-[11px] font-bold"
               aria-label="Choose driver"
             >
               <option value="">Choose driver…</option>
@@ -2019,7 +2011,7 @@ function AdminOrderCard({
             onChange={(event) => {
               if (event.target.value) onStatus(event.target.value as OrderStatus);
             }}
-            className="ms-auto h-8 rounded-lg border border-ink/10 bg-white px-2 text-[11px] font-bold text-ink/55"
+            className="ms-auto h-8 rounded-[6px] border border-line bg-surface px-2 text-[11px] font-bold text-muted"
             aria-label="Next legal status"
           >
             <option value="">Next step…</option>
@@ -2031,7 +2023,7 @@ function AdminOrderCard({
             ))}
           </select>
         ) : (
-          <span className="ms-auto text-[11px] font-medium text-ink/30">
+          <span className="ms-auto text-[11px] font-medium text-muted">
             closed
           </span>
         )}

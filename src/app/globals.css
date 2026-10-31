@@ -311,7 +311,9 @@ html[lang="ar"] .display-sm {
 
 html[lang="ar"] .display,
 html[lang="ar"] .display-sm {
-  line-height: 1.18;
+  /* Plex Arabic needs more leading than the Latin display face; 1.18 clips
+     the ascenders of the first line at large sizes. */
+  line-height: 1.32;
 }
 
 [dir="rtl"] .rtl-flip {
@@ -432,7 +434,10 @@ html[dir="rtl"] .tnum {
 .field-ink {
   background: var(--ink);
   color: var(--on-ink);
-  /* Saffron needs the light stop on an ink field. */
+  /* Saffron needs the light stop on an ink field. Scoping the Tailwind bridge
+     keeps `text-on-dark` cream here in dark mode, where the global token flips
+     to near-black. */
+  --color-on-dark: #f7f4ec;
   --signal: #e9ae55;
   --signal-ink: #f2c47c;
 }
@@ -442,15 +447,18 @@ html[dir="rtl"] .tnum {
 }
 
 html.dark .field-ink .text-saffron {
-  color: #955b0b;
+  color: #e9ae55;
 }
 
 html.dark .field-ink {
-  background: var(--surface);
-  color: var(--ink);
+  /* Keep the feature band dark in both themes. The default dark "on-ink" token
+     is near-black, so scope a cream foreground to the band's descendants. */
+  background: #07120f;
+  color: #f7f4ec;
   border-color: var(--line);
-  --signal: #955b0b;
-  --signal-ink: #7a4c0d;
+  --on-ink: #f7f4ec;
+  --signal: #e9ae55;
+  --signal-ink: #f2c47c;
 }
 
 .panel-quiet {

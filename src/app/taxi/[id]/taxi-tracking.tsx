@@ -64,14 +64,14 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
     <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
       <div className="space-y-4">
         <div className="card overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/8 bg-cream/60 px-5 py-3">
-            <span className="inline-flex items-center gap-2 text-xs font-extrabold">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface-2/60 px-5 py-3">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold">
               {ride.status === "completed" ? (
-                <CheckCircle2 size={15} className="text-teal" />
+                <CheckCircle2 size={15} className="text-brand" />
               ) : ride.status === "cancelled" ? (
                 <XCircle size={15} className="text-coral" />
               ) : (
-                <span className="status-dot live-dot text-teal" />
+                <span className="status-dot live-dot text-brand" />
               )}
               {t(TAXI_STATUS_TEXT[ride.status])}
             </span>
@@ -108,12 +108,12 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
         </div>
 
         <div className="card p-5">
-          <div className="text-sm font-extrabold">{t("Ride details")}</div>
+          <div className="text-sm font-semibold">{t("Ride details")}</div>
           <div className="mt-3 space-y-3 text-sm">
             <div className="flex items-start gap-2">
-              <Circle size={14} className="mt-0.5 shrink-0 text-teal" />
+              <Circle size={14} className="mt-0.5 shrink-0 text-brand" />
               <div>
-                <div className="text-[11px] font-medium text-ink/40">
+                <div className="text-[11px] font-medium text-muted">
                   {t("Pickup point")}
                 </div>
                 <div className="font-bold">{ride.pickupLabel}</div>
@@ -122,31 +122,31 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
             <div className="flex items-start gap-2">
               <MapPin size={14} className="mt-0.5 shrink-0 text-coral" />
               <div>
-                <div className="text-[11px] font-medium text-ink/40">
+                <div className="text-[11px] font-medium text-muted">
                   {t("Destination")}
                 </div>
                 <div className="font-bold">{ride.dropoffLabel}</div>
               </div>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 border-t border-ink/8 pt-3 text-center">
+          <div className="mt-4 grid grid-cols-3 gap-2 border-t border-line pt-3 text-center">
             <div>
-              <div className="text-[11px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-muted">
                 {t("Distance")}
               </div>
-              <div className="text-sm font-extrabold">{ride.distanceKm.toFixed(1)} km</div>
+              <div className="text-sm font-semibold">{ride.distanceKm.toFixed(1)} km</div>
             </div>
             <div>
-              <div className="text-[11px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-muted">
                 {t("Fare")}
               </div>
-              <div className="text-sm font-extrabold">{money(ride.fare)}</div>
+              <div className="text-sm font-semibold">{money(ride.fare)}</div>
             </div>
             <div>
-              <div className="text-[11px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-muted">
                 {t("Payment")}
               </div>
-              <div className="text-sm font-extrabold">{t("Cash")}</div>
+              <div className="text-sm font-semibold">{t("Cash")}</div>
             </div>
           </div>
         </div>
@@ -154,15 +154,15 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
 
       <div className="space-y-4">
         <div className="card p-5">
-          <div className="text-sm font-extrabold">{t("Your driver")}</div>
+          <div className="text-sm font-semibold">{t("Your driver")}</div>
           {ride.driverName ? (
             <div className="mt-3 flex items-center gap-3">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal/10 text-teal">
+              <span className="grid h-12 w-12 place-items-center rounded-[10px] bg-brand-soft text-brand">
                 <CarTaxiFront size={22} />
               </span>
               <div className="min-w-0">
-                <div className="font-extrabold">{ride.driverName}</div>
-                <div className="text-xs text-ink/45">
+                <div className="font-semibold">{ride.driverName}</div>
+                <div className="text-xs text-muted">
                   {ride.vehicle} · {ride.plate}
                 </div>
               </div>
@@ -177,8 +177,8 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
               ) : null}
             </div>
           ) : (
-            <div className="mt-3 flex items-center gap-2 rounded-xl bg-cream p-3 text-xs font-bold text-ink/50">
-              <Loader2 size={14} className="animate-spin text-teal" />
+            <div className="mt-3 flex items-center gap-2 rounded-[6px] bg-surface-2 p-3 text-xs font-bold text-muted">
+              <Loader2 size={14} className="animate-spin text-brand" />
               {t("Finding a driver…")}
             </div>
           )}
@@ -192,14 +192,14 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
                   {done ? (
                     <CheckCircle2
                       size={16}
-                      className={current ? "text-teal" : "text-teal/40"}
+                      className={current ? "text-brand" : "text-brand/40"}
                     />
                   ) : (
-                    <Circle size={16} className="text-ink/20" />
+                    <Circle size={16} className="text-muted" />
                   )}
                   <span
                     className={`text-xs font-bold ${
-                      current ? "text-ink" : done ? "text-ink/55" : "text-ink/30"
+                      current ? "text-ink" : done ? "text-muted" : "text-muted"
                     }`}
                   >
                     {t(TAXI_STATUS_TEXT[status])}
@@ -210,7 +210,7 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
           </div>
 
           {error ? (
-            <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">
+            <p className="mt-3 rounded-[6px] bg-danger-soft px-3 py-2 text-xs font-bold text-danger">
               {error}
             </p>
           ) : null}
@@ -235,7 +235,7 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
           ) : null}
         </div>
 
-        <div className="rounded-2xl bg-saffron/15 p-4 text-[11px] font-bold leading-5 text-ink/55">
+        <div className="rounded-[10px] bg-saffron/15 p-4 text-[11px] font-bold leading-5 text-muted">
           {t("Pay the driver in cash at the end of the trip.")}
         </div>
       </div>

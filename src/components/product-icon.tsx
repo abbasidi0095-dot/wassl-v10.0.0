@@ -34,7 +34,7 @@ type Visual = {
 const TONE: Record<Tone, { tile: string; ink: string }> = {
   coral: { tile: "bg-coral/10", ink: "text-coral" },
   saffron: { tile: "bg-saffron/20", ink: "text-saffron-deep" },
-  teal: { tile: "bg-teal/10", ink: "text-teal" },
+  teal: { tile: "bg-brand-soft", ink: "text-brand" },
 };
 
 function visual(Icon: LucideIcon, tone: Tone): Visual {
@@ -98,7 +98,7 @@ export function ProductIcon({
 export function ProductTile({
   name,
   category,
-  className = "h-10 w-10 rounded-xl",
+  className = "h-10 w-10 rounded-[6px]",
   iconSize = 18,
 }: {
   name: string;

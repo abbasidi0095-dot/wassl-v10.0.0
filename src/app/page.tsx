@@ -117,14 +117,17 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <dl className="mt-10 grid max-w-xl grid-cols-2 gap-y-5 border-t border-line pt-6 sm:grid-cols-4 sm:gap-x-6">
+            <dl className="mt-10 grid max-w-xl grid-cols-2 gap-y-5 border-t border-line pt-6 sm:grid-cols-4 sm:gap-x-5">
               {[
                 { value: String(priority.length), label: t("cities live") },
                 { value: String(stores.length), label: t("local stores") },
                 { value: "24/7", label: t("grocery where staffed") },
                 { value: "COD", label: t("cash on delivery") },
-              ].map((item) => (
-                <div key={item.label}>
+              ].map((item, index) => (
+                <div
+                  key={item.label}
+                  className={index > 0 ? "sm:border-s sm:border-line sm:ps-5" : ""}
+                >
                   <dt className="tnum font-display text-[26px] font-semibold leading-none tracking-[-0.03em]">
                     {item.value}
                   </dt>
@@ -219,35 +222,39 @@ export default async function HomePage() {
               {t("All Moroccan cities")}
             </Link>
           </div>
-          <div className="mt-4 grid border-s border-t border-line sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 border-s border-t border-line lg:grid-cols-4">
             {doors.map((door) => (
               <Link
                 key={door.label}
                 href={door.href}
-                className="group relative flex items-center gap-4 border-e border-b border-line bg-surface p-4 transition-colors hover:bg-surface-2 sm:block sm:min-h-[136px] sm:p-5"
+                className="group relative flex min-h-[148px] flex-col border-e border-b border-line bg-surface p-4 transition-colors after:absolute after:bottom-0 after:start-0 after:h-[2px] after:w-0 after:bg-brand after:transition-[width] after:duration-300 hover:bg-surface-2 hover:after:w-full sm:min-h-[160px] sm:p-5"
               >
-                <door.icon
-                  size={20}
-                  strokeWidth={1.6}
-                  className="shrink-0 text-ink/70 sm:mb-8"
-                />
-                <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <door.icon
+                    size={20}
+                    strokeWidth={1.6}
+                    className="text-muted"
+                  />
+                  {door.count !== null ? (
+                    <span className="text-[11px] text-muted tnum">{door.count}</span>
+                  ) : (
+                    <span className="text-[11px] text-muted">—</span>
+                  )}
+                </div>
+                <div className="mt-auto pt-6">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-display text-[22px] font-semibold tracking-[-0.03em] sm:text-[24px]">
+                    <span className="font-display text-[20px] font-semibold tracking-[-0.03em] sm:text-[24px]">
                       {door.label}
                     </span>
-                    {door.count !== null ? (
-                      <span className="text-[11px] text-muted tnum">
-                        {door.count}
-                      </span>
-                    ) : null}
+                    <ArrowUpRight
+                      size={15}
+                      className="shrink-0 text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100"
+                    />
                   </div>
-                  <p className="mt-0.5 text-[13px] text-muted sm:mt-1">{door.note}</p>
+                  <p className="mt-0.5 text-[12px] leading-4 text-muted sm:mt-1 sm:text-[13px]">
+                    {door.note}
+                  </p>
                 </div>
-                <ArrowUpRight
-                  size={16}
-                  className="shrink-0 text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100 sm:absolute sm:end-5 sm:top-5"
-                />
               </Link>
             ))}
           </div>
@@ -264,22 +271,25 @@ export default async function HomePage() {
                 <h2 className="display-sm mt-3 max-w-[18ch] text-[clamp(2.1rem,1.5rem+2vw,3.4rem)]">
                   {t("The whole supermarket, at your door.")}
                 </h2>
-                <p className="mt-5 max-w-[46ch] text-[15px] leading-6 opacity-60">
+                <p className="mt-5 max-w-[46ch] text-[15px] leading-6 text-on-dark/70">
                   {t(
                     "Aisles, units, live stock, size variants and substitutions — delivery or pickup, express or scheduled. Open overnight only when the store is staffed.",
                   )}
                 </p>
-                <dl className="mt-8 grid grid-cols-3 gap-4 border-t border-white/15 pt-5">
+                <dl className="mt-8 grid grid-cols-3 border-t border-[#f7f4ec]/20 pt-5">
                   {[
                     { value: "21+", label: t("aisle products") },
                     { value: "30", label: t("min express") },
                     { value: "4", label: t("delivery windows") },
-                  ].map((item) => (
-                    <div key={item.label}>
+                  ].map((item, index) => (
+                    <div
+                      key={item.label}
+                      className={index > 0 ? "border-s border-[#f7f4ec]/15 ps-4" : ""}
+                    >
                       <dt className="tnum font-display text-[24px] font-semibold leading-none">
                         {item.value}
                       </dt>
-                      <dd className="mt-1.5 text-[11px] leading-4 opacity-50">
+                      <dd className="mt-1.5 text-[11px] leading-4 text-on-dark/55">
                         {item.label}
                       </dd>
                     </div>
@@ -288,7 +298,7 @@ export default async function HomePage() {
                 <div className="mt-8 flex flex-wrap items-center gap-5">
                   <Link
                     href={`/store/${featuredGrocery.slug}`}
-                    className="btn btn-lg bg-white text-ink hover:bg-white/85"
+                    className="btn btn-lg bg-[#f7f4ec] text-[#0c1a17] hover:opacity-90"
                   >
                     {t("Shop {store}", { store: featuredGrocery.name })}
                     <ArrowRight size={16} className="rtl:-scale-x-100" />
@@ -302,66 +312,73 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-5 grid-rows-5 gap-3">
-                <div className="relative col-span-3 row-span-3 overflow-hidden rounded-[8px]">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="relative min-h-[300px] overflow-hidden rounded-[8px] sm:min-h-[420px]">
                   <Image
                     src={storePhoto(featuredGrocery)}
                     alt={featuredGrocery.name}
                     fill
-                    sizes="(max-width: 1024px) 60vw, 40vw"
+                    sizes="(max-width: 1024px) 100vw, 28vw"
                     className="object-cover"
                   />
-                </div>
-                <div className="col-span-2 row-span-2 flex flex-col justify-between rounded-[8px] border border-white/15 p-4">
-                  <Clock3 size={17} className="text-saffron" />
-                  <div>
-                    <div className="text-[13px] font-medium">
-                      {t("Open overnight")}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#07120f]/85 to-transparent p-4 pt-12">
+                    <div className="text-[12px] font-medium text-on-dark">
+                      {featuredGrocery.name}
                     </div>
-                    <div className="mt-1 text-[11px] leading-4 opacity-50">
-                      {t("Delivery only with overnight staff and a driver online.")}
+                    <div className="text-[11px] text-on-dark/60">
+                      {featuredGrocery.landmark}
                     </div>
                   </div>
                 </div>
-                <div className="col-span-2 row-span-3 flex flex-col justify-between rounded-[8px] border border-white/15 p-4">
-                  <Bike size={17} className="text-saffron" />
-                  <div>
-                    <div className="text-[13px] font-medium">
-                      {t("Pickup or delivery")}
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-1 flex-col justify-between rounded-[8px] border border-[#f7f4ec]/20 p-5">
+                    <Clock3 size={17} className="text-saffron" />
+                    <div className="mt-6">
+                      <div className="text-[13px] font-medium">
+                        {t("Open overnight")}
+                      </div>
+                      <div className="mt-1 text-[11px] leading-4 text-on-dark/60">
+                        {t("Delivery only with overnight staff and a driver online.")}
+                      </div>
                     </div>
-                    <div className="mt-1 text-[11px] leading-4 opacity-50">
-                      {t("Pay cash at collection or on arrival.")}
+                  </div>
+
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-[8px]">
+                    <Image
+                      src={
+                        groceryStores[1]
+                          ? storePhoto(groceryStores[1])
+                          : storePhoto(featuredGrocery)
+                      }
+                      alt={groceryStores[1]?.name ?? featuredGrocery.name}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 20vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#07120f]/85 via-[#07120f]/10 to-transparent" />
+                    <div className="absolute inset-x-3 bottom-2.5 text-[11px] font-medium text-on-dark">
+                      {groceryStores[1]?.name ?? featuredGrocery.name}
+                      <span className="ms-1 text-on-dark/60">
+                        · {groceryStores[1]?.citySlug ?? featuredGrocery.citySlug}
+                      </span>
                     </div>
-                    <div className="mt-3 text-[11px] opacity-50 tnum">
-                      {t("Ready in {min} min", { min: featuredGrocery.prepTime })}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 rounded-[8px] border border-[#f7f4ec]/20 px-4 py-3">
+                    <div className="inline-flex items-center gap-2 text-[12px]">
+                      <Bike size={15} className="text-saffron" />
+                      <span className="text-on-dark/70">
+                        {t("Ready in {min} min", { min: featuredGrocery.prepTime })}
+                      </span>
                     </div>
                     <Link
                       href={`/store/${featuredGrocery.slug}`}
-                      className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-saffron"
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-saffron"
                     >
                       {t("Order pickup")}
                       <ArrowRight size={11} className="rtl:-scale-x-100" />
                     </Link>
-                  </div>
-                </div>
-                <div className="relative col-span-3 row-span-2 overflow-hidden rounded-[8px]">
-                  <Image
-                    src={
-                      groceryStores[1]
-                        ? storePhoto(groceryStores[1])
-                        : storePhoto(featuredGrocery)
-                    }
-                    alt={groceryStores[1]?.name ?? featuredGrocery.name}
-                    fill
-                    sizes="(max-width: 1024px) 60vw, 40vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-ink/20" />
-                  <div className="absolute inset-x-3 bottom-3 text-[11px] font-medium text-on-dark">
-                    {groceryStores[1]?.name ?? featuredGrocery.name}
-                    <span className="ms-1 opacity-60">
-                      · {groceryStores[1]?.citySlug ?? featuredGrocery.citySlug}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -384,7 +401,7 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="mt-6">
-            <StoreBrowser stores={stores} />
+            <StoreBrowser stores={stores} initialLimit={9} />
           </div>
         </section>
 

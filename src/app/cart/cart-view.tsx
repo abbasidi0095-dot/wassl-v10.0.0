@@ -29,12 +29,14 @@ export function CartView() {
 
   if (!items.length) {
     return (
-      <div className="mt-8 border-y border-line py-20 text-center">
-        <ShoppingBag size={22} className="mx-auto text-muted" />
-        <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">
+      <div className="mt-8 rounded-[10px] border border-line bg-surface px-6 pb-10 pt-14 text-center sm:pb-12 sm:pt-20">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-[10px] bg-surface-2 text-brand">
+          <ShoppingBag size={24} strokeWidth={1.5} />
+        </div>
+        <h2 className="display-sm mt-6 text-[clamp(1.8rem,1.4rem+1.4vw,2.6rem)]">
           {t("Your cart is empty")}
         </h2>
-        <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted">
+        <p className="mx-auto mt-3 max-w-[42ch] text-[13px] leading-6 text-muted">
           {t("Browse local stores in Dakhla or Laayoune and add something you love.")}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -45,6 +47,11 @@ export function CartView() {
           <Link href="/grocery" className="btn btn-ghost">
             {t("Shop groceries")}
           </Link>
+        </div>
+        <div className="mx-auto mt-10 grid max-w-md grid-cols-3 gap-3 border-t border-line pt-5 text-[11px] text-muted">
+          <span>{t("Cash on delivery")}</span>
+          <span className="border-x border-line">{t("Live tracking")}</span>
+          <span>{t("Local stores")}</span>
         </div>
       </div>
     );

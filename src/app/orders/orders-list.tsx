@@ -161,28 +161,47 @@ export function OrdersList() {
           >
             {item.id === "taxi" ? <CarTaxiFront size={14} /> : <ReceiptText size={14} />}
             {item.label}
-            <span className="text-[11px] text-muted tnum">{item.count}</span>
+            <span
+              className={`rounded-[2px] px-1.5 py-0.5 text-[10px] tnum ${
+                tab === item.id
+                  ? "bg-surface-2 font-semibold text-ink"
+                  : "bg-transparent text-muted"
+              }`}
+            >
+              {item.count}
+            </span>
           </button>
         ))}
       </div>
 
       {tab === "orders" ? (
-        <form onSubmit={openCode} className="mt-4 flex max-w-xl gap-2 border-y border-line py-2">
-        <div className="relative flex-1">
-          <Search
-            size={15}
-            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
-          />
-          <input
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            className="input h-10 border-0 bg-transparent ps-9 focus:shadow-none"
-            placeholder="Enter order code, e.g. WSL-84F2A1"
-          />
-        </div>
-        <button type="submit" className="btn btn-primary btn-sm">
-          {t("Track")} <ArrowRight size={13} className="rtl:-scale-x-100" />
-        </button>
+        <form onSubmit={openCode} className="mt-5 max-w-xl">
+          <label htmlFor="order-code" className="label">
+            {t("Order code")}
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search
+                size={15}
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
+              />
+              <input
+                id="order-code"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                className="input h-11 ps-9 tnum"
+                placeholder="WSL-84F2A1"
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              {t("Track")} <ArrowRight size={13} className="rtl:-scale-x-100" />
+            </button>
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted">
+            {t("e.g. {code}", { code: "WSL-84F2A1" })}
+          </p>
         </form>
       ) : null}
 
@@ -216,7 +235,7 @@ export function OrdersList() {
                         className="object-cover"
                       />
                     ) : (
-                      <span className="grid h-full w-full place-items-center text-teal/50">
+                      <span className="grid h-full w-full place-items-center text-brand/50">
                         <ReceiptText size={18} />
                       </span>
                     )}
@@ -225,13 +244,15 @@ export function OrdersList() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-[14px] font-semibold">{order.storeName}</span>
                       <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
-                        <span className="status-dot" /> {meta.label}
+                        <span className="status-dot" /> {t(meta.label)}
                       </span>
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-muted tnum">
                       <span>{order.code}</span>
                       <span className="text-line-strong">/</span>
-                      <span>{order.itemCount} items</span>
+                      <span>
+                        {t("{count} items", { count: order.itemCount })}
+                      </span>
                       <span className="text-line-strong">/</span>
                       <span>{timeAgo(order.createdAt)}</span>
                     </div>
@@ -251,24 +272,29 @@ export function OrdersList() {
                   type="button"
                   onClick={() => reorder(order)}
                   className="btn btn-ghost btn-sm shrink-0"
-                  aria-label={`Reorder from ${order.storeName}`}
+                  aria-label={`${t("Reorder")} · ${order.storeName}`}
                 >
-                  <RotateCcw size={12} /> Reorder
+                  <RotateCcw size={12} /> {t("Reorder")}
                 </button>
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="mt-5 border-y border-line py-16 text-center">
-          <PackageCheck size={22} className="mx-auto text-muted" />
-          <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">No orders yet</h2>
+        <div className="mt-6 rounded-[10px] border border-line bg-surface px-6 py-16 text-center">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-surface-2 text-brand">
+            <PackageCheck size={20} strokeWidth={1.6} />
+          </div>
+          <h2 className="display-sm mt-4 text-[clamp(1.6rem,1.3rem+1vw,2.2rem)]">
+            {t("No orders yet")}
+          </h2>
           <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted">
-            Your local orders will appear here. Try Dakhla Grill or Sahara Market to
-            see the full flow.
+            {t(
+              "Your local orders will appear here. Try Dakhla Grill or Sahara Market to see the full flow.",
+            )}
           </p>
           <Link href="/city/dakhla" className="btn btn-primary mt-5">
-            Browse Dakhla <ArrowRight size={14} />
+            {t("Browse Dakhla")} <ArrowRight size={14} className="rtl:-scale-x-100" />
           </Link>
         </div>
       )}
@@ -320,12 +346,14 @@ export function OrdersList() {
           })}
         </div>
       ) : (
-        <div className="mt-5 border-y border-line py-16 text-center">
-          <CarTaxiFront size={22} className="mx-auto text-muted" />
-          <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">
+        <div className="mt-6 rounded-[10px] border border-line bg-surface px-6 py-16 text-center">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-surface-2 text-brand">
+            <CarTaxiFront size={20} strokeWidth={1.6} />
+          </div>
+          <h2 className="display-sm mt-4 text-[clamp(1.6rem,1.3rem+1vw,2.2rem)]">
             {t("No taxi rides yet")}
           </h2>
-          <p className="mt-2 max-w-sm text-sm leading-6 text-ink/50">
+          <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted">
             {t("Your taxi trips will appear here once you request a ride.")}
           </p>
           <Link href="/taxi" className="btn btn-primary mt-5">
@@ -334,7 +362,7 @@ export function OrdersList() {
         </div>
       )}
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-6 grid overflow-hidden rounded-[10px] border border-line bg-surface sm:grid-cols-3">
         {(tab === "taxi"
           ? [
               {
@@ -366,11 +394,18 @@ export function OrdersList() {
                 text: t("See the exact amount before arrival."),
               },
             ]
-        ).map((item) => (
-          <div key={item.label} className="rounded-2xl border border-ink/10 bg-white/45 p-4">
-            <item.icon size={16} className="text-teal" />
-            <div className="mt-2 text-[11px] font-extrabold">{item.label}</div>
-            <div className="mt-0.5 text-[11px] text-ink/40">{item.text}</div>
+        ).map((item, index) => (
+          <div
+            key={item.label}
+            className={`flex gap-2.5 p-3.5 ${
+              index > 0 ? "border-t border-line sm:border-s sm:border-t-0" : ""
+            }`}
+          >
+            <item.icon size={15} strokeWidth={1.7} className="mt-0.5 shrink-0 text-brand" />
+            <div className="min-w-0">
+              <div className="text-[12px] font-semibold">{item.label}</div>
+              <div className="mt-0.5 text-[11px] leading-5 text-muted">{item.text}</div>
+            </div>
           </div>
         ))}
       </div>

@@ -71,7 +71,7 @@ export function DriverTaxiQueue({
         <div>
           <div className="eyebrow">{driver.citySlug} · {t("Taxi")}</div>
           <h1 className="display mt-2 text-4xl">{t("Taxi rides")}</h1>
-          <p className="mt-1 text-sm text-ink/45">
+          <p className="mt-1 text-sm text-muted">
             {t("Accept a nearby request and collect the fare in cash.")}
           </p>
         </div>
@@ -79,11 +79,11 @@ export function DriverTaxiQueue({
       </div>
 
       {error ? (
-        <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">{error}</p>
+        <p className="rounded-[6px] bg-danger-soft px-3 py-2 text-xs font-bold text-danger">{error}</p>
       ) : null}
 
       <section>
-        <h2 className="text-sm font-extrabold">{t("Your trip")}</h2>
+        <h2 className="text-sm font-semibold">{t("Your trip")}</h2>
         {assigned.length ? (
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             {assigned.map((ride) => {
@@ -105,11 +105,11 @@ export function DriverTaxiQueue({
                 <div key={ride.id} className="card p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="pill">{t(TAXI_STATUS_TEXT[ride.status])}</span>
-                    <span className="text-sm font-extrabold">{money(ride.fare)}</span>
+                    <span className="text-sm font-semibold">{money(ride.fare)}</span>
                   </div>
                   <div className="mt-3 space-y-2 text-sm">
                     <div className="flex items-start gap-2">
-                      <CircleDot size={14} className="mt-0.5 shrink-0 text-teal" />
+                      <CircleDot size={14} className="mt-0.5 shrink-0 text-brand" />
                       <span className="font-bold">{ride.pickupLabel}</span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -117,7 +117,7 @@ export function DriverTaxiQueue({
                       <span className="font-bold">{ride.dropoffLabel}</span>
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-ink/45">
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
                     <span>
                       {ride.customerName} · {ride.distanceKm.toFixed(1)} km
                     </span>
@@ -150,25 +150,25 @@ export function DriverTaxiQueue({
           </div>
         ) : (
           <div className="card mt-3 grid place-items-center px-6 py-10 text-center">
-            <CarTaxiFront size={22} className="text-teal" />
-            <p className="mt-2 text-sm font-bold text-ink/45">{t("No rides yet")}</p>
+            <CarTaxiFront size={22} className="text-brand" />
+            <p className="mt-2 text-sm font-bold text-muted">{t("No rides yet")}</p>
           </div>
         )}
       </section>
 
       <section>
-        <h2 className="text-sm font-extrabold">{t("Open requests")}</h2>
+        <h2 className="text-sm font-semibold">{t("Open requests")}</h2>
         {open.length ? (
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             {open.map((ride) => (
               <div key={ride.id} className="card p-4">
                 <div className="flex items-center justify-between gap-2">
                   <span className="pill">{t("Ride requested")}</span>
-                  <span className="text-sm font-extrabold">{money(ride.fare)}</span>
+                  <span className="text-sm font-semibold">{money(ride.fare)}</span>
                 </div>
                 <div className="mt-3 space-y-2 text-sm">
                   <div className="flex items-start gap-2">
-                    <CircleDot size={14} className="mt-0.5 shrink-0 text-teal" />
+                    <CircleDot size={14} className="mt-0.5 shrink-0 text-brand" />
                     <span className="font-bold">{ride.pickupLabel}</span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -176,7 +176,7 @@ export function DriverTaxiQueue({
                     <span className="font-bold">{ride.dropoffLabel}</span>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-ink/45">
+                <div className="mt-3 flex items-center justify-between text-xs text-muted">
                   <span>
                     {ride.distanceKm.toFixed(1)} km · {t("Cash to driver")}
                   </span>
@@ -197,7 +197,7 @@ export function DriverTaxiQueue({
           </div>
         ) : (
           <div className="card mt-3 grid place-items-center px-6 py-10 text-center">
-            <p className="text-sm font-bold text-ink/45">{t("No rides yet")}</p>
+            <p className="text-sm font-bold text-muted">{t("No rides yet")}</p>
           </div>
         )}
       </section>

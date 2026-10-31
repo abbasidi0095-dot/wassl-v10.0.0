@@ -78,20 +78,22 @@ export function StaffHeader({
         </div>
       </div>
 
-      <div className="container-wassl">
-        <nav className="staff-nav -mb-px gap-1 pb-0" aria-label="Workspace">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              data-active={pathname === link.href}
-              className="!rounded-none !border-b-2 !border-transparent !px-1.5 !pb-2.5 !pt-1 data-[active=true]:!border-brand data-[active=true]:!bg-transparent data-[active=true]:!text-ink"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      {links.length ? (
+        <div className="container-wassl">
+          <nav className="staff-nav -mb-px gap-1 pb-0" aria-label="Workspace">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                data-active={pathname === link.href}
+                className="!rounded-none !border-b-2 !border-transparent !px-1.5 !pb-2.5 !pt-1 data-[active=true]:!border-brand data-[active=true]:!bg-transparent data-[active=true]:!text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      ) : null}
     </header>
   );
 }

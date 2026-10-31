@@ -130,12 +130,12 @@ export function SignupForm({
   return (
     <div className="card p-6 sm:p-8">
       <div className="eyebrow">Create an account</div>
-      <h2 className="mt-2 text-3xl font-extrabold tracking-[-0.05em]">
+      <h2 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
         Join Wassl
       </h2>
-      <p className="mt-2 text-sm leading-6 text-ink/55">
+      <p className="mt-2 text-sm leading-6 text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="font-bold text-teal hover:text-teal-dark">
+        <Link href="/login" className="font-bold text-brand hover:text-brand-dark">
           Sign in
         </Link>
         .
@@ -152,10 +152,10 @@ export function SignupForm({
                 setRole(item.id);
                 setError("");
               }}
-              className={`rounded-xl px-2 py-2.5 text-[11px] font-extrabold transition ${
+              className={`rounded-[6px] px-2 py-2.5 text-[11px] font-semibold transition ${
                 role === item.id
-                  ? "bg-teal text-on-dark shadow-sm"
-                  : "bg-cream text-ink/55 hover:bg-ink/5"
+                  ? "bg-brand text-on-dark shadow-sm"
+                  : "bg-surface-2 text-muted hover:bg-ink/5"
               }`}
             >
               <Icon size={15} className="mx-auto mb-1" />
@@ -164,7 +164,7 @@ export function SignupForm({
           );
         })}
       </div>
-      <p className="mt-2 text-[11px] font-semibold text-ink/45">
+      <p className="mt-2 text-[11px] font-semibold text-muted">
         {selectedRole.hint}
       </p>
 
@@ -202,7 +202,7 @@ export function SignupForm({
           <span className="label">
             Phone{" "}
             {role === "customer" ? (
-              <span className="font-normal text-ink/35">(for delivery updates)</span>
+              <span className="font-normal text-muted">(for delivery updates)</span>
             ) : null}
           </span>
           <input
@@ -252,7 +252,7 @@ export function SignupForm({
               placeholder="e.g. Dakhla Grill"
               required
             />
-            <span className="mt-1 block text-[11px] text-ink/40">
+            <span className="mt-1 block text-[11px] text-muted">
               We use this to set up your storefront when operations approves you.
             </span>
           </label>
@@ -290,7 +290,7 @@ export function SignupForm({
             <button
               type="button"
               onClick={() => setShowPassword((value) => !value)}
-              className="absolute end-3 top-1/2 -translate-y-1/2 text-ink/35 hover:text-ink"
+              className="absolute end-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -322,13 +322,13 @@ export function SignupForm({
         </label>
 
         {error ? (
-          <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
+          <p className="rounded-[6px] bg-danger-soft px-3 py-2 text-xs font-bold text-danger">
             {error}
           </p>
         ) : null}
 
         {role !== "customer" ? (
-          <p className="flex items-start gap-2 rounded-xl bg-saffron/10 px-3 py-2 text-[11px] font-semibold leading-5 text-saffron-deep">
+          <p className="flex items-start gap-2 rounded-[6px] bg-saffron/10 px-3 py-2 text-[11px] font-semibold leading-5 text-saffron-deep">
             <CheckCircle2 size={14} className="mt-0.5 shrink-0" />
             Your account starts as pending. You can sign in, but your workspace
             unlocks only after a Wassl operator approves it.

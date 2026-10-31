@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { ArrowDown, Search } from "lucide-react";
 import { getOpenState } from "@/lib/hours";
 import type { Store as StoreType } from "@/lib/types";
 import { categoryLabel } from "@/lib/utils";
@@ -27,7 +27,13 @@ const SORTS: { value: Sort; label: string }[] = [
   { value: "minimum", label: "Lowest minimum" },
 ];
 
-export function StoreBrowser({ stores }: { stores: StoreType[] }) {
+export function StoreBrowser({
+  stores,
+  initialLimit,
+}: {
+  stores: StoreType[];
+  initialLimit?: number;
+}) {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
@@ -35,11 +41,20 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
   const [sort, setSort] = useState<Sort>("recommended");
   const [openOnly, setOpenOnly] = useState(false);
   const [dietary, setDietary] = useState("all");
+  const [expanded, setExpanded] = useState(false);
 
   const dietaryOptions = useMemo(
     () => [...new Set(stores.flatMap((store) => store.dietaryTags ?? []))].sort(),
     [stores],
   );
+
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>([["all", stores.length]]);
+    for (const store of stores) {
+      counts.set(store.category, (counts.get(store.category) ?? 0) + 1);
+    }
+    return counts;
+  }, [stores]);
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -78,6 +93,19 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
       );
     });
   }, [stores, query, category, tag, sort, openOnly, dietary]);
+
+  const filtering =
+    Boolean(query.trim()) ||
+    category !== "all" ||
+    tag !== "all" ||
+    dietary !== "all" ||
+    openOnly;
+  const limited =
+    initialLimit !== undefined && !filtering && !expanded
+      ? Math.min(initialLimit, filtered.length)
+      : filtered.length;
+  const visible = filtered.slice(0, limited);
+  const hidden = filtered.length - visible.length;
 
   return (
     <div>
@@ -133,7 +161,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-1 overflow-x-auto scrollbar-none">
+      <div className="mt-1 flex items-center gap-1 overflow-x-auto border-b border-line scrollbar-none">
         {CATEGORIES.map((item) => (
           <button
             key={item.value}
@@ -142,18 +170,21 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
               setCategory(item.value);
               setTag("all");
             }}
-            className={`relative whitespace-nowrap px-3 py-2 text-[13px] font-medium transition-colors ${
+            className={`relative whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition-colors ${
               category === item.value
                 ? "text-ink after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:bg-brand"
                 : "text-muted hover:text-ink"
             }`}
           >
             {t(item.label)}
+            <span className="ms-1.5 text-[11px] text-muted tnum">
+              {categoryCounts.get(item.value) ?? 0}
+            </span>
           </button>
         ))}
       </div>
 
-      <div className="mt-1 flex items-center gap-4 overflow-x-auto border-t border-line pt-2.5 scrollbar-none">
+      <div className="mt-1 flex items-center gap-4 overflow-x-auto border-b border-line pb-2.5 pt-1.5 scrollbar-none">
         <button
           type="button"
           onClick={() => setTag("all")}
@@ -177,19 +208,45 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
         ))}
       </div>
 
-      <p className="mt-5 text-[13px] text-muted tnum">
-        {filtered.length} {filtered.length === 1 ? t("store") : t("stores")}
-        {storeCategoryLabel(category, t)}
-        {tag !== "all" ? ` · ${tag}` : ""}
-        {dietary !== "all" ? ` · ${dietary}` : ""}
+      <p className="mt-5 flex flex-wrap items-baseline justify-between gap-2 text-[13px] text-muted tnum">
+        <span>
+          {filtered.length} {filtered.length === 1 ? t("store") : t("stores")}
+          {storeCategoryLabel(category, t)}
+          {tag !== "all" ? ` · ${tag}` : ""}
+          {dietary !== "all" ? ` · ${dietary}` : ""}
+        </span>
+        {hidden > 0 ? (
+          <span className="text-[11px]">
+            {t("Showing {shown}", { shown: visible.length })}
+          </span>
+        ) : null}
       </p>
 
       {filtered.length ? (
-        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((store) => (
-            <StoreCard key={store.id} store={store} />
-          ))}
-        </div>
+        <>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visible.map((store) => (
+              <StoreCard key={store.id} store={store} />
+            ))}
+          </div>
+          {hidden > 0 || (expanded && initialLimit !== undefined) ? (
+            <div className="mt-6 flex justify-center border-t border-line pt-6">
+              <button
+                type="button"
+                onClick={() => setExpanded((value) => !value)}
+                className="btn btn-ghost"
+              >
+                {hidden > 0
+                  ? t("Show all {count} stores", { count: filtered.length })
+                  : t("Show fewer stores")}
+                <ArrowDown
+                  size={14}
+                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                />
+              </button>
+            </div>
+          ) : null}
+        </>
       ) : (
         <div className="mt-4 border-y border-line py-16 text-center">
           <h3 className="font-display text-xl font-semibold">{t("No stores match")}</h3>

@@ -347,17 +347,17 @@ export function DriverDashboard({
           <h1 className="display mt-2 text-[clamp(1.9rem,1.5rem+1.4vw,2.7rem)]">
             {online ? "You are on the road." : "You are offline."}
           </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-bold text-ink/45">
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-bold text-muted">
             <span className="inline-flex items-center gap-1">
               <Star size={12} className="fill-saffron text-saffron" />
               {driver.rating} rating
             </span>
             <span className="inline-flex items-center gap-1">
-              <Bike size={12} className="text-teal" />
+              <Bike size={12} className="text-brand" />
               {driver.vehicle} · {driver.plate}
             </span>
             <span className="inline-flex items-center gap-1">
-              <Phone size={12} className="text-teal" />
+              <Phone size={12} className="text-brand" />
               {driver.phone}
             </span>
           </div>
@@ -385,7 +385,7 @@ export function DriverDashboard({
             label: "Deliveries",
             value: `${driver.deliveries}`,
             icon: PackageCheck,
-            tone: "bg-teal/10 text-teal",
+            tone: "bg-brand-soft text-brand",
           },
           {
             label: "Cash on hand",
@@ -397,7 +397,7 @@ export function DriverDashboard({
             label: "Cash limit left",
             value: money(cashLeft),
             icon: Gauge,
-            tone: cashLeft < 100 ? "bg-red-50 text-red-500" : "bg-ink/5 text-ink",
+            tone: cashLeft < 100 ? "bg-danger-soft text-danger" : "bg-surface-2 text-ink",
           },
           {
             label: "Active orders",
@@ -433,14 +433,14 @@ export function DriverDashboard({
               route={route}
               followDriverId="me"
             />
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/8 bg-paper px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-paper px-4 py-3">
               <div className="flex items-center gap-2">
-                <span className={`status-dot ${online ? "live-dot text-teal" : "text-ink/30"}`} />
+                <span className={`status-dot ${online ? "live-dot text-brand" : "text-muted"}`} />
                 <div>
-                  <div className="text-[11px] font-extrabold">
+                  <div className="text-[11px] font-semibold">
                     {sharing ? "Live GPS sharing" : simulating ? "Simulating route" : "GPS idle"}
                   </div>
-                  <div className="text-[11px] font-bold text-ink/35">
+                  <div className="text-[11px] font-bold text-muted">
                     {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
                     {current ? ` · ${distance.toFixed(1)} km to next stop` : ""}
                   </div>
@@ -461,7 +461,7 @@ export function DriverDashboard({
 
           <div className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-extrabold tracking-[-0.04em]">Assigned orders</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.04em]">Assigned orders</h2>
               <span className="pill">{active.length} active</span>
             </div>
             {orders.length ? (
@@ -478,16 +478,16 @@ export function DriverDashboard({
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[13px] font-extrabold">{order.code}</span>
+                            <span className="text-[13px] font-semibold">{order.code}</span>
                             <span className="pill">{meta.label}</span>
                           </div>
-                          <div className="mt-1 text-[11px] font-bold text-ink/35">
+                          <div className="mt-1 text-[11px] font-bold text-muted">
                             {timeAgo(order.createdAt)} · {order.customerName}
                           </div>
                         </div>
                         <div className="text-end">
-                          <div className="text-base font-extrabold">{money(order.total)}</div>
-                          <div className="text-[11px] font-medium text-teal">
+                          <div className="text-base font-semibold">{money(order.total)}</div>
+                          <div className="text-[11px] font-medium text-brand">
                             collect cash
                           </div>
                         </div>
@@ -495,10 +495,10 @@ export function DriverDashboard({
 
                       <div className="mt-3 space-y-2 text-[11px]">
                         <div className="flex items-start gap-2">
-                          <Store size={13} className="mt-0.5 shrink-0 text-teal" />
+                          <Store size={13} className="mt-0.5 shrink-0 text-brand" />
                           <div>
-                            <div className="font-extrabold">{order.store?.name}</div>
-                            <div className="text-ink/40">
+                            <div className="font-semibold">{order.store?.name}</div>
+                            <div className="text-muted">
                               {order.store?.address} · {order.store?.landmark}
                             </div>
                           </div>
@@ -506,8 +506,8 @@ export function DriverDashboard({
                         <div className="flex items-start gap-2">
                           <MapPin size={13} className="mt-0.5 shrink-0 text-coral" />
                           <div>
-                            <div className="font-extrabold">{order.address}</div>
-                            <div className="text-ink/40">
+                            <div className="font-semibold">{order.address}</div>
+                            <div className="text-muted">
                               {order.landmark}
                               {order.notes ? ` · “${order.notes}”` : ""}
                             </div>
@@ -515,7 +515,7 @@ export function DriverDashboard({
                         </div>
                       </div>
 
-                      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink/5 pt-3">
+                      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
                         <a
                           href={`tel:${order.customerPhone.replace(/\s/g, "")}`}
                           className="btn btn-ghost btn-sm"
@@ -541,17 +541,17 @@ export function DriverDashboard({
                   );
                 })}
                 {!active.length ? (
-                  <div className="rounded-2xl border border-dashed border-ink/15 px-4 py-8 text-center">
-                    <div className="grid place-items-center text-teal/60"><Bike size={26} /></div>
-                    <div className="mt-2 text-sm font-extrabold">No active deliveries</div>
-                    <p className="mt-1 text-[11px] text-ink/40">
+                  <div className="rounded-[10px] border border-dashed border-line px-4 py-8 text-center">
+                    <div className="grid place-items-center text-brand/60"><Bike size={26} /></div>
+                    <div className="mt-2 text-sm font-semibold">No active deliveries</div>
+                    <p className="mt-1 text-[11px] text-muted">
                       Dispatch will assign an order when one is ready in {driver.citySlug}.
                     </p>
                   </div>
                 ) : null}
               </div>
             ) : (
-              <div className="mt-4 rounded-2xl border border-dashed border-ink/15 px-4 py-8 text-center text-sm text-ink/40">
+              <div className="mt-4 rounded-[10px] border border-dashed border-line px-4 py-8 text-center text-sm text-muted">
                 No orders assigned to you yet.
               </div>
             )}
@@ -561,17 +561,17 @@ export function DriverDashboard({
         <aside className="space-y-4" id="cash">
           <div className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-extrabold tracking-[-0.04em]">COD wallet</h2>
-              <Banknote size={19} className="text-teal" />
+              <h2 className="text-lg font-semibold tracking-[-0.04em]">COD wallet</h2>
+              <Banknote size={19} className="text-brand" />
             </div>
-            <div className="mt-4 rounded-2xl bg-ink p-4 text-on-dark">
+            <div className="mt-4 rounded-[10px] bg-ink p-4 text-on-dark">
               <div className="text-[11px] font-medium text-on-dark/40">
                 Cash currently with you
               </div>
-              <div className="mt-1 text-3xl font-extrabold tracking-[-0.05em]">
+              <div className="mt-1 text-3xl font-semibold tracking-[-0.05em]">
                 {money(driver.cashOnHand)}
               </div>
-              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/15">
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface/15">
                 <div
                   className="h-full rounded-full bg-saffron"
                   style={{
@@ -585,20 +585,20 @@ export function DriverDashboard({
               </div>
             </div>
             <div className="mt-3 space-y-2 text-[11px]">
-              <div className="flex justify-between text-ink/45">
+              <div className="flex justify-between text-muted">
                 <span>Delivery earnings (est.)</span>
-                <span className="font-extrabold text-ink">{money(earnings)}</span>
+                <span className="font-semibold text-ink">{money(earnings)}</span>
               </div>
-              <div className="flex justify-between text-ink/45">
+              <div className="flex justify-between text-muted">
                 <span>Cash liability</span>
-                <span className="font-extrabold text-red-500">{money(driver.cashOnHand)}</span>
+                <span className="font-semibold text-danger">{money(driver.cashOnHand)}</span>
               </div>
-              <div className="flex justify-between border-t border-ink/8 pt-2 text-sm font-extrabold">
+              <div className="flex justify-between border-t border-line pt-2 text-sm font-semibold">
                 <span>Net position</span>
                 <span>{money(earnings - driver.cashOnHand)}</span>
               </div>
             </div>
-            <div className="mt-3 rounded-xl bg-saffron/15 p-3 text-[11px] leading-5 font-bold text-ink/55">
+            <div className="mt-3 rounded-[6px] bg-saffron/15 p-3 text-[11px] leading-5 font-bold text-muted">
               Cash is settled with dispatch at the end of your shift. Earnings are
               separate from the cash you carry.
             </div>
@@ -606,12 +606,12 @@ export function DriverDashboard({
 
           <div className="card p-5">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-extrabold">Live city queue</h2>
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-teal">
-                <span className="status-dot live-dot text-teal" /> Live
+              <h2 className="text-sm font-semibold">Live city queue</h2>
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand">
+                <span className="status-dot live-dot text-brand" /> Live
               </span>
             </div>
-            <p className="mt-1 text-[11px] text-ink/40">
+            <p className="mt-1 text-[11px] text-muted">
               Orders in {driver.citySlug}. Accept a ready order to start your route.
             </p>
             <div className="mt-3 space-y-2">
@@ -620,19 +620,19 @@ export function DriverDashboard({
                   <div
                     key={order.id}
                     data-order-id={order.id}
-                    className="rounded-xl bg-cream px-3 py-2.5 text-[11px]"
+                    className="rounded-[6px] bg-surface-2 px-3 py-2.5 text-[11px]"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="truncate font-extrabold">
+                        <div className="truncate font-semibold">
                           {order.store?.name || "Store"}
                         </div>
-                        <div className="text-[11px] text-ink/35">
+                        <div className="text-[11px] text-muted">
                           {order.code} · {STATUS_META[order.status].label} ·{" "}
                           {timeAgo(order.createdAt)}
                         </div>
                       </div>
-                      <span className="shrink-0 font-extrabold">
+                      <span className="shrink-0 font-semibold">
                         {money(order.total)}
                       </span>
                     </div>
@@ -653,14 +653,14 @@ export function DriverDashboard({
                               : "Go online to accept"}
                       </button>
                     ) : (
-                      <div className="mt-2 text-[11px] font-bold text-ink/30">
+                      <div className="mt-2 text-[11px] font-bold text-muted">
                         Waiting for the store to mark it ready
                       </div>
                     )}
                   </div>
                 ))
               ) : (
-                <div className="rounded-xl border border-dashed border-ink/15 px-3 py-6 text-center text-[11px] text-ink/35">
+                <div className="rounded-[6px] border border-dashed border-line px-3 py-6 text-center text-[11px] text-muted">
                   No live orders in {driver.citySlug} right now. This panel updates
                   automatically.
                 </div>
@@ -670,24 +670,24 @@ export function DriverDashboard({
 
           <div className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-extrabold">Delivered today</h2>
-              <CheckCircle2 size={17} className="text-teal" />
+              <h2 className="text-sm font-semibold">Delivered today</h2>
+              <CheckCircle2 size={17} className="text-brand" />
             </div>
             <div className="mt-3 space-y-2">
               {history.length ? (
                 history.map((order) => (
                   <div key={order.id} className="flex items-center justify-between gap-2 text-[11px]">
                     <div className="min-w-0">
-                      <div className="truncate font-bold text-ink/65">{order.store?.name}</div>
-                      <div className="text-[11px] text-ink/35">
+                      <div className="truncate font-bold text-muted">{order.store?.name}</div>
+                      <div className="text-[11px] text-muted">
                         {order.deliveredAt ? clock(order.deliveredAt) : ""} · {order.code}
                       </div>
                     </div>
-                    <span className="shrink-0 font-extrabold">{money(order.total)}</span>
+                    <span className="shrink-0 font-semibold">{money(order.total)}</span>
                   </div>
                 ))
               ) : (
-                <div className="text-[11px] text-ink/35">No deliveries completed yet.</div>
+                <div className="text-[11px] text-muted">No deliveries completed yet.</div>
               )}
             </div>
           </div>
@@ -695,7 +695,7 @@ export function DriverDashboard({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl">
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2.5 text-[12px] font-medium text-on-dark shadow-[var(--shadow-float)]">
           {toast}
         </div>
       ) : null}

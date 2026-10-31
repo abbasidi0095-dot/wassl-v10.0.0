@@ -29,8 +29,8 @@ export function FavoritesView({
     return (
       <div className="card mt-6 grid place-items-center px-6 py-16 text-center">
         <Heart size={26} className="text-coral" />
-        <h2 className="mt-3 text-xl font-extrabold">{t("No favourites yet")}</h2>
-        <p className="mt-1 text-sm text-ink/45">
+        <h2 className="mt-3 text-xl font-semibold">{t("No favourites yet")}</h2>
+        <p className="mt-1 text-sm text-muted">
           {t("Tap the heart on a grocery product to save it here.")}
         </p>
         <Link href="/grocery" className="btn btn-primary mt-5">
@@ -47,23 +47,23 @@ export function FavoritesView({
           <ProductTile
             name={product.name}
             category={product.category}
-            className="h-16 w-16 rounded-2xl"
+            className="h-16 w-16 rounded-[10px]"
             iconSize={26}
           />
           <div className="min-w-0 flex-1">
-            <div className="truncate text-[13px] font-extrabold">{product.name}</div>
-            <div className="text-[11px] font-bold text-ink/40">
+            <div className="truncate text-[13px] font-semibold">{product.name}</div>
+            <div className="text-[11px] font-bold text-muted">
               {storeName} · {product.unit || "each"}
             </div>
-            <div className="mt-1 text-sm font-extrabold">{money(product.price)}</div>
+            <div className="mt-1 text-sm font-semibold">{money(product.price)}</div>
             <div className="mt-1 flex items-center gap-2">
-              <Link href={`/store/${storeSlug}`} className="text-[11px] font-extrabold text-teal">
+              <Link href={`/store/${storeSlug}`} className="text-[11px] font-semibold text-brand">
                 {t("Open store")} <ArrowRight size={10} className="inline rtl:-scale-x-100" />
               </Link>
               <button
                 type="button"
                 onClick={() => remove(product.id)}
-                className="ms-auto grid h-8 w-8 place-items-center rounded-lg text-coral hover:bg-red-50"
+                className="ms-auto grid h-8 w-8 place-items-center rounded-[4px] text-coral hover:bg-danger-soft"
                 aria-label={t("Remove from favourites")}
               >
                 <Heart size={14} className="fill-coral" />
@@ -73,8 +73,8 @@ export function FavoritesView({
         </div>
       ))}
       <Link href="/grocery" className="card-flat grid place-items-center p-4 text-center">
-        <ShoppingBasket size={20} className="text-teal" />
-        <span className="mt-1 text-[11px] font-extrabold">{t("Keep shopping")}</span>
+        <ShoppingBasket size={20} className="text-brand" />
+        <span className="mt-1 text-[11px] font-semibold">{t("Keep shopping")}</span>
       </Link>
     </div>
   );

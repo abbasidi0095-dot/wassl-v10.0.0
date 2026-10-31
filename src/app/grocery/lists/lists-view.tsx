@@ -60,9 +60,9 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
   if (!lists.length) {
     return (
       <div className="card mt-6 grid place-items-center px-6 py-16 text-center">
-        <ListChecks size={26} className="text-teal" />
-        <h2 className="mt-3 text-xl font-extrabold">{t("No lists yet")}</h2>
-        <p className="mt-1 text-sm text-ink/45">
+        <ListChecks size={26} className="text-brand" />
+        <h2 className="mt-3 text-xl font-semibold">{t("No lists yet")}</h2>
+        <p className="mt-1 text-sm text-muted">
           {t("Open a product and choose “Save to list” to start one.")}
         </p>
         <Link href="/grocery" className="btn btn-primary mt-5">
@@ -76,14 +76,14 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
     <div className="mt-5 grid gap-4 lg:grid-cols-2">
       {lists.map((list) => (
         <div key={list.id} className="card overflow-hidden">
-          <div className="flex items-center justify-between border-b border-ink/8 px-4 py-3">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <div>
-              <div className="text-sm font-extrabold">{list.name}</div>
-              <div className="text-[11px] font-bold text-ink/35">
+              <div className="text-sm font-semibold">{list.name}</div>
+              <div className="text-[11px] font-bold text-muted">
                 {list.items.length} {t("items")}
               </div>
             </div>
-            <ListChecks size={16} className="text-teal" />
+            <ListChecks size={16} className="text-brand" />
           </div>
           <div className="divide-y divide-ink/5">
             {list.items.map((item) => (
@@ -98,29 +98,29 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
                   aria-label={t("Mark {item}", { item: item.name })}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className={`truncate text-[13px] font-extrabold ${item.checked ? "line-through opacity-50" : ""}`}>
+                  <div className={`truncate text-[13px] font-semibold ${item.checked ? "line-through opacity-50" : ""}`}>
                     {item.name}
                   </div>
-                  <div className="text-[11px] font-bold text-ink/35">
+                  <div className="text-[11px] font-bold text-muted">
                     {item.storeName} · {item.unit || "each"} · ×{item.qty}
                   </div>
                 </div>
-                <div className="text-xs font-extrabold">{money(item.price * item.qty)}</div>
+                <div className="text-xs font-semibold">{money(item.price * item.qty)}</div>
                 <button
                   type="button"
                   onClick={() => update(list.id, item.productId, { remove: true })}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-ink/25 hover:bg-red-50 hover:text-coral"
+                  className="grid h-8 w-8 place-items-center rounded-[4px] text-muted hover:bg-danger-soft hover:text-coral"
                   aria-label={t("Remove item")}
                 >
                   <Trash2 size={13} />
                 </button>
-                <Link href={`/store/${item.storeSlug}`} className="text-[11px] font-extrabold text-teal">
+                <Link href={`/store/${item.storeSlug}`} className="text-[11px] font-semibold text-brand">
                   {t("Shop")}
                 </Link>
               </div>
             ))}
             {!list.items.length ? (
-              <div className="px-4 py-6 text-center text-xs font-bold text-ink/40">
+              <div className="px-4 py-6 text-center text-xs font-bold text-muted">
                 {t("This list is empty.")}
               </div>
             ) : null}

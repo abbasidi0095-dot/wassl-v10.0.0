@@ -34,7 +34,7 @@ export default async function GroceryFavoritesPage() {
         <div className="max-w-2xl">
           <div className="eyebrow">{t("Wassl Grocery")}</div>
           <h1 className="display mt-2 text-4xl">{t("Your favourites")}</h1>
-          <p className="mt-2 text-sm text-ink/50">
+          <p className="mt-2 text-sm text-muted">
             {t("Products you saved from local supermarkets.")}
           </p>
         </div>

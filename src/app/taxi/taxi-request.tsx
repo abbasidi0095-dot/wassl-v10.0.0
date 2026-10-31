@@ -259,23 +259,23 @@ export function TaxiRequest({
             </label>
           </div>
 
-          <div className="mt-4 flex items-end justify-between rounded-xl bg-cream p-3">
+          <div className="mt-4 flex items-end justify-between rounded-[6px] bg-surface-2 p-3">
             <div>
-              <div className="text-[11px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-muted">
                 {t("Distance")}
               </div>
-              <div className="text-sm font-extrabold">{distance.toFixed(1)} km</div>
+              <div className="text-sm font-semibold">{distance.toFixed(1)} km</div>
             </div>
             <div className="text-end">
-              <div className="text-[11px] font-medium text-ink/40">
+              <div className="text-[11px] font-medium text-muted">
                 {t("Estimated fare")}
               </div>
-              <div className="text-2xl font-extrabold tracking-[-0.04em]">{money(fare)}</div>
+              <div className="text-2xl font-semibold tracking-[-0.04em]">{money(fare)}</div>
             </div>
           </div>
 
           {error ? (
-            <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">
+            <p className="mt-3 rounded-[6px] bg-danger-soft px-3 py-2 text-xs font-bold text-danger">
               {error}
             </p>
           ) : null}
@@ -289,7 +289,7 @@ export function TaxiRequest({
             {submitting ? <Loader2 size={16} className="animate-spin" /> : <Navigation size={16} />}
             {submitting ? t("Requesting…") : t("Request taxi")}
           </button>
-          <p className="mt-2 text-center text-[11px] font-bold text-ink/35">
+          <p className="mt-2 text-center text-[11px] font-bold text-muted">
             {t("Cash to driver")} · {t("No card needed")}
           </p>
         </div>
@@ -304,7 +304,7 @@ function TaxiHistory({ rides }: { rides: TaxiRide[] }) {
   const { t } = useI18n();
   return (
     <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
-      <div className="border-b border-ink/8 px-4 py-3 text-sm font-extrabold">
+      <div className="border-b border-line px-4 py-3 text-sm font-semibold">
         {t("Trip history")}
       </div>
       <div className="divide-y divide-ink/5">
@@ -312,19 +312,19 @@ function TaxiHistory({ rides }: { rides: TaxiRide[] }) {
           <Link
             key={ride.id}
             href={`/taxi/${ride.id}`}
-            className="flex items-center justify-between gap-3 px-4 py-3 text-xs hover:bg-cream/60"
+            className="flex items-center justify-between gap-3 px-4 py-3 text-xs hover:bg-surface-2/60"
           >
             <span className="min-w-0">
-              <span className="block truncate font-extrabold">
+              <span className="block truncate font-semibold">
                 {ride.pickupLabel} → {ride.dropoffLabel}
               </span>
-              <span className="text-[11px] text-ink/40">
+              <span className="text-[11px] text-muted">
                 {new Date(ride.createdAt).toLocaleDateString()} · {ride.distanceKm.toFixed(1)} km
               </span>
             </span>
             <span className="shrink-0 text-end">
-              <span className="block font-extrabold">{money(ride.fare)}</span>
-              <span className="text-[11px] text-ink/40">{t(TAXI_STATUS_TEXT[ride.status])}</span>
+              <span className="block font-semibold">{money(ride.fare)}</span>
+              <span className="text-[11px] text-muted">{t(TAXI_STATUS_TEXT[ride.status])}</span>
             </span>
           </Link>
         ))}

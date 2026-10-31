@@ -21,14 +21,11 @@ export default async function MerchantPage() {
         session={session}
         title={store.name}
         subtitle={`${store.citySlug} · store workspace`}
-        links={[
-          { href: "/merchant", label: "Overview" },
-          { href: "/merchant#orders", label: "Order board" },
-          ...(store.category === "grocery"
-            ? [{ href: "/merchant/grocery", label: "Catalog & stock" }]
-            : [{ href: "/merchant#menu", label: "Menu" }]),
-          { href: "/merchant#store", label: "Store & money" },
-        ]}
+        links={
+          store.category === "grocery"
+            ? [{ href: "/merchant/grocery", label: "Grocery catalog & stock" }]
+            : []
+        }
       />
       <main className="container-wassl py-6">
         <MerchantDashboard

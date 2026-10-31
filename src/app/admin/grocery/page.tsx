@@ -37,7 +37,7 @@ export default async function AdminGroceryPage() {
           <div>
             <div className="eyebrow">Wassl Grocery</div>
             <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">{t("Supermarket operations")}</h1>
-            <p className="mt-1 text-sm text-ink/45">
+            <p className="mt-1 text-sm text-muted">
               {t("Live inventory across {count} grocery stores.", { count: groceryStores.length })}
             </p>
           </div>

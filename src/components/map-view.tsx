@@ -237,7 +237,7 @@ export function MapView({
         role="img"
         aria-label="Map unavailable in this browser"
       >
-        <p className="max-w-xs px-4 text-center text-[11px] font-bold leading-5 text-ink/45">
+        <p className="max-w-xs px-4 text-center text-[11px] font-bold leading-5 text-muted">
           Map preview is unavailable because this browser does not support
           WebGL2. Ordering and delivery details still work.
         </p>

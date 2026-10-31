@@ -225,9 +225,9 @@ export function GroceryManager({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="text-[13px] text-muted">{store.citySlug} · {t("Grocery")}</div>
+          <div className="eyebrow">{store.citySlug} · {t("Grocery")}</div>
           <h1 className="display mt-2 text-[clamp(1.8rem,1.5rem+1.2vw,2.4rem)]">{store.name}</h1>
-          <p className="mt-1 text-sm text-ink/45">
+          <p className="mt-1 text-[13px] text-muted">
             {t("Catalog, stock, delivery zones and 24/7 availability.")}
           </p>
         </div>
@@ -249,14 +249,21 @@ export function GroceryManager({
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 border-t border-line lg:grid-cols-4">
         {[
           { label: t("SKUs"), value: stats.count },
           { label: t("Low stock"), value: stats.low },
           { label: t("Out of stock"), value: stats.out },
           { label: t("Inventory value"), value: money(stats.value) },
-        ].map((item) => (
-          <div key={item.label}>
+        ].map((item, index) => (
+          <div
+            key={item.label}
+            className={`py-4 ${
+              index % 2 === 1 ? "border-s border-line ps-4" : ""
+            } ${index > 1 ? "border-t border-line lg:border-t-0" : ""} ${
+              index > 1 ? "lg:border-s lg:border-line lg:ps-5" : ""
+            } lg:ps-5 lg:[&:nth-child(1)]:ps-0`}
+          >
             <div className="text-[11px] text-muted">{item.label}</div>
             <div className="mt-1.5 font-display text-[24px] font-semibold leading-none tracking-[-0.03em] tnum">
               {item.value}
@@ -266,7 +273,7 @@ export function GroceryManager({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 start-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl rtl:translate-x-1/2">
+        <div className="fixed bottom-6 start-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2.5 text-[12px] font-medium text-on-dark shadow-[var(--shadow-float)] rtl:translate-x-1/2">
           {toast}
         </div>
       ) : null}
@@ -275,12 +282,12 @@ export function GroceryManager({
         <section className="mt-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <label className="inline-flex items-center gap-1.5 rounded-xl border border-ink/10 bg-white/60 px-3 py-2 text-[11px] font-extrabold text-ink/55">
+              <label className="inline-flex min-h-9 items-center gap-2 rounded-[6px] border border-line bg-surface px-3 py-2 text-[12px] font-medium text-muted">
                 <input
                   type="checkbox"
                   checked={lowOnly}
                   onChange={(event) => setLowOnly(event.target.checked)}
-                  className="h-3.5 w-3.5 accent-teal"
+                  className="h-4 w-4 accent-[var(--brand)]"
                 />
                 {t("Low stock only")}
               </label>
@@ -300,7 +307,7 @@ export function GroceryManager({
           </div>
 
           <div className="card mt-3 overflow-hidden">
-            <div className="divide-y divide-ink/5">
+            <div className="divide-y divide-line">
               {visible.map((product) => {
                 const stock =
                   product.variants?.length
@@ -311,17 +318,17 @@ export function GroceryManager({
                   <div key={product.id} className="flex flex-wrap items-center gap-3 p-3">
                     <div className="min-w-0 flex-1 basis-full sm:basis-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate text-[13px] font-extrabold">{product.name}</span>
+                        <span className="truncate text-[13px] font-semibold">{product.name}</span>
                         {product.variants?.length ? (
                           <span className="pill">{product.variants.length} {t("variants")}</span>
                         ) : null}
                         {product.popular ? <span className="pill pill-warm">{t("Popular")}</span> : null}
                       </div>
-                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-ink/40">
+                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted">
                         <span>{product.category}</span>
                         <span>{product.sku || t("No SKU")}</span>
-                        <span>{product.unit || "each"}</span>
-                        <span>{money(product.price)}</span>
+                        <span>{product.unit || t("each")}</span>
+                        <span className="tnum">{money(product.price)}</span>
                       </div>
                     </div>
                     <span
@@ -334,10 +341,10 @@ export function GroceryManager({
                       }`}
                     >
                       {badge.tone === "low"
-                              ? t("Only {count} left", { count: stock ?? 0 })
-                              : badge.tone === "out"
-                                ? t("Sold out")
-                                : t("In stock")}
+                        ? t("Only {count} left", { count: stock ?? 0 })
+                        : badge.tone === "out"
+                          ? t("Sold out")
+                          : t("In stock")}
                     </span>
                     <div className="flex shrink-0 items-center gap-1">
                       {product.variants?.length ? null : (
@@ -345,16 +352,18 @@ export function GroceryManager({
                           <button
                             type="button"
                             onClick={() => adjustStock(product, -1)}
-                            className="grid h-8 w-8 place-items-center rounded-lg border border-ink/10 hover:bg-cream"
+                            className="grid h-9 w-9 place-items-center rounded-[4px] border border-line transition-colors hover:border-line-strong hover:bg-surface-2"
                             aria-label={t("Decrease stock")}
                           >
                             −
                           </button>
-                          <span className="w-7 text-center text-xs font-extrabold">{stock ?? "∞"}</span>
+                          <span className="w-7 text-center text-[12px] font-semibold tnum">
+                            {stock ?? "∞"}
+                          </span>
                           <button
                             type="button"
                             onClick={() => adjustStock(product, 1)}
-                            className="grid h-8 w-8 place-items-center rounded-lg border border-ink/10 hover:bg-cream"
+                            className="grid h-9 w-9 place-items-center rounded-[4px] border border-line transition-colors hover:border-line-strong hover:bg-surface-2"
                             aria-label={t("Increase stock")}
                           >
                             +
@@ -377,7 +386,7 @@ export function GroceryManager({
                 );
               })}
               {!visible.length ? (
-                <div className="px-6 py-10 text-center text-sm font-bold text-ink/40">
+                <div className="px-6 py-10 text-center text-sm font-bold text-muted">
                   {t("No products match this filter.")}
                 </div>
               ) : null}
@@ -387,8 +396,8 @@ export function GroceryManager({
       ) : (
         <section className="mt-5 grid gap-4 lg:grid-cols-2">
           <div className="card p-5">
-            <h2 className="flex items-center gap-2 text-sm font-extrabold">
-              <Truck size={15} className="text-teal" /> {t("Fulfilment")}
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Truck size={15} className="text-brand" /> {t("Fulfilment")}
             </h2>
             <div className="mt-4 space-y-3">
               {[
@@ -398,13 +407,13 @@ export function GroceryManager({
                 { key: "alwaysOpen" as const, label: t("Always open (24/7 ordering)") },
                 { key: "overnightStaffed" as const, label: t("Overnight staffed") },
               ].map((row) => (
-                <label key={row.key} className="flex items-center justify-between gap-3 rounded-xl bg-cream p-3">
-                  <span className="text-xs font-extrabold">{row.label}</span>
+                <label key={row.key} className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 p-3">
+                  <span className="text-xs font-semibold">{row.label}</span>
                   <input
                     type="checkbox"
                     checked={Boolean(settings[row.key])}
                     onChange={(event) => updateSetting(row.key, event.target.checked)}
-                    className="h-4 w-4 accent-teal"
+                    className="h-4 w-4 accent-[var(--brand)]"
                   />
                 </label>
               ))}
@@ -497,8 +506,8 @@ export function GroceryManager({
 
           <div className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-sm font-extrabold">
-                <Settings2 size={15} className="text-teal" /> {t("Delivery zones")}
+              <h2 className="flex items-center gap-2 text-sm font-semibold">
+                <Settings2 size={15} className="text-brand" /> {t("Delivery zones")}
               </h2>
               <button
                 type="button"
@@ -518,7 +527,7 @@ export function GroceryManager({
             </div>
             <div className="mt-3 space-y-2">
               {settings.deliveryZones.map((zone, index) => (
-                <div key={zone.id} className="grid grid-cols-2 gap-2 rounded-xl bg-cream p-3 sm:grid-cols-4">
+                <div key={zone.id} className="grid grid-cols-2 gap-2 rounded-[6px] bg-surface-2 p-3 sm:grid-cols-4">
                   <label className="col-span-2 block sm:col-span-4">
                     <span className="label">{t("Zone name")}</span>
                     <input
@@ -563,7 +572,7 @@ export function GroceryManager({
                         deliveryZones: current.deliveryZones.filter((_, i) => i !== index),
                       }))
                     }
-                    className="mt-5 grid h-9 place-items-center rounded-xl text-coral hover:bg-red-50"
+                    className="mt-5 grid h-9 place-items-center rounded-[6px] text-danger hover:bg-danger-soft"
                     aria-label={t("Remove zone")}
                   >
                     <Trash2 size={14} />
@@ -580,7 +589,7 @@ export function GroceryManager({
               {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
               {t("Save grocery settings")}
             </button>
-            {error ? <p className="mt-2 text-xs font-bold text-coral">{error}</p> : null}
+            {error ? <p className="mt-2 text-xs font-bold text-danger">{error}</p> : null}
           </div>
         </section>
       )}
@@ -629,26 +638,26 @@ function ProductModal({
   }
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/50 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl"
+        className="max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-t-[10px] bg-surface p-5 shadow-[var(--shadow-float)] sm:rounded-[10px]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-extrabold">
+            <h2 className="font-display text-[22px] font-semibold tracking-[-0.025em]">
               {editing ? t("Edit product") : t("Add product")}
             </h2>
-            <p className="mt-0.5 text-[11px] text-ink/40">{storeName}</p>
+            <p className="mt-0.5 text-[11px] text-muted">{storeName}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-xl bg-ink/5 text-ink/50"
+            className="grid h-9 w-9 place-items-center rounded-[6px] bg-surface-2 text-muted transition-colors hover:text-ink"
             aria-label={t("Close")}
           >
             <X size={16} />
@@ -709,23 +718,23 @@ function ProductModal({
               onChange={(event) => set("description", event.target.value)}
             />
           </label>
-          <label className="flex items-center gap-2 rounded-xl bg-cream p-3">
+          <label className="flex items-center gap-2 rounded-[6px] bg-surface-2 p-3">
             <input
               type="checkbox"
               checked={draft.available}
               onChange={(event) => set("available", event.target.checked)}
-              className="h-4 w-4 accent-teal"
+              className="h-4 w-4 accent-[var(--brand)]"
             />
-            <span className="text-xs font-extrabold">{t("Available")}</span>
+            <span className="text-xs font-semibold">{t("Available")}</span>
           </label>
-          <label className="flex items-center gap-2 rounded-xl bg-cream p-3">
+          <label className="flex items-center gap-2 rounded-[6px] bg-surface-2 p-3">
             <input
               type="checkbox"
               checked={draft.popular}
               onChange={(event) => set("popular", event.target.checked)}
-              className="h-4 w-4 accent-teal"
+              className="h-4 w-4 accent-[var(--brand)]"
             />
-            <span className="text-xs font-extrabold">{t("Popular")}</span>
+            <span className="text-xs font-semibold">{t("Popular")}</span>
           </label>
         </div>
 
@@ -754,7 +763,7 @@ function ProductModal({
           </div>
           <div className="mt-2 space-y-2">
             {draft.variants.map((variant, index) => (
-              <div key={variant.id} className="grid grid-cols-2 gap-2 rounded-xl bg-cream p-3 sm:grid-cols-5">
+              <div key={variant.id} className="grid grid-cols-2 gap-2 rounded-[6px] bg-surface-2 p-3 sm:grid-cols-5">
                 <input
                   className="input"
                   placeholder={t("Label")}
@@ -802,7 +811,7 @@ function ProductModal({
                   onClick={() =>
                     set("variants", draft.variants.filter((_, i) => i !== index))
                   }
-                  className="grid h-9 place-items-center rounded-xl text-coral hover:bg-red-50"
+                  className="grid h-9 place-items-center rounded-[6px] text-danger hover:bg-danger-soft"
                   aria-label={t("Remove variant")}
                 >
                   <Trash2 size={14} />
@@ -812,7 +821,7 @@ function ProductModal({
           </div>
         </div>
 
-        {error ? <p className="mt-3 text-xs font-bold text-coral">{error}</p> : null}
+        {error ? <p className="mt-3 text-xs font-bold text-danger">{error}</p> : null}
         <div className="mt-5 flex gap-2">
           <button type="button" onClick={onClose} className="btn btn-ghost flex-1">
             {t("Cancel")}

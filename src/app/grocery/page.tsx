@@ -40,29 +40,32 @@ export default async function GroceryPage() {
       <SiteHeader cities={cities} />
       <main>
         <section className="container-wassl">
-          <div className="grid gap-8 border-b border-line py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-12 lg:py-12">
+          <div className="grid gap-7 border-b border-line py-6 sm:py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-12 lg:py-12">
             <div>
               <div className="flex items-center gap-2 text-[13px] text-muted">
                 <span className="status-dot live-dot text-success" />
                 {t("{count} supermarkets open now", { count: openNow })}
               </div>
 
-              <h1 className="display mt-5 max-w-[16ch] text-[clamp(2.5rem,1.5rem+4.4vw,5rem)]">
+              <h1 className="display mt-4 max-w-[16ch] text-[clamp(2.4rem,1.5rem+4.2vw,5rem)] sm:mt-5">
                 {t("The whole supermarket,")} {t("at your door.")}
               </h1>
 
-              <p className="lede mt-6 max-w-[52ch]" dir="auto">
+              <p
+                className="lede mt-4 max-w-[52ch] text-[15px] leading-7 sm:mt-6 sm:text-[18px]"
+                dir="auto"
+              >
                 {t(
                   "Aisles, units and live stock from local supermarkets. Delivery or pickup, express or scheduled — with overnight availability only when it is really staffed.",
                 )}
               </p>
 
-              <dl className="mt-8 grid max-w-lg grid-cols-3 gap-5 border-t border-line pt-5">
+              <dl className="mt-6 grid max-w-lg grid-cols-3 gap-5 border-t border-line pt-5 sm:mt-8">
                 {[
                   { value: `${items.length}`, label: t("supermarkets") },
                   { value: `${openNow}`, label: t("open right now") },
                   {
-                    value: t("30"),
+                    value: "30",
                     label: t("min express"),
                   },
                 ].map((item) => (
@@ -75,7 +78,7 @@ export default async function GroceryPage() {
                 ))}
               </dl>
 
-              <div className="mt-7 flex flex-wrap items-center gap-3">
+              <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-7">
                 <Link href="/grocery/favorites" className="btn btn-ghost btn-sm h-9">
                   <Heart size={13} /> {t("Favourites")}
                 </Link>
@@ -90,7 +93,7 @@ export default async function GroceryPage() {
 
             {featured ? (
               <div className="relative">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] bg-surface-2">
+                <div className="relative aspect-[16/9] overflow-hidden rounded-[10px] bg-surface-2 sm:aspect-[4/3]">
                   <Image
                     src={featured.photo}
                     alt={featured.store.name}

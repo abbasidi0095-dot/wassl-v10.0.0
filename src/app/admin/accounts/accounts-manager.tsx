@@ -179,8 +179,8 @@ export function AccountsManager({
     <section className="mt-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold tracking-[-0.04em]">Accounts & access</h2>
-          <p className="mt-1 text-[11px] text-ink/40">
+          <h2 className="text-xl font-semibold tracking-[-0.04em]">Accounts & access</h2>
+          <p className="mt-1 text-[11px] text-muted">
             Customers are active immediately. Store owners and drivers stay
             pending until you approve them.
           </p>
@@ -189,10 +189,10 @@ export function AccountsManager({
           <button
             type="button"
             onClick={() => setPendingOnly((value) => !value)}
-            className={`rounded-xl border px-3 py-1.5 text-[11px] font-extrabold transition ${
+            className={`rounded-[6px] border px-3 py-1.5 text-[11px] font-semibold transition ${
               pendingOnly
                 ? "border-ink bg-ink text-on-dark"
-                : "border-ink/10 bg-white/60 text-ink/50"
+                : "border-line bg-surface text-muted"
             }`}
           >
             Pending {pendingCount ? `· ${pendingCount}` : ""}
@@ -207,12 +207,12 @@ export function AccountsManager({
       </div>
 
       {toast ? (
-        <p className="mt-3 flex items-center gap-1.5 rounded-xl bg-teal/10 px-3 py-2 text-xs font-bold text-teal">
+        <p className="mt-3 flex items-center gap-1.5 rounded-[6px] bg-brand-soft px-3 py-2 text-xs font-bold text-brand">
           <CheckCircle2 size={14} /> {toast}
         </p>
       ) : null}
       {error ? (
-        <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
+        <p className="mt-3 rounded-[6px] bg-danger-soft px-3 py-2 text-xs font-bold text-danger">
           {error}
         </p>
       ) : null}
@@ -240,19 +240,19 @@ export function AccountsManager({
                   <tr key={user.id}>
                     <td>
                       <div className="flex items-center gap-2">
-                        <div className="grid h-8 w-8 place-items-center rounded-full bg-cream text-ink/45">
+                        <div className="grid h-8 w-8 place-items-center rounded-full bg-surface-2 text-muted">
                           <UserRound size={15} />
                         </div>
                         <div>
-                          <div className="font-extrabold">{user.name}</div>
-                          <div className="text-[11px] text-ink/40">{user.email}</div>
+                          <div className="font-semibold">{user.name}</div>
+                          <div className="text-[11px] text-muted">{user.email}</div>
                           {user.requestedStoreName ? (
-                            <div className="text-[11px] font-semibold text-teal">
+                            <div className="text-[11px] font-semibold text-brand">
                               {user.requestedStoreName}
                             </div>
                           ) : null}
                           {user.phone || user.citySlug ? (
-                            <div className="text-[11px] text-ink/30">
+                            <div className="text-[11px] text-muted">
                               {[user.phone, user.citySlug].filter(Boolean).join(" · ")}
                             </div>
                           ) : null}
@@ -312,7 +312,7 @@ export function AccountsManager({
                           ))}
                         </select>
                       ) : (
-                        <span className="text-[11px] text-ink/30">
+                        <span className="text-[11px] text-muted">
                           {draft.role === "admin"
                             ? "Full platform access"
                             : "Customer storefront account"}
@@ -321,15 +321,15 @@ export function AccountsManager({
                     </td>
                     <td>
                       {status === "pending" ? (
-                        <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-extrabold uppercase text-saffron-deep">
+                        <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-semibold uppercase text-saffron-deep">
                           Pending
                         </span>
                       ) : status === "rejected" ? (
-                        <span className="rounded-full bg-red-50 px-2 py-1 text-[11px] font-extrabold uppercase text-red-600">
+                        <span className="rounded-full bg-danger-soft px-2 py-1 text-[11px] font-semibold uppercase text-danger">
                           Rejected
                         </span>
                       ) : (
-                        <span className="rounded-full bg-teal/10 px-2 py-1 text-[11px] font-extrabold uppercase text-teal">
+                        <span className="rounded-full bg-brand-soft px-2 py-1 text-[11px] font-semibold uppercase text-brand">
                           Active
                         </span>
                       )}
@@ -377,7 +377,7 @@ export function AccountsManager({
                             type="button"
                             onClick={() => void reject(user)}
                             disabled={working}
-                            className="btn btn-ghost btn-sm text-red-600"
+                            className="btn btn-ghost btn-sm text-danger"
                             title="Reject this account"
                           >
                             <ShieldX size={13} />
@@ -392,7 +392,7 @@ export function AccountsManager({
           </table>
         </div>
         {!ordered.length ? (
-          <div className="px-4 py-10 text-center text-sm text-ink/40">
+          <div className="px-4 py-10 text-center text-sm text-muted">
             No accounts match.
           </div>
         ) : null}

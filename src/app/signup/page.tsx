@@ -74,7 +74,7 @@ export default async function SignupPage({
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center justify-between lg:hidden">
             <Logo />
-            <Link href="/" className="inline-flex items-center gap-1 text-xs font-bold text-ink/55">
+            <Link href="/" className="inline-flex items-center gap-1 text-xs font-bold text-muted">
               <ArrowLeft size={14} className="rtl:-scale-x-100" /> {t("Storefront")}
             </Link>
           </div>
@@ -93,11 +93,11 @@ export default async function SignupPage({
             }))}
           />
 
-          <div className="mt-6 flex items-center justify-between text-xs font-bold text-ink/45">
+          <div className="mt-6 flex items-center justify-between text-xs font-bold text-muted">
             <Link href="/" className="inline-flex items-center gap-1 hover:text-ink">
               <ArrowLeft size={14} className="rtl:-scale-x-100" /> {t("Back to storefront")}
             </Link>
-            <Link href="/login" className="text-teal hover:text-teal-dark">
+            <Link href="/login" className="text-brand hover:text-brand-dark">
               {t("Already have an account?")}
             </Link>
           </div>

@@ -55,19 +55,19 @@ export function OrderRefundPanel({ orderId }: { orderId: string }) {
 
   return (
     <div className="card-flat mt-3 p-4">
-      <div className="flex items-center gap-2 text-sm font-extrabold">
-        <RotateCcw size={15} className="text-teal" />
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <RotateCcw size={15} className="text-brand" />
         {t("Returns & refunds")}
       </div>
       {request ? (
-        <div className="mt-2 rounded-xl bg-cream p-3 text-[11px] font-bold text-ink/55">
+        <div className="mt-2 rounded-[6px] bg-surface-2 p-3 text-[11px] font-bold text-muted">
           <div className="flex items-center justify-between">
             <span>{t("Refund request")}</span>
             <span className="pill">{t(request.status)}</span>
           </div>
           <div className="mt-1">{money(request.amount)} · {request.reason}</div>
           {request.adminNote ? (
-            <div className="mt-1 text-ink/40">{t("Operations note")}: {request.adminNote}</div>
+            <div className="mt-1 text-muted">{t("Operations note")}: {request.adminNote}</div>
           ) : null}
         </div>
       ) : open ? (
@@ -79,7 +79,7 @@ export function OrderRefundPanel({ orderId }: { orderId: string }) {
             onChange={(event) => setReason(event.target.value)}
             required
           />
-          <label className="flex items-center gap-2 text-[11px] font-bold text-ink/50">
+          <label className="flex items-center gap-2 text-[11px] font-bold text-muted">
             <input
               type="checkbox"
               checked={restock}

@@ -131,12 +131,12 @@ export function GroceryAdmin({
               return (
                 <div key={product.id} className="flex flex-wrap items-center gap-3 p-3">
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-extrabold">{product.name}</div>
-                    <div className="text-[11px] font-bold text-ink/40">
+                    <div className="truncate text-[13px] font-semibold">{product.name}</div>
+                    <div className="text-[11px] font-bold text-muted">
                       {storeName.get(product.storeId)} · {product.sku || t("No SKU")} · {money(product.price)}
                     </div>
                   </div>
-                  <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-extrabold uppercase text-saffron-deep">
+                  <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-semibold uppercase text-saffron-deep">
                     {badge.tone === "low"
                               ? t("Only {count} left", { count: stock ?? 0 })
                               : badge.tone === "out"
@@ -144,7 +144,7 @@ export function GroceryAdmin({
                                 : t("In stock")}
                   </span>
                   {product.variants?.length ? (
-                    <span className="text-[11px] font-bold text-ink/35">
+                    <span className="text-[11px] font-bold text-muted">
                       {product.variants.length} {t("variants")}
                     </span>
                   ) : (
@@ -153,7 +153,7 @@ export function GroceryAdmin({
                         type="button"
                         onClick={() => adjust(product, -1)}
                         disabled={busy === product.id}
-                        className="grid h-8 w-8 place-items-center rounded-lg border border-ink/10"
+                        className="grid h-8 w-8 place-items-center rounded-[6px] border border-line"
                       >
                         −
                       </button>
@@ -171,7 +171,7 @@ export function GroceryAdmin({
               );
             })}
             {!lowStock.length ? (
-              <div className="px-6 py-8 text-center text-sm font-bold text-ink/40">
+              <div className="px-6 py-8 text-center text-sm font-bold text-muted">
                 {t("Everything is above the low-stock threshold.")}
               </div>
             ) : null}
@@ -191,16 +191,16 @@ export function GroceryAdmin({
             <div key={refund.id} className="card p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="text-[13px] font-extrabold">{refund.orderId}</div>
-                  <div className="text-[11px] font-bold text-ink/35">
+                  <div className="text-[13px] font-semibold">{refund.orderId}</div>
+                  <div className="text-[11px] font-bold text-muted">
                     {timeAgo(refund.createdAt)} · {refund.lines.length} {t("lines")}
                   </div>
                 </div>
                 <span className="pill">{t(refund.status)}</span>
               </div>
-              <p className="mt-2 text-xs text-ink/55">{refund.reason}</p>
+              <p className="mt-2 text-xs text-muted">{refund.reason}</p>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-extrabold">{money(refund.amount)}</span>
+                <span className="text-sm font-semibold">{money(refund.amount)}</span>
                 {refund.status === "pending" ? (
                   <div className="flex gap-1">
                     <button
@@ -234,7 +234,7 @@ export function GroceryAdmin({
             </div>
           ))}
           {!refunds.length ? (
-            <div className="card grid place-items-center px-6 py-10 text-center text-sm font-bold text-ink/40 lg:col-span-2">
+            <div className="card grid place-items-center px-6 py-10 text-center text-sm font-bold text-muted lg:col-span-2">
               {t("No refund requests yet.")}
             </div>
           ) : null}

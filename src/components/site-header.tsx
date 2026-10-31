@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   CarTaxiFront,
   ChevronDown,
+  House,
   LayoutDashboard,
   MapPin,
   Menu,
@@ -132,7 +133,7 @@ export function SiteHeader({
   );
 
   const mobileNav = [
-    { href: "/", label: t("Home"), icon: MapPin },
+    { href: "/", label: t("Home"), icon: House },
     {
       href: currentCity ? `/city/${currentCity.slug}` : "/",
       label: t("Stores"),

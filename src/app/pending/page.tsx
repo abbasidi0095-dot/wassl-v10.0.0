@@ -23,37 +23,37 @@ export default async function PendingPage() {
   if (session.status !== "pending") redirect(homeForRole(session.role));
 
   return (
-    <main className="grid min-h-screen place-items-center bg-cream p-5 sm:p-10">
+    <main className="grid min-h-screen place-items-center bg-surface-2 p-5 sm:p-10">
       <div className="w-full max-w-lg">
         <div className="mb-8 flex items-center justify-between">
           <Logo />
-          <Link href="/" className="text-xs font-bold text-ink/55 hover:text-ink">
+          <Link href="/" className="text-xs font-bold text-muted hover:text-ink">
             Storefront
           </Link>
         </div>
 
         <div className="card p-7 sm:p-9">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-saffron/20 text-saffron-deep">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-saffron/20 text-saffron-deep">
             <Clock3 size={24} />
           </div>
           <div className="eyebrow mt-5">Account received</div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.05em]">
+          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
             Almost there, {session.name.split(" ")[0]}.
           </h1>
-          <p className="mt-3 text-sm leading-6 text-ink/60">
+          <p className="mt-3 text-sm leading-6 text-muted">
             Your account is created. A Wassl operator now reviews new store and
             driver accounts and attaches your workspace before it opens.
           </p>
 
-          <dl className="mt-6 grid grid-cols-2 gap-3 rounded-2xl bg-cream/80 p-4 text-sm">
+          <dl className="mt-6 grid grid-cols-2 gap-3 rounded-[10px] bg-surface-2/80 p-4 text-sm">
             <div>
-              <dt className="text-[11px] font-bold uppercase tracking-wider text-ink/40">
+              <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">
                 Account
               </dt>
               <dd className="mt-1 font-bold">{session.name}</dd>
             </div>
             <div>
-              <dt className="text-[11px] font-bold uppercase tracking-wider text-ink/40">
+              <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">
                 Requested role
               </dt>
               <dd className="mt-1 font-bold">
@@ -71,7 +71,7 @@ export default async function PendingPage() {
           <div className="mt-3">
             <PendingActions />
           </div>
-          <p className="mt-4 text-center text-[11px] leading-5 text-ink/40">
+          <p className="mt-4 text-center text-[11px] leading-5 text-muted">
             Already approved? Sign out and sign in again to pick up your new
             access.
           </p>

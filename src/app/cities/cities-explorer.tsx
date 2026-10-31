@@ -29,7 +29,7 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
         <div className="relative">
           <Search
             size={16}
-            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-ink/35"
+            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
           />
           <input
             value={query}
@@ -47,10 +47,10 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
               key={item.value}
               type="button"
               onClick={() => setFilter(item.value)}
-              className={`rounded-xl border px-3.5 py-2 text-[11px] font-extrabold transition ${
+              className={`rounded-[6px] border px-3.5 py-2 text-[11px] font-semibold transition ${
                 filter === item.value
-                  ? "border-teal bg-teal text-on-dark"
-                  : "border-ink/10 bg-white/60 text-ink/55"
+                  ? "border-teal bg-brand text-on-dark"
+                  : "border-line bg-surface text-muted"
               }`}
             >
               {item.label}
@@ -68,11 +68,11 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
               className="card-flat group p-4 transition hover:-translate-y-1 hover:border-teal/30"
             >
               <div className="flex items-start justify-between">
-                <span className="text-lg font-extrabold tracking-tight">{city.name}</span>
-                <ArrowUpRight size={15} className="text-teal transition group-hover:translate-x-0.5 rtl:-scale-x-100" />
+                <span className="text-lg font-semibold tracking-tight">{city.name}</span>
+                <ArrowUpRight size={15} className="text-brand transition group-hover:translate-x-0.5 rtl:-scale-x-100" />
               </div>
-              <div className="arabic mt-1 text-sm text-ink/40">{city.nameAr}</div>
-              <div className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-teal">
+              <div className="arabic mt-1 text-sm text-muted">{city.nameAr}</div>
+              <div className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-brand">
                 <span className="status-dot live-dot" /> {t("Live")}
               </div>
             </Link>
@@ -81,10 +81,10 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
       ) : null}
 
       <div className="mt-6 flex items-center justify-between">
-        <p className="text-xs font-bold text-ink/45">
+        <p className="text-xs font-bold text-muted">
           {t(filtered.length === 1 ? "{count} city" : "{count} cities", { count: filtered.length })}
         </p>
-        <span className="text-[11px] font-bold text-ink/30">
+        <span className="text-[11px] font-bold text-muted">
           {filter === "priority" ? t("Priority operations") : t("Full national directory")}
         </span>
       </div>
@@ -95,28 +95,28 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
             <Link
               key={city.id}
               href={`/city/${city.slug}`}
-              className="group flex items-center justify-between bg-paper px-4 py-3.5 transition hover:bg-cream"
+              className="group flex items-center justify-between bg-paper px-4 py-3.5 transition hover:bg-surface-2"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-teal/8 text-teal">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-brand-soft text-brand">
                   <MapPin size={15} />
                 </span>
                 <div className="min-w-0">
-                  <div className="truncate text-[13px] font-extrabold">{city.name}</div>
-                  <div className="arabic truncate text-[11px] text-ink/35">{city.nameAr}</div>
+                  <div className="truncate text-[13px] font-semibold">{city.name}</div>
+                  <div className="arabic truncate text-[11px] text-muted">{city.nameAr}</div>
                 </div>
               </div>
               <div className="ms-3 flex shrink-0 items-center gap-2">
                 <span
                   className={`rounded-full px-2 py-1 text-[11px] font-medium ${
                     city.launchStatus === "live"
-                      ? "bg-teal/10 text-teal"
-                      : "bg-ink/5 text-ink/35"
+                      ? "bg-brand-soft text-brand"
+                      : "bg-ink/5 text-muted"
                   }`}
                 >
                   {city.launchStatus === "live" ? "Live" : "Soon"}
                 </span>
-                <ArrowUpRight size={13} className="text-ink/20 group-hover:text-teal" />
+                <ArrowUpRight size={13} className="text-muted group-hover:text-brand" />
               </div>
             </Link>
           ))}

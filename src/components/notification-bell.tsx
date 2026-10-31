@@ -60,7 +60,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative grid h-9 w-9 place-items-center rounded-[6px] text-ink/70 transition-colors hover:bg-surface-2 hover:text-ink"
+        className="relative grid h-9 w-9 place-items-center rounded-[6px] text-muted transition-colors hover:bg-surface-2 hover:text-ink"
         aria-label={t("Notifications")}
         aria-expanded={open}
       >
@@ -125,7 +125,7 @@ export function NotificationBell() {
                       <span className="mt-0.5 block text-[11px] leading-4 text-muted">
                         {item.body}
                       </span>
-                      <span className="mt-1 block text-[11px] font-bold uppercase tracking-wider text-ink/30">
+                      <span className="mt-1 block text-[11px] font-bold uppercase tracking-wider text-muted">
                         {timeAgo(item.at)}
                       </span>
                     </span>
@@ -179,7 +179,7 @@ export function NotificationBell() {
                 <button
                   type="button"
                   onClick={clearNotifications}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-ink/40 hover:bg-white hover:text-coral"
+                  className="grid h-8 w-8 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-danger"
                   aria-label={t("Clear notifications")}
                 >
                   <Trash2 size={14} />
@@ -188,12 +188,12 @@ export function NotificationBell() {
             </div>
 
             {pushState === "unsupported" ? (
-              <p className="border-t border-ink/8 px-4 py-2 text-[11px] font-bold text-ink/40">
+              <p className="border-t border-line px-4 py-2 text-[11px] font-bold text-muted">
                 {t("This browser does not support web notifications.")}
               </p>
             ) : null}
             {pushState === "denied" ? (
-              <p className="border-t border-ink/8 px-4 py-2 text-[11px] font-bold text-ink/40">
+              <p className="border-t border-line px-4 py-2 text-[11px] font-bold text-muted">
                 {t("Allow notifications in your browser settings to receive alerts.")}
               </p>
             ) : null}

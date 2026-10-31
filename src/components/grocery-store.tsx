@@ -345,7 +345,7 @@ export function GroceryStore({
         </aside>
 
         <div className="min-w-0">
-          <div className="flex flex-col gap-3 border-y border-line py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-line pb-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative w-full sm:max-w-[340px]">
               <Search
                 size={15}
@@ -388,7 +388,7 @@ export function GroceryStore({
             </div>
           </div>
 
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none lg:hidden">
+          <div className="sticky top-0 z-30 -mx-4 mt-3 flex gap-2 overflow-x-auto border-b border-line bg-paper/95 px-4 pb-2 pt-2 backdrop-blur-sm scrollbar-none lg:hidden">
             <button
               type="button"
               onClick={() => setCategory("all")}
@@ -440,28 +440,28 @@ export function GroceryStore({
                 return (
                   <article
                     key={product.id}
-                    className={`group relative flex gap-3 rounded-[8px] border border-line bg-surface p-3 transition-colors hover:border-line-strong ${
+                    className={`group relative flex gap-3 rounded-[8px] border border-line bg-surface p-2.5 transition-colors hover:border-line-strong ${
                       soldOut ? "opacity-70" : ""
                     }`}
                   >
                     <button
                       type="button"
                       onClick={() => setSheet(product)}
-                      className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[6px] bg-surface-2"
+                      className="h-16 w-16 shrink-0 overflow-hidden rounded-[6px] bg-surface-2 sm:h-[72px] sm:w-[72px]"
                       aria-label={t("View {product}", { product: product.name })}
                     >
                       <ProductTile
                         name={product.name}
                         category={product.category}
                         className="h-full w-full"
-                        iconSize={28}
+                        iconSize={24}
                       />
                     </button>
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="flex items-start justify-between gap-1">
-                        <div className="min-w-0">
+                        <div className="min-w-0 pt-0.5">
                           {product.brand ? (
-                            <div className="text-[11px] text-muted">
+                            <div className="truncate text-[10px] font-medium text-muted">
                               {product.brand}
                             </div>
                           ) : null}
@@ -475,10 +475,10 @@ export function GroceryStore({
                         <button
                           type="button"
                           onClick={() => toggleFavorite(product.id)}
-                          className={`grid h-7 w-7 shrink-0 place-items-center rounded-[4px] transition-colors ${
+                          className={`-me-1.5 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-[4px] transition-colors ${
                             favorite
                               ? "text-danger"
-                              : "text-muted/50 hover:text-danger"
+                              : "text-muted/45 hover:text-danger"
                           }`}
                           aria-label={
                             favorite
@@ -487,45 +487,39 @@ export function GroceryStore({
                           }
                         >
                           <Heart
-                            size={14}
+                            size={15}
                             className={favorite ? "fill-current" : ""}
                           />
                         </button>
                       </div>
 
-                      <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+                      <div className="mt-auto flex items-end justify-between gap-2 pt-1">
                         <div>
                           <div className="text-[14px] font-semibold tnum">
                             {money(product.price)}
                           </div>
-                          <div
-                            className={`mt-0.5 text-[11px] ${
-                              badge.tone === "out"
-                                ? "text-danger"
-                                : badge.tone === "low"
-                                  ? "text-signal"
-                                  : "text-muted"
-                            }`}
-                          >
-                            {stock === undefined
-                              ? t("In stock")
-                              : badge.tone === "low"
-                                ? t("Only {count} left", { count: stock })
-                                : badge.tone === "out"
-                                  ? t("Sold out")
-                                  : t("In stock")}
-                          </div>
+                          {badge.tone === "low" || badge.tone === "out" ? (
+                            <div
+                              className={`mt-0.5 text-[11px] ${
+                                badge.tone === "out" ? "text-danger" : "text-signal"
+                              }`}
+                            >
+                              {badge.tone === "low"
+                                ? t("Only {count} left", { count: stock ?? 0 })
+                                : t("Sold out")}
+                            </div>
+                          ) : null}
                         </div>
                         <button
                           type="button"
                           onClick={() => add(product)}
                           disabled={soldOut}
-                          className="grid h-8 w-8 place-items-center rounded-[4px] border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:border-line disabled:text-muted/40 disabled:hover:bg-transparent"
+                          className="-mb-1 -me-1 grid h-11 w-11 place-items-center rounded-[6px] border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:border-line disabled:text-muted/40 disabled:hover:bg-transparent"
                           aria-label={t("Add {product} to cart", {
                             product: product.name,
                           })}
                         >
-                          <Plus size={15} />
+                          <Plus size={16} />
                         </button>
                       </div>
                     </div>
