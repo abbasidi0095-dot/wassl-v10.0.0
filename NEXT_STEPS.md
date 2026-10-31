@@ -20,13 +20,14 @@ This repository contains the **Wassl** delivery marketplace demo with Phase 2 ha
 - [x] Approval provisions a storefront or courier profile automatically; rejection blocks the account
 - [x] Admin accounts are provisioned only, never self-service (`WASSL_ADMIN_EMAIL` / `WASSL_ADMIN_PASSWORD`)
 - [x] Seeded store, driver and customer passwords are backfilled on older databases
-- [x] Legacy email-OTP endpoints remain as a compatibility fallback
+- [x] Unused legacy passwordless OTP endpoints removed (2026-10-31)
 - [x] Best-effort Supabase profile mirror with a service-role key and `supabase/schema.sql`
-- [ ] Add password reset and email verification
-- [ ] Persist OTP codes in Postgres/Redis before relying on the fallback in a multi-instance deployment
+- [x] Email verification with Brevo OTP (2026-10-31)
+- [ ] Add password reset
+- [x] OTP challenges are persisted in the database as HMACs and survive restarts
 
 ## 🔌 2. Plug in User-Provided Restaurant APIs
-- [x] Resend transactional email integration ready (set `RESEND key` in the deployment secrets)
+- [x] Brevo transactional email integration ready (set `BREVO_API_KEY` in the deployment secrets)
 - [ ] In `src/lib/data-source/marocapis.ts`, replace the mock `normalise()` function with your real provider
 - [ ] Update `src/data/restaurants.locked.json` generation (`scripts/import-restaurants.mjs`) to call your API instead of/as well as MarocAPIs
 - [ ] Re-run `node --env-file=.env.local scripts/import-restaurants.mjs` to publish a new locked snapshot
