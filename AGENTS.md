@@ -16,8 +16,8 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.3.2** (31 October 2026; restaurant-first home)
-- Live: <https://wassl-34-preview.fly.dev>
+- Release: **10.3.3** (31 October 2026; self-hosted on OCI)
+- Live: <https://141.145.192.23.nip.io>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
 - Product: local delivery + **Wassl Grocery** + **Wassl Taxi**, cash only (COD / cash fare).
@@ -90,6 +90,18 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.3.3 — self-hosted on OCI
+- Fly app and volume retired after the service became unreachable.
+- App moved to OCI `instance-20261024-2302`; `/opt/wassl` checkout,
+  `/var/lib/wassl` JSON store, `/etc/wassl.env` runtime env.
+- `wassl.service` runs Next on `127.0.0.1:3000`; `caddy.service` serves
+  `https://141.145.192.23.nip.io` with Let's Encrypt and proxies loopback.
+- OCI security list opened for `80`/`443`; no NSG. Host firewalld allows only
+  `ssh`, `http`, `https`.
+- Mobile shell, App Links, Universal Links, README, AGENTS and
+  [docs/HOSTING.md](docs/HOSTING.md) updated to the new host.
+- Temporary Cloudflare quick tunnel disabled after direct TLS was verified.
 
 ### 10.3.2 — restaurant-first home
 - `src/app/page.tsx` reordered: three open, top-rated Dakhla restaurant cards
@@ -261,16 +273,22 @@ persists; every mutation should add an audit entry via `recordAudit`.
 
 ## Deployment notes
 
-- Fly app `wassl-34-preview` (personal org of the token used at release), region
-  `cdg`, 1 × shared-cpu-1x/1GB, volume `wassl_data` → `/data`, JSON backend.
-- `fly.toml` targets this app; `NEXT_PUBLIC_SITE_URL` is the Fly hostname.
+- Host: OCI VPS `instance-20261024-2302`, region `eu-paris-1`, public IP
+  `141.145.192.23`, private IP `10.0.0.125`.
+- Live: <https://141.145.192.23.nip.io>.
+- App checkout `/opt/wassl`; JSON data `/var/lib/wassl`; env `/etc/wassl.env`
+  (root `600`). The Fly deployment and volume are retired.
+- `wassl.service` runs `next start -H 127.0.0.1 -p 3000`; `caddy.service`
+  terminates TLS on `80/443` and proxies to loopback.
+- OCI VCN default security list allows TCP `22`, `80`, `443`; the VNIC has no
+  NSG. Host firewalld allows `ssh`, `http`, `https` only.
 - Required secrets: `WASSL_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
-  `VAPID_SUBJECT`, `WASSL_ADMIN_EMAIL`, `WASSL_ADMIN_PASSWORD`.
+  `VAPID_SUBJECT`, `WASSL_ADMIN_EMAIL`, `WASSL_ADMIN_PASSWORD`, plus
+  `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`.
 - Operator email for v10: `admin@wassl.ma`; password is intentionally not
-  committed. Rotate with `flyctl secrets set WASSL_ADMIN_PASSWORD=...`; the next
-  sign-in calls `ensureBootstrapAdmin()` and applies it.
-- The old `wassl-ma` app belongs to another Fly account and is not accessible
-  with the release token; do not delete it.
+  committed. Rotate it in `/etc/wassl.env`, then the next sign-in calls
+  `ensureBootstrapAdmin()` and applies it.
+- Full runbook: [docs/HOSTING.md](docs/HOSTING.md).
 - Native push delivery still needs FCM (`google-services.json`) and an APNs key;
   token registration and the server-side device store already exist.
 - iOS archives are unsigned in CI; Apple team/certificates are required for

@@ -13,7 +13,7 @@ delivery and cash fares only. Live order/ride tracking, a persistent activity
 dock, web push notifications, four languages (EN/FR/ES/AR) with RTL, and light
 and dark themes.
 
-- **Live:** <https://wassl-34-preview.fly.dev>
+- **Live:** <https://141.145.192.23.nip.io>
 - **Repository:** <https://github.com/abbasidi0095-dot/wassl-v10.0.0>
 - **Agent guide:** [AGENTS.md](AGENTS.md) — architecture, constraints and the
   complete change history written for future agents.
@@ -28,6 +28,16 @@ and dark themes.
 ---
 
 ## Release history
+
+### 10.3.3 — 31 October 2026 — self-hosted on OCI
+- Fly is retired; Wassl runs on the OCI VPS at
+  <https://141.145.192.23.nip.io>.
+- Next.js binds `127.0.0.1:3000`; Caddy terminates Let's Encrypt TLS on
+  `80/443` and proxies to loopback.
+- JSON data lives on the persistent `/var/lib/wassl` volume; systemd units
+  restart both services on boot.
+- Mobile shell, App Links, Universal Links and all documentation now point at
+  the new host. See [docs/HOSTING.md](docs/HOSTING.md).
 
 ### 10.3.2 — 31 October 2026 — restaurant-first home
 - Home now opens with three open, top-rated Dakhla restaurants and an “All
@@ -615,7 +625,7 @@ This is a demo, deliberately scoped. Before a real pilot:
 
 Wassl 10.0.0 ships as a Capacitor native shell around the production Next.js app
 (app ID `ma.wassl.app`). The native projects live in `android/` and `ios/`; the
-shell loads `https://wassl-34-preview.fly.dev` so auth, live orders, maps and dashboards
+shell loads `https://141.145.192.23.nip.io` so auth, live orders, maps and dashboards
 stay identical to the web app. Native additions: splash/icons, safe-area layout,
 offline fallback, deep links, Android back handling, haptic add-to-cart, dark
 mode with native status-bar sync, and push token registration.
