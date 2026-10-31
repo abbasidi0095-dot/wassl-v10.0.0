@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
-import { effectiveAccountStatus, ensureBootstrapAdmin, getUserByEmail } from "@/lib/db";
+import {
+  effectiveAccountStatus,
+  ensureBootstrapAdmin,
+  getUserByEmail,
+  issueEmailVerification,
+} from "@/lib/db";
+import { sendVerificationEmail } from "@/lib/email";
+import { isTestMode } from "@/lib/email-verification";
 import { verifyPassword } from "@/lib/security";
 import { createSessionToken } from "@/lib/security";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
@@ -41,6 +48,45 @@ export async function POST(request: Request) {
       { error: "This account was not approved. Contact Wassl operations." },
       { status: 403 },
     );
+  }
+
+  /*
+   * The password is correct, but the address was never confirmed. Send a fresh
+   * code instead of opening a session. The code is the second factor that
+   * proves the email belongs to this person.
+   */
+  if (user.emailVerified === false) {
+    const verification = await issueEmailVerification(user.email);
+    let delivered = false;
+    let cooldown = 0;
+    if (!verification.ok) {
+      cooldown = verification.retryAfterSeconds ?? 60;
+    }
+    if (verification.ok) {
+      const result = await sendVerificationEmail(
+        verification.email,
+        verification.code,
+        verification.name,
+      );
+      delivered = result.ok;
+      if (!result.ok) {
+        console.error("[auth] verification email failed:", result.error);
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      needsVerification: true,
+      email: user.email,
+      redirect: `/verify-email?email=${encodeURIComponent(user.email)}&next=login${
+        delivered ? "" : `&cooldown=${cooldown}`
+      }${
+        !delivered && cooldown === 0 ? "&warning=1" : ""
+      }`,
+      ...(verification.ok && isTestMode()
+        ? { devCode: verification.code }
+        : {}),
+    });
   }
 
   const session: Session = {

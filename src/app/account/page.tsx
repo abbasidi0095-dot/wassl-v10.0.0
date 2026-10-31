@@ -10,6 +10,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth";
+import { isEmailVerified } from "@/lib/email-verification";
 import { getCities, getOrderViews, getUserById } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
 import { STATUS_META } from "@/lib/types";

@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.1.0** (31 October 2026; Coastal Manifest redesign)
+- Release: **10.2.0** (31 October 2026; verified email accounts)
 - Live: <https://wassl-34-preview.fly.dev>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -50,6 +50,7 @@ src/components/     site/staff headers, menu, map, product icons, live activity,
                     notification bell, ongoing tracker, locale/theme providers
 src/lib/            db.ts (all mutations + audit), i18n.ts, push.ts, taxi.ts,
                     grocery.ts (availability, zones, fees, stock),
+                    email.ts (Brevo), email-verification.ts (OTP lifecycle),
                     order-machine.ts, auth.ts, security.ts, events.ts
 src/data/           cities.json (209), restaurants.locked.json (checksum-locked)
 android/ ios/       Capacitor native shells
@@ -80,12 +81,36 @@ persists; every mutation should add an audit entry via `recordAudit`.
 9. Grocery stock is decremented/reserved inside `mutate()` only. Never trust
    client price/stock; use `resolveProductStock` and `groceryFees`. Release on
    cancellation, commit on delivery, restock on refund.
-10. Customer-facing strings should go through `t()`; the English string is the
+10. Verification codes are stored only as HMACs; never log a code, return it
+    outside `WASSL_OTP_TEST_MODE`, or email it to an address the user did not
+    just prove they control.
+11. Customer-facing strings should go through `t()`; the English string is the
     dictionary key and missing translations fall back safely.
-11. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
+12. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.2.0 — verified email accounts (Brevo OTP)
+- `src/lib/email-verification.ts`: HMAC code hashing, 10-minute TTL, five
+  attempts, 60s resend cooldown, three sends/10min, email masking, test mode.
+- `User.emailVerified`, `emailVerifiedAt`, `emailVerification` challenge added;
+  new accounts start `false`, legacy/seed/staff accounts stay verified.
+- `issueEmailVerification` / `confirmEmailVerification` in `db.ts` run inside
+  `mutate()` and audit without ever recording the code.
+- `src/lib/email.ts` now uses Brevo (`BREVO_API_KEY`, `BREVO_SENDER_*`) with a
+  branded HTML + text verification email; Resend removed.
+- Signup no longer opens a session: it creates the account, issues/sends a code
+  and sends the browser to `/verify-email`. Login with an unverified address
+  does the same. Sessions are only created after confirmation.
+- `/verify-email` screen with segmented inputs, paste, auto-submit, resend
+  countdown, masked address and EN/FR/ES/AR copy.
+- Removed the unused passwordless `/api/auth/otp/*` routes and `src/lib/otp.ts`;
+  `upsertOtpUser` is kept for operations provisioning and tests.
+- Tests: 17 OTP/email tests (hash, lifecycle, expiry, attempts, cooldown, rate
+  limit, template escaping) and updated signup e2e that completes the code.
+- Secrets: `BREVO_API_KEY` and `BREVO_SENDER_EMAIL` are Fly/local env only.
+  Never set `WASSL_OTP_TEST_MODE=1` on a public deployment.
 
 ### 10.1.0 — Coastal Manifest redesign
 - Added `DESIGN-SYSTEM.md` (tokens, type, spacing, components, motion, a11y) and

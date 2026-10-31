@@ -40,8 +40,26 @@ export interface User {
   loyaltyPoints?: number;
   favorites?: string[];
   shoppingLists?: ShoppingList[];
+  /**
+   * Email verification. Older/seeded accounts leave this undefined and are
+   * treated as verified; new self-service accounts start as `false`.
+   */
+  emailVerified?: boolean;
+  emailVerifiedAt?: string;
+  /** Hashed one-time challenge; the plaintext code is never stored. */
+  emailVerification?: EmailVerificationChallenge;
   createdAt?: string;
   lastLoginAt?: string;
+}
+
+export interface EmailVerificationChallenge {
+  codeHash: string;
+  expiresAt: string;
+  attempts: number;
+  /** Sends inside the current rate-limit window. */
+  sends: number;
+  windowStartedAt: string;
+  lastSentAt: string;
 }
 
 export type StoreCategory =

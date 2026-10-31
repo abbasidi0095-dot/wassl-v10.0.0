@@ -4,11 +4,11 @@ import {
   effectiveAccountStatus,
   getCities,
   getUserByEmail,
+  issueEmailVerification,
 } from "@/lib/db";
-import { createSessionToken, hashPassword } from "@/lib/security";
-import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
-import { homeForRole } from "@/lib/auth-config";
-import type { Session } from "@/lib/types";
+import { sendVerificationEmail } from "@/lib/email";
+import { isTestMode } from "@/lib/email-verification";
+import { hashPassword } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -124,28 +124,48 @@ export async function POST(request: Request) {
     );
   }
 
-  const status = effectiveAccountStatus(user);
-  const session: Session = {
-    userId: user.id,
-    role: user.role,
-    name: user.name,
-    email: user.email,
-    status,
-    storeId: user.storeId,
-    driverId: user.driverId,
-  };
+  /*
+   * The account exists but no session is opened yet. The six-digit code is the
+   * proof that the address belongs to the person signing up; a failed delivery
+   * is recoverable from the verification screen.
+   */
+  const verification = await issueEmailVerification(user.email);
+  let delivered = false;
+  let warning: string | undefined;
 
-  const response = NextResponse.json({
-    ok: true,
-    role: user.role,
-    status,
-    needsApproval: status === "pending",
-    redirect: status === "pending" ? "/pending" : homeForRole(user.role),
-  });
-  response.cookies.set(
-    SESSION_COOKIE,
-    createSessionToken(session),
-    sessionCookieOptions(request),
+  if (verification.ok) {
+    const result = await sendVerificationEmail(
+      verification.email,
+      verification.code,
+      verification.name,
+    );
+    delivered = result.ok;
+    if (!result.ok) {
+      console.error("[auth] verification email failed:", result.error);
+      warning =
+        "Your account is ready, but we could not send the code. Use “Resend code” on the next screen.";
+    }
+  } else {
+    warning =
+      "Your account is ready, but a code could not be issued right now. Use “Resend code” on the next screen.";
+  }
+
+  const status = effectiveAccountStatus(user);
+  return NextResponse.json(
+    {
+      ok: true,
+      needsVerification: true,
+      email: user.email,
+      role: user.role,
+      status,
+      redirect: `/verify-email?email=${encodeURIComponent(user.email)}&next=signup${
+        warning ? "&warning=1" : ""
+      }`,
+      ...(warning ? { warning } : {}),
+      ...(delivered && verification.ok && isTestMode()
+        ? { devCode: verification.code }
+        : {}),
+    },
+    { status: 201 },
   );
-  return response;
 }

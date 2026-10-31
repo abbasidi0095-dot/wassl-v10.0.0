@@ -57,7 +57,24 @@ async function signupMerchant(
   await page.getByLabel("Store name").fill(input.storeName);
   await page.getByLabel("Password", { exact: true }).fill(input.password);
   await page.getByLabel("Confirm password").fill(input.password);
-  await page.getByRole("button", { name: "Create account" }).click();
+
+  // The signup response carries the test-mode code; production sends it by
+  // email through Brevo and never returns it to the browser.
+  const [response] = await Promise.all([
+    page.waitForResponse(
+      (candidate) =>
+        candidate.url().includes("/api/auth/signup") &&
+        candidate.request().method() === "POST",
+    ),
+    page.getByRole("button", { name: "Create account" }).click(),
+  ]);
+  const body = (await response.json()) as { devCode?: string };
+  expect(body.devCode).toMatch(/^\d{6}$/);
+  await expect(page).toHaveURL(/\/verify-email/, { timeout: 15_000 });
+
+  for (let index = 0; index < 6; index += 1) {
+    await page.getByLabel(`Digit ${index + 1}`).fill(body.devCode![index]);
+  }
   await expect(page).toHaveURL(/\/pending/, { timeout: 15_000 });
 }
 

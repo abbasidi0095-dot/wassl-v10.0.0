@@ -29,6 +29,18 @@ and dark themes.
 
 ## Release history
 
+### 10.2.0 — 31 October 2026 — verified email accounts (Brevo OTP)
+- New self-service accounts must confirm a six-digit code before a session is
+  opened; password sign-in for an unverified address sends a fresh code.
+- Brevo transactional delivery replaces Resend; branded HTML + plain-text email
+  with a 10-minute code, single use and no stored plaintext.
+- HMAC-hashed challenges, five-attempt limit, 60-second resend cooldown and
+  three sends per ten minutes, all inside the serialized database mutation.
+- `/verify-email` screen with segmented code input, paste, auto-submit, resend
+  countdown, masked address and EN/FR/ES/AR copy.
+- Seeded/demo and operations-provisioned accounts remain verified; the unused
+  passwordless OTP login routes were removed (no UI used them).
+
 ### 10.1.0 — 31 October 2026 — "Coastal Manifest" redesign
 - New art direction and design system: Bricolage Grotesque + Instrument Sans +
   IBM Plex Sans Arabic (self-hosted), limestone paper, Atlantic ink, one saffron
@@ -154,9 +166,11 @@ Copy `.env.example` to `.env.local` for a documented template.
 | `WASSL_DEMO_STORE_PASSWORD` | demo fallback | Password for the seeded store accounts |
 | `WASSL_DEMO_DRIVER_PASSWORD` | demo fallback | Password for the seeded driver accounts |
 | `WASSL_DEMO_CUSTOMER_PASSWORD` | demo fallback | Password for the seeded customer account |
-| `RESEND_API_KEY` | unset | Optional order-notification email (OTP fallback also uses it) |
-| `RESEND_FROM` | `Wassl <orders@wassl.ma>` | Verified Resend sender address |
-| `WASSL_ADMIN_EMAILS` | `admin@wassl.ma` | Extra addresses allowed to claim the admin role through the legacy OTP path |
+| `BREVO_API_KEY` | unset | Brevo transactional email key for verification and receipts |
+| `BREVO_SENDER_EMAIL` | `abbasidi0095@gmail.com` | Verified Brevo sender address |
+| `BREVO_SENDER_NAME` | `Wassl` | Sender display name |
+| `BREVO_REPLY_TO` | unset | Optional reply-to address |
+| `WASSL_ADMIN_EMAILS` | `admin@wassl.ma` | Extra addresses allowed to claim the admin role through the staff flow |
 | `NEXT_PUBLIC_SUPABASE_URL` | provided project | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | provided key | Public Supabase key (safe in the browser) |
 | `SUPABASE_SERVICE_ROLE_KEY` | unset | Server-only key that lets the app mirror profiles into Supabase |
@@ -416,7 +430,8 @@ src/
   app/
     api/
       admin/…             reset, city activation, full state
-      auth/…              password login/signup, OTP fallback, logout
+      auth/…              password login/signup, OTP send/confirm, logout
+      verify-email/       six-digit verification screen
       driver/…            location, status
       events/             SSE stream
       merchant/store/     open/closed toggle
@@ -531,7 +546,7 @@ This is a demo, deliberately scoped. Before a real pilot:
    Normalise it into tables (and add PostGIS for geospatial queries) before
    high-volume reporting or sharding. The JSON store remains the demo default.
 2. **Auth** — email + password sign-in with operator approval is in place; add
-   password reset, email verification, session revocation, a shared OTP store
+   password reset, session revocation, a distributed rate-limit store
    for multi-instance fallback and persisted rate limits. Rotate `WASSL_SECRET`
    and the seeded credentials before a public launch.
 3. **State machine** — enforce legal transitions server-side per role instead of

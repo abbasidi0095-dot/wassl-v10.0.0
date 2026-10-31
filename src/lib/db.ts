@@ -7,6 +7,17 @@ import {
   runWithEventBatch,
 } from "./events";
 import { hashPassword, orderCode, randomId, verifyPassword } from "./security";
+import {
+  codeMatches,
+  generateVerificationCode,
+  hashVerificationCode,
+  OTP_MAX_ATTEMPTS,
+  OTP_MAX_SENDS,
+  OTP_RESEND_COOLDOWN_MS,
+  OTP_SEND_WINDOW_MS,
+  OTP_TTL_MS,
+  type VerificationFailure,
+} from "./email-verification";
 import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
 import { casablancaNow } from "./hours";
@@ -167,6 +178,8 @@ export async function createAccount(input: {
       requestedStoreName: input.requestedStoreName?.trim() || undefined,
       requestedVehicle: input.requestedVehicle?.trim() || undefined,
       accountStatus: input.role === "customer" ? "active" : "pending",
+      // New self-service accounts must confirm the address before a session.
+      emailVerified: false,
       createdAt: new Date().toISOString(),
     };
     db.users.push(user);
@@ -181,6 +194,176 @@ export async function createAccount(input: {
       actorName: user.name,
     });
     return user;
+  });
+}
+
+export type IssueEmailVerificationResult =
+  | {
+      ok: true;
+      code: string;
+      email: string;
+      name: string;
+      expiresAt: string;
+      resendAfterSeconds: number;
+    }
+  | {
+      ok: false;
+      failure: Extract<
+        VerificationFailure,
+        "not_found" | "already_verified" | "cooldown" | "rate_limited"
+      >;
+      retryAfterSeconds?: number;
+    };
+
+/**
+ * Creates a fresh six-digit challenge for an unverified account. Enforces a
+ * one-minute resend cooldown and three sends per ten-minute window, entirely
+ * inside the serialized mutation so concurrent requests cannot race.
+ *
+ * The plaintext code is returned to the caller for delivery and is never
+ * persisted or logged.
+ */
+export async function issueEmailVerification(
+  email: string,
+): Promise<IssueEmailVerificationResult> {
+  const normalized = email.trim().toLowerCase();
+  return mutate((db) => {
+    const user = db.users.find(
+      (candidate) => candidate.email.toLowerCase() === normalized,
+    );
+    if (!user) return { ok: false, failure: "not_found" as const };
+    if (user.emailVerified !== false) {
+      return { ok: false, failure: "already_verified" as const };
+    }
+
+    const now = Date.now();
+    const previous = user.emailVerification;
+    const windowStart = previous ? Date.parse(previous.windowStartedAt) : 0;
+    const inWindow =
+      Boolean(previous) &&
+      Number.isFinite(windowStart) &&
+      now - windowStart < OTP_SEND_WINDOW_MS;
+    const sends = inWindow ? previous!.sends : 0;
+
+    if (inWindow && sends >= OTP_MAX_SENDS) {
+      return {
+        ok: false,
+        failure: "rate_limited" as const,
+        retryAfterSeconds: Math.max(
+          1,
+          Math.ceil((windowStart + OTP_SEND_WINDOW_MS - now) / 1000),
+        ),
+      };
+    }
+
+    if (previous) {
+      const lastSent = Date.parse(previous.lastSentAt);
+      if (Number.isFinite(lastSent) && now - lastSent < OTP_RESEND_COOLDOWN_MS) {
+        return {
+          ok: false,
+          failure: "cooldown" as const,
+          retryAfterSeconds: Math.max(
+            1,
+            Math.ceil((lastSent + OTP_RESEND_COOLDOWN_MS - now) / 1000),
+          ),
+        };
+      }
+    }
+
+    const code = generateVerificationCode();
+    const expiresAt = new Date(now + OTP_TTL_MS).toISOString();
+
+    user.emailVerified = false;
+    user.emailVerification = {
+      codeHash: hashVerificationCode(normalized, code),
+      expiresAt,
+      attempts: 0,
+      sends: sends + 1,
+      windowStartedAt: inWindow
+        ? previous!.windowStartedAt
+        : new Date(now).toISOString(),
+      lastSentAt: new Date(now).toISOString(),
+    };
+
+    recordAudit(db, {
+      action: "auth.verification_sent",
+      entity: "auth",
+      entityId: user.id,
+      summary: `Verification code sent to ${user.email}`,
+      actorRole: "system",
+      actorName: user.name,
+    });
+
+    return {
+      ok: true as const,
+      code,
+      email: user.email,
+      name: user.name,
+      expiresAt,
+      resendAfterSeconds: Math.ceil(OTP_RESEND_COOLDOWN_MS / 1000),
+    };
+  });
+}
+
+export type ConfirmEmailVerificationResult =
+  | { ok: true; user: User }
+  | { ok: false; failure: VerificationFailure };
+
+/**
+ * Checks a submitted code, counts attempts and marks the address verified.
+ * A successful code is consumed; five wrong attempts invalidate the challenge.
+ */
+export async function confirmEmailVerification(
+  email: string,
+  code: string,
+): Promise<ConfirmEmailVerificationResult> {
+  const normalized = email.trim().toLowerCase();
+  return mutate((db) => {
+    const user = db.users.find(
+      (candidate) => candidate.email.toLowerCase() === normalized,
+    );
+    if (!user) return { ok: false, failure: "not_found" as const };
+    // Never open a session for an already-verified address without checking a
+    // live code: that would let anyone who knows the address in.
+    if (user.emailVerified === true) {
+      return { ok: false, failure: "already_verified" as const };
+    }
+
+    const challenge = user.emailVerification;
+    if (!challenge) return { ok: false, failure: "no_code" as const };
+
+    if (Date.now() > Date.parse(challenge.expiresAt)) {
+      user.emailVerification = undefined;
+      return { ok: false, failure: "expired" as const };
+    }
+    if (challenge.attempts >= OTP_MAX_ATTEMPTS) {
+      user.emailVerification = undefined;
+      return { ok: false, failure: "too_many_attempts" as const };
+    }
+
+    challenge.attempts += 1;
+
+    if (!codeMatches(normalized, code, challenge.codeHash)) {
+      if (challenge.attempts >= OTP_MAX_ATTEMPTS) {
+        user.emailVerification = undefined;
+      }
+      return { ok: false, failure: "incorrect" as const };
+    }
+
+    user.emailVerified = true;
+    user.emailVerifiedAt = new Date().toISOString();
+    user.emailVerification = undefined;
+
+    recordAudit(db, {
+      action: "auth.email_verified",
+      entity: "auth",
+      entityId: user.id,
+      summary: `${user.email} verified their email`,
+      actorRole: "system",
+      actorName: user.name,
+    });
+
+    return { ok: true as const, user };
   });
 }
 
@@ -345,6 +528,9 @@ export async function upsertOtpUser(input: {
       role,
       accountStatus:
         role === "merchant" || role === "driver" ? "pending" : "active",
+      // Accounts provisioned through the staff flow are already vetted.
+      emailVerified: true,
+      emailVerifiedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
     };
     db.users.push(created);

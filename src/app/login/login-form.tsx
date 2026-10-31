@@ -53,9 +53,18 @@ export function LoginForm({
         redirect?: string;
         role?: string;
         needsApproval?: boolean;
+        needsVerification?: boolean;
+        email?: string;
       };
       if (!response.ok) {
         setError(data.error || "Could not sign in");
+        return;
+      }
+      if (data.needsVerification) {
+        const target =
+          data.redirect ||
+          `/verify-email?email=${encodeURIComponent(data.email || email.trim().toLowerCase())}`;
+        router.push(target);
         return;
       }
       const safeNext =

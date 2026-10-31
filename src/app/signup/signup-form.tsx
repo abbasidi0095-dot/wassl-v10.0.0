@@ -104,9 +104,18 @@ export function SignupForm({
         error?: string;
         redirect?: string;
         needsApproval?: boolean;
+        needsVerification?: boolean;
+        email?: string;
       };
       if (!response.ok) {
         setError(data.error || "Could not create the account");
+        return;
+      }
+      if (data.needsVerification) {
+        const target =
+          data.redirect ||
+          `/verify-email?email=${encodeURIComponent(data.email || email.trim().toLowerCase())}`;
+        router.push(target);
         return;
       }
       router.push(data.redirect || "/account");
@@ -184,6 +193,9 @@ export function SignupForm({
             autoComplete="email"
             required
           />
+          <span className="mt-1 block text-[11px] text-muted">
+            We will send a 6-digit code to confirm this address.
+          </span>
         </label>
 
         <label className="block">
