@@ -3177,3 +3177,42 @@ export async function dashboardStats() {
     liveCities: db.cities.filter((city) => city.launchStatus === "live").length,
   };
 }
+
+export async function deleteStoreAdmin(
+  storeId: string,
+  actor: OrderActor,
+): Promise<{ id: string; name: string }> {
+  return mutate((db) => {
+    const store = db.stores.find((item) => item.id === storeId);
+    if (!store) throw new Error("Store not found");
+    if (store.locked) throw new Error("Locked directory stores cannot be deleted");
+    const activeOrder = db.orders.find(
+      (order) =>
+        order.storeId === storeId &&
+        !["delivered", "cancelled"].includes(order.status),
+    );
+    if (activeOrder) {
+      throw new Error("Finish or cancel active orders before deleting this store");
+    }
+    db.stores = db.stores.filter((item) => item.id !== storeId);
+    db.products = db.products.filter((item) => item.storeId !== storeId);
+    for (const user of db.users) {
+      if (user.storeId === storeId) {
+        delete user.storeId;
+        user.accountStatus = "pending";
+      }
+    }
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "store.delete",
+      entity: "store",
+      entityId: storeId,
+      summary: `Deleted store ${store.name}`,
+      before: `${store.category} · ${store.citySlug}`,
+    });
+    publish({ type: "store", storeId, citySlug: store.citySlug });
+    return { id: store.id, name: store.name };
+  });
+}

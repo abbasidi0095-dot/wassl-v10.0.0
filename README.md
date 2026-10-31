@@ -29,6 +29,17 @@ and dark themes.
 
 ## Release history
 
+### 10.8.0 — 31 October 2026 — grocery back office
+- Admin **Stores** now separates **Restaurants**, **Grocery** and **Other**
+  partners, with a view-specific **Add grocery** action and one-click delete.
+- **Grocery operations** has its own store manager: create a supermarket,
+  edit its name, city, contact, address, delivery fee, minimum order, prep
+  time and cover photo, or delete the store with its catalogue.
+- Store deletion is guarded: locked directory stores cannot be removed, and a
+  store with active orders must be finished or cancelled first.
+- Deleted stores disappear from the storefront, grocery rail and merchant
+  workspace; historical customer orders fall back to a neutral store label.
+
 ### 10.7.0 — 31 October 2026 — photos and GPS
 - Store owners can upload a restaurant/store cover from the merchant profile;
   admins can upload the same cover from the store editor.

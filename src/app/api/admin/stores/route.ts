@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { createStore, updateStoreAdmin, type CreateStoreInput } from "@/lib/db";
+import {
+  createStore,
+  deleteStoreAdmin,
+  updateStoreAdmin,
+  type CreateStoreInput,
+} from "@/lib/db";
 import { actorFromSession, isResponse, requireApiRole } from "@/lib/api-auth";
 import type { Store } from "@/lib/types";
 
@@ -117,6 +122,28 @@ export async function PATCH(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Could not update the store" },
+      { status: 400 },
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  const session = requireApiRole(request, ["admin"]);
+  if (isResponse(session)) return session;
+  const body = (await request.json().catch(() => null)) as
+    | { storeId?: string }
+    | null;
+  if (!body?.storeId) {
+    return NextResponse.json({ error: "storeId is required" }, { status: 400 });
+  }
+  try {
+    return NextResponse.json({
+      ok: true,
+      store: await deleteStoreAdmin(body.storeId, actorFromSession(session)),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Could not delete the store" },
       { status: 400 },
     );
   }

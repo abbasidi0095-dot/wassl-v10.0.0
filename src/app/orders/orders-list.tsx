@@ -270,14 +270,16 @@ export function OrdersList() {
                     </div>
                   </div>
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => reorder(order)}
-                  className="btn btn-ghost btn-sm shrink-0"
-                  aria-label={`${t("Reorder")} · ${order.storeName}`}
-                >
-                  <RotateCcw size={12} /> {t("Reorder")}
-                </button>
+                {order.storeSlug ? (
+                  <button
+                    type="button"
+                    onClick={() => reorder(order)}
+                    className="btn btn-ghost btn-sm shrink-0"
+                    aria-label={`${t("Reorder")} · ${order.storeName}`}
+                  >
+                    <RotateCcw size={12} /> {t("Reorder")}
+                  </button>
+                ) : null}
               </div>
             );
           })}

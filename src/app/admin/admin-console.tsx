@@ -32,6 +32,7 @@ import {
   ShoppingBasket as ShoppingBasketIcon,
   Star,
   Store as StoreIcon,
+  Trash2,
   Truck,
   Users,
   UtensilsCrossed,
@@ -163,6 +164,7 @@ export function AdminConsole({
   const [driverChoice, setDriverChoice] = useState<Record<string, string>>({});
   const [storeFormOpen, setStoreFormOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
+  const [storeView, setStoreView] = useState<"restaurant" | "grocery" | "other">("restaurant");
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [provision, setProvision] = useState<{
     role: "driver" | "merchant";
@@ -184,6 +186,19 @@ export function AdminConsole({
     () => drivers.filter((driver) => driver.kind === "taxi" || driver.kind === "both"),
     [drivers],
   );
+  const visibleStores = useMemo(() => {
+    if (storeView === "grocery") {
+      return stores.filter((store) => store.category === "grocery");
+    }
+    if (storeView === "restaurant") {
+      return stores.filter(
+        (store) => store.category === "restaurant" || store.category === "cafe",
+      );
+    }
+    return stores.filter(
+      (store) => store.category !== "restaurant" && store.category !== "cafe" && store.category !== "grocery",
+    );
+  }, [storeView, stores]);
 
   const refresh = useCallback(async (silent = false) => {
     if (!silent) setRefreshing(true);
@@ -429,6 +444,33 @@ export function AdminConsole({
       setEditingDriver(null);
       setToast(`${data.driver.name} updated`);
       await refresh(true);
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function deleteStore(store: Store) {
+    if (
+      !window.confirm(
+        `Delete ${store.name} and all of its menu items? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    setBusy(store.id);
+    try {
+      const response = await fetch("/api/admin/stores", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeId: store.id }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setToast(data.error || "Could not delete the store");
+        return;
+      }
+      setStores((current) => current.filter((item) => item.id !== store.id));
+      setToast(`${store.name} deleted`);
     } finally {
       setBusy("");
     }
@@ -714,6 +756,7 @@ export function AdminConsole({
         <StoreFormModal
           store={editingStore}
           cities={cities}
+          defaultCategory={storeView === "grocery" ? "grocery" : undefined}
           busy={busy === (editingStore?.id ?? "new-store")}
           onClose={() => {
             setStoreFormOpen(false);
@@ -1007,12 +1050,32 @@ export function AdminConsole({
             <div>
               <h2 className="text-xl font-semibold tracking-[-0.04em]">Stores & supply</h2>
               <p className="mt-1 text-[11px] text-muted">
-                Add a partner, edit its details or toggle it open and closed.
-                Merchants keep their own dashboard.
+                Restaurants and grocery stores are managed separately. Add,
+                edit, pause or remove a partner; merchants keep their dashboard.
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="pill">{stores.length} partners</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="pill">{visibleStores.length} shown</span>
+              <div className="flex rounded-[6px] border border-line p-0.5">
+                {[
+                  { id: "restaurant" as const, label: "Restaurants" },
+                  { id: "grocery" as const, label: "Grocery" },
+                  { id: "other" as const, label: "Other" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setStoreView(item.id)}
+                    className={`rounded-[4px] px-2.5 py-1.5 text-[11px] font-semibold ${
+                      storeView === item.id
+                        ? "bg-ink text-on-dark"
+                        : "text-muted hover:text-ink"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={() => {
@@ -1021,7 +1084,8 @@ export function AdminConsole({
                 }}
                 className="btn btn-primary btn-sm"
               >
-                <Plus size={13} /> Add store
+                <Plus size={13} />{" "}
+                {storeView === "grocery" ? "Add grocery" : "Add store"}
               </button>
               <button
                 type="button"
@@ -1047,7 +1111,7 @@ export function AdminConsole({
                   </tr>
                 </thead>
                 <tbody>
-                  {stores.map((store) => {
+                  {visibleStores.map((store) => {
                     const openState = getOpenState(store);
                     return (
                       <tr key={store.id}>
@@ -1120,6 +1184,15 @@ export function AdminConsole({
                             className="btn btn-ghost btn-sm"
                           >
                             {store.isOpen ? "Pause" : "Open"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void deleteStore(store)}
+                            disabled={busy === store.id}
+                            className="btn btn-ghost btn-sm text-danger"
+                            title="Delete store and menu"
+                          >
+                            <Trash2 size={11} />
                           </button>
                         </div>
                       </td>
@@ -1855,12 +1928,14 @@ function EntityIcon({ entity }: { entity: AuditEntry["entity"] }) {
 function StoreFormModal({
   store,
   cities,
+  defaultCategory,
   busy,
   onClose,
   onSave,
 }: {
   store: Store | null;
   cities: City[];
+  defaultCategory?: StoreCategory;
   busy: boolean;
   onClose: () => void;
   onSave: (draft: StoreDraft) => Promise<void>;
@@ -1869,7 +1944,7 @@ function StoreFormModal({
     name: store?.name ?? "",
     nameAr: store?.nameAr ?? "",
     citySlug: store?.citySlug ?? cities.find((city) => city.priority)?.slug ?? cities[0]?.slug ?? "dakhla",
-    category: store?.category ?? "restaurant",
+    category: store?.category ?? defaultCategory ?? "restaurant",
     tagline: store?.tagline ?? "",
     address: store?.address ?? "",
     landmark: store?.landmark ?? "",

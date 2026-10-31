@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.7.0** (31 October 2026; product/store photos and GPS)
+- Release: **10.8.0** (31 October 2026; grocery back office)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,15 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.8.0 — grocery back office
+- Admin **Stores** tab filters partners into Restaurants, Grocery and Other;
+  the add action defaults to the active view and each row can be deleted.
+- `/admin/grocery` gains a grocery store manager (`GroceryStoreEditor`) with
+  cover upload plus create/edit/delete against `/api/admin/stores`.
+- `deleteStoreAdmin()` removes a store and its products, detaches merchant
+  accounts, blocks locked stores and refuses while orders are active.
+- The customer order list hides Reorder when the source store no longer exists.
 
 ### 10.7.0 — photos and GPS
 - `Store.image` and `Product.image` fields; `storePhoto()` prefers merchant

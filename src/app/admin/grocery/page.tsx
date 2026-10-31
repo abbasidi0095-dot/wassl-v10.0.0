@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
-import { getProducts, getRefundRequests, getStores } from "@/lib/db";
+import { getCities, getProducts, getRefundRequests, getStores } from "@/lib/db";
 import { StaffHeader } from "@/components/staff-header";
 import { getTranslator } from "@/lib/i18n-server";
 import { GroceryAdmin } from "./grocery-admin";
@@ -11,7 +11,11 @@ export const metadata = { title: "Grocery operations" };
 export default async function AdminGroceryPage() {
   const session = await requireRole("admin");
   const { t } = await getTranslator();
-  const [stores, refunds] = await Promise.all([getStores(), getRefundRequests()]);
+  const [stores, refunds, cities] = await Promise.all([
+    getStores(),
+    getRefundRequests(),
+    getCities(),
+  ]);
   const groceryStores = stores.filter((store) => store.category === "grocery");
   const products = (
     await Promise.all(groceryStores.map((store) => getProducts(store.id)))
@@ -45,7 +49,8 @@ export default async function AdminGroceryPage() {
           </Link>
         </div>
         <GroceryAdmin
-          stores={groceryStores.map((store) => ({ id: store.id, name: store.name, citySlug: store.citySlug }))}
+          stores={groceryStores}
+          cities={cities}
           initialProducts={products}
           initialRefunds={refunds}
         />
