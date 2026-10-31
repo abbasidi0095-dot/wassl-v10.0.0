@@ -98,8 +98,10 @@ persists; every mutation should add an audit entry via `recordAudit`.
   `www` to the apex. The old `nip.io` name remains available as a fallback.
 - `NEXT_PUBLIC_SITE_URL`, mobile shell URL, App Links, Universal Links, README,
   AGENTS and hosting docs were updated to `https://wassl.shop`.
-- Brevo domain authentication records for `wassl.shop` still need to be added
-  before switching `BREVO_SENDER_EMAIL` from the Gmail sender.
+- Brevo domain authentication for `wassl.shop` is complete (DKIM, Brevo code,
+  DMARC). `noreply@wassl.shop` is an active sender, and
+  `BREVO_SENDER_EMAIL` now uses it. A delivery test to the operator inbox was
+  accepted by Brevo.
 
 ### 10.4.0 — handover codes and fleet provisioning
 - `Order.deliveryPin` is now generated for every order, not only grocery.

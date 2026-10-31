@@ -34,6 +34,8 @@ and dark themes.
   for both `wassl.shop` and `www.wassl.shop`; `www` redirects to the apex.
 - The Namecheap A/CNAME records, Caddy site blocks, mobile shell, App Links,
   Universal Links and documentation all point at the new domain.
+- Brevo authenticated `wassl.shop` and `noreply@wassl.shop` is the active OTP
+  sender; the Gmail sender remains only as a fallback.
 - Short link: <https://tinyurl.com/wasslshop>.
 
 ### 10.4.0 — 31 October 2026 — handover codes and fleet provisioning

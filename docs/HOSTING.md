@@ -101,8 +101,9 @@ for both names through HTTP-01/ALPN on ports `80`/`443`.
 ## Email sender
 
 Brevo authenticates `wassl.shop` with DKIM, a Brevo TXT verification code and
-DMARC. Keep `BREVO_SENDER_EMAIL` on the verified sender
-(`noreply@wassl.shop` once the domain is authenticated).
+DMARC. The active sender is `noreply@wassl.shop`; `BREVO_SENDER_EMAIL` is set to
+it in `/etc/wassl.env`. The old Gmail sender remains on the Brevo account as a
+fallback but is not used by the app.
 
 ## Cloudflare tunnel
 
