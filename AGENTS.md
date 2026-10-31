@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.4.1** (31 October 2026; wassl.shop domain)
+- Release: **10.5.0** (31 October 2026; Aero glass and live branding)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,20 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.5.0 — Aero glass and live branding
+- `themeStyle()` turns `PlatformSettings.primaryColor`, `accentColor` and the
+  theme preset into inline CSS variables. `:root` and `html.dark` consume
+  `--brand-custom*` / `--signal-custom*` with Coastal fallbacks.
+- Root layout loads settings, sets the palette before paint, passes
+  `BrandProvider` the brand name, Arabic name, logo and default theme.
+- Admin Settings gained colour pickers, four presets (Coastal, Aero, Midnight,
+  Sand), a logo upload (PNG/JPEG/WebP), a default light/dark selector and the
+  Arabic brand name. Saving refreshes the server tree.
+- Header, cards, panels, inputs and buttons use translucent Aero gradients,
+  inner highlights and layered shadows. The bottom bar is now a floating glass
+  dock with an active pill; footer padding was increased to clear it.
+- Existing `#0f6e6e` settings are migrated to the Coastal `#0b4a45`.
 
 ### 10.4.1 — wassl.shop
 - Namecheap BasicDNS now serves `wassl.shop` (`A @ → 141.145.192.23`) and

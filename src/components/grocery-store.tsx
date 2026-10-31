@@ -440,7 +440,7 @@ export function GroceryStore({
                 return (
                   <article
                     key={product.id}
-                    className={`group relative flex gap-3 rounded-[8px] border border-line bg-surface p-2.5 transition-colors hover:border-line-strong ${
+                    className={`aero-tile group relative flex gap-3 rounded-[8px] border p-2.5 transition-colors hover:border-line-strong ${
                       soldOut ? "opacity-70" : ""
                     }`}
                   >

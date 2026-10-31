@@ -9,7 +9,7 @@ export function CartMini({ storeId }: { storeId: string }) {
   const { items, count, subtotal, deliveryFee, storeId: cartStore, storeName, minOrder } = useCart();
   if (cartStore !== storeId || !items.length) {
     return (
-      <div className="rounded-[10px] border border-line bg-surface p-4 text-center">
+      <div className="aero-tile rounded-[10px] border p-4 text-center">
         <ShoppingBag size={18} className="mx-auto text-muted" />
         <p className="mt-2 text-[11px] text-muted">
           Add items to start your order.

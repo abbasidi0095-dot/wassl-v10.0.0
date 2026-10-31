@@ -31,7 +31,10 @@ const settings: PlatformSettings = {
   currency: "MAD",
   commissionRate: 12,
   defaultDeliveryFee: 12,
-  primaryColor: "#0f6e6e",
+  primaryColor: "#0b4a45",
+  accentColor: "#955b0b",
+  themePreset: "coastal",
+  defaultTheme: "system",
   cityWaitlistEnabled: true,
 };
 

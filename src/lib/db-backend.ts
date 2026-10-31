@@ -55,6 +55,12 @@ function hydrate(db: Database): Database {
   db.refundRequests ??= [];
   db.pushSubscriptions ??= [];
   db.taxiRides ??= [];
+  if (db.settings.primaryColor === "#0f6e6e") {
+    db.settings.primaryColor = "#0b4a45";
+  }
+  db.settings.accentColor ??= "#955b0b";
+  db.settings.themePreset ??= "coastal";
+  db.settings.defaultTheme ??= "system";
 
   // Give existing records a handover code once. The code is persisted on the
   // next mutation; until then the in-memory view is still consistent.

@@ -29,7 +29,7 @@ export function CartView() {
 
   if (!items.length) {
     return (
-      <div className="mt-8 rounded-[10px] border border-line bg-surface px-6 pb-10 pt-14 text-center sm:pb-12 sm:pt-20">
+      <div className="mt-8 aero-tile rounded-[10px] border px-6 pb-10 pt-14 text-center sm:pb-12 sm:pt-20">
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-[10px] bg-surface-2 text-brand">
           <ShoppingBag size={24} strokeWidth={1.5} />
         </div>
@@ -64,7 +64,7 @@ export function CartView() {
 
   return (
     <div className="mt-8 grid gap-6 pb-16 lg:grid-cols-[1fr_340px] lg:items-start">
-      <div className="rounded-[10px] border border-line bg-surface">
+      <div className="aero-tile rounded-[10px] border">
         <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
           <div>
             <div className="text-[11px] text-muted">{t("Ordering from")}</div>
@@ -159,7 +159,7 @@ export function CartView() {
         </div>
       </div>
 
-      <aside className="rounded-[10px] border border-line bg-surface p-5 lg:sticky lg:top-24">
+      <aside className="aero-tile rounded-[10px] border p-5 lg:sticky lg:top-24">
         <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
           {t("Summary")}
         </h2>

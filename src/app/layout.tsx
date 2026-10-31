@@ -4,8 +4,11 @@ import { LocaleProvider } from "@/components/locale-provider";
 import { LiveActivityProvider } from "@/components/live-activity-provider";
 import { OngoingTracker } from "@/components/ongoing-tracker";
 import { NativeShell } from "@/components/native-shell";
+import { BrandProvider } from "@/components/brand-provider";
 import { dirFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
+import { getSettings } from "@/lib/db";
+import { themeStyle } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -53,9 +56,20 @@ export const viewport: Viewport = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const locale = await getLocale();
+  const [locale, settings] = await Promise.all([getLocale(), getSettings()]);
+  const defaultDark =
+    settings.defaultTheme === "dark"
+      ? "true"
+      : settings.defaultTheme === "light"
+        ? "false"
+        : 'window.matchMedia("(prefers-color-scheme: dark)").matches';
   return (
-    <html lang={locale} dir={dirFor(locale)} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={dirFor(locale)}
+      style={themeStyle(settings)}
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -78,6 +92,17 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        <BrandProvider
+          value={{
+            brandName: settings.brandName,
+            brandNameAr: settings.brandNameAr,
+            logoImage: settings.logoImage,
+            primaryColor: settings.primaryColor,
+            accentColor: settings.accentColor ?? "#955b0b",
+            supportPhone: settings.supportPhone,
+            themePreset: settings.themePreset,
+          }}
+        >
         <LocaleProvider initialLocale={locale}>
           <LiveActivityProvider>
             <CartProvider>
@@ -87,6 +112,7 @@ export default async function RootLayout({
             </CartProvider>
           </LiveActivityProvider>
         </LocaleProvider>
+        </BrandProvider>
       </body>
     </html>
   );

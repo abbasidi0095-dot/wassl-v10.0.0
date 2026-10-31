@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Banknote,
@@ -38,6 +39,7 @@ import {
 } from "lucide-react";
 import { AccountProvisionModal, resizePhoto } from "./account-provision-modal";
 import { AdminMenuModal } from "./admin-menu-modal";
+import { THEME_PRESETS } from "@/lib/theme";
 import type { AdminUserView, OrderView } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
 import type {
@@ -157,6 +159,7 @@ export function AdminConsole({
   } | null>(null);
   const [menuStore, setMenuStore] = useState<Store | null>(null);
   const [driverFilter, setDriverFilter] = useState<"all" | "delivery" | "taxi">("all");
+  const router = useRouter();
 
   const pendingUsers = useMemo(
     () => users.filter((user) => (user.accountStatus ?? "active") === "pending"),
@@ -462,6 +465,7 @@ export function AdminConsole({
       }
       setSettings(data.settings);
       setToast("Platform settings saved");
+      router.refresh();
     } finally {
       setBusy("");
     }
@@ -1418,6 +1422,186 @@ export function AdminConsole({
                   className="input"
                 />
               </label>
+              <label className="block">
+                <span className="label">Arabic brand name</span>
+                <input
+                  value={settings.brandNameAr}
+                  onChange={(event) =>
+                    setSettings({ ...settings, brandNameAr: event.target.value })
+                  }
+                  className="input arabic"
+                />
+              </label>
+
+              <div>
+                <span className="label">Theme preset</span>
+                <div className="mt-1 grid grid-cols-2 gap-2">
+                  {THEME_PRESETS.map((preset) => {
+                    const active = (settings.themePreset ?? "coastal") === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            themePreset: preset.id,
+                            primaryColor: preset.primary,
+                            accentColor: preset.accent,
+                          })
+                        }
+                        className={`flex items-center gap-2 rounded-[8px] border p-2 text-start transition-colors ${
+                          active
+                            ? "border-brand bg-brand-soft/50 ring-1 ring-brand/20"
+                            : "border-line bg-surface hover:border-line-strong"
+                        }`}
+                      >
+                        <span className="flex shrink-0 -space-x-1">
+                          <span
+                            className="h-6 w-6 rounded-full border-2 border-surface"
+                            style={{ background: preset.primary }}
+                          />
+                          <span
+                            className="h-6 w-6 rounded-full border-2 border-surface"
+                            style={{ background: preset.accent }}
+                          />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-[11px] font-semibold">
+                            {preset.label}
+                          </span>
+                          <span className="block truncate text-[10px] text-muted">
+                            {preset.note}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="label">Primary colour</span>
+                  <div className="flex items-center gap-2 rounded-[6px] border border-line bg-surface p-1.5">
+                    <input
+                      type="color"
+                      value={settings.primaryColor}
+                      onChange={(event) =>
+                        setSettings({
+                          ...settings,
+                          primaryColor: event.target.value,
+                          themePreset: "custom",
+                        })
+                      }
+                      className="h-8 w-10 cursor-pointer rounded-[4px] border-0 bg-transparent p-0"
+                      aria-label="Primary colour"
+                    />
+                    <span className="text-[11px] font-medium uppercase text-muted">
+                      {settings.primaryColor}
+                    </span>
+                  </div>
+                </label>
+                <label className="block">
+                  <span className="label">Accent colour</span>
+                  <div className="flex items-center gap-2 rounded-[6px] border border-line bg-surface p-1.5">
+                    <input
+                      type="color"
+                      value={settings.accentColor ?? "#955b0b"}
+                      onChange={(event) =>
+                        setSettings({
+                          ...settings,
+                          accentColor: event.target.value,
+                          themePreset: "custom",
+                        })
+                      }
+                      className="h-8 w-10 cursor-pointer rounded-[4px] border-0 bg-transparent p-0"
+                      aria-label="Accent colour"
+                    />
+                    <span className="text-[11px] font-medium uppercase text-muted">
+                      {settings.accentColor ?? "#955b0b"}
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              <label className="block">
+                <span className="label">Default theme</span>
+                <select
+                  value={settings.defaultTheme ?? "system"}
+                  onChange={(event) =>
+                    setSettings({
+                      ...settings,
+                      defaultTheme: event.target.value as PlatformSettings["defaultTheme"],
+                    })
+                  }
+                  className="input"
+                >
+                  <option value="system">Follow the visitor’s device</option>
+                  <option value="light">Light by default</option>
+                  <option value="dark">Dark by default</option>
+                </select>
+                <span className="mt-1 block text-[10px] leading-4 text-muted">
+                  A visitor’s own light/dark toggle always wins.
+                </span>
+              </label>
+
+              <div className="rounded-[8px] border border-line p-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  {settings.logoImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={settings.logoImage}
+                      alt="Current logo"
+                      className="h-12 w-12 rounded-[6px] bg-surface-2 object-contain p-1"
+                    />
+                  ) : (
+                    <span className="grid h-12 w-12 place-items-center rounded-[6px] bg-brand text-on-dark font-display text-lg font-semibold">
+                      {settings.brandName.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-semibold">Logo mark</div>
+                    <div className="text-[10px] text-muted">
+                      Square PNG/JPG/WebP. Used in the header, footer and auth.
+                    </div>
+                  </div>
+                  <label className="btn btn-ghost btn-sm cursor-pointer">
+                    {busy === "logo" ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : null}
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={async (event) => {
+                        const file = event.target.files?.[0];
+                        if (!file) return;
+                        setBusy("logo");
+                        try {
+                          const image = await resizePhoto(file, "png");
+                          setSettings((current) => ({ ...current, logoImage: image }));
+                        } finally {
+                          setBusy("");
+                        }
+                      }}
+                    />
+                  </label>
+                  {settings.logoImage ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSettings((current) => ({ ...current, logoImage: undefined }))
+                      }
+                      className="btn btn-ghost btn-sm text-danger"
+                    >
+                      Remove
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+
               <label className="block">
                 <span className="label">Tagline</span>
                 <input

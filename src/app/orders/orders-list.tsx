@@ -281,7 +281,7 @@ export function OrdersList() {
           })}
         </div>
       ) : (
-        <div className="mt-6 rounded-[10px] border border-line bg-surface px-6 py-16 text-center">
+        <div className="mt-6 aero-tile rounded-[10px] border px-6 py-16 text-center">
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-surface-2 text-brand">
             <PackageCheck size={20} strokeWidth={1.6} />
           </div>
@@ -346,7 +346,7 @@ export function OrdersList() {
           })}
         </div>
       ) : (
-        <div className="mt-6 rounded-[10px] border border-line bg-surface px-6 py-16 text-center">
+        <div className="mt-6 aero-tile rounded-[10px] border px-6 py-16 text-center">
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-surface-2 text-brand">
             <CarTaxiFront size={20} strokeWidth={1.6} />
           </div>
@@ -362,7 +362,7 @@ export function OrdersList() {
         </div>
       )}
 
-      <div className="mt-6 grid overflow-hidden rounded-[10px] border border-line bg-surface sm:grid-cols-3">
+      <div className="mt-6 grid overflow-hidden aero-tile rounded-[10px] border sm:grid-cols-3">
         {(tab === "taxi"
           ? [
               {

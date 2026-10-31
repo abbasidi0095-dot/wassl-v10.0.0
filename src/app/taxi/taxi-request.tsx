@@ -108,7 +108,7 @@ export function TaxiRequest({
   if (activeRide) {
     return (
       <div className="space-y-4">
-        <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+        <div className="overflow-hidden aero-tile rounded-[10px] border">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
             <span className="inline-flex items-center gap-2 text-[13px] font-medium">
               <span className="status-dot live-dot text-success" />
@@ -165,7 +165,7 @@ export function TaxiRequest({
   return (
     <div className="space-y-5">
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="order-2 overflow-hidden rounded-[10px] border border-line bg-surface p-2 lg:order-1">
+        <div className="order-2 overflow-hidden aero-tile rounded-[10px] border p-2 lg:order-1">
           <MapView
             points={[
               {
@@ -191,7 +191,7 @@ export function TaxiRequest({
           />
         </div>
 
-        <div className="order-1 rounded-[10px] border border-line bg-surface p-5 lg:order-2">
+        <div className="order-1 aero-tile rounded-[10px] border p-5 lg:order-2">
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div className="text-[15px] font-semibold">
               {t("Request a ride")}
@@ -303,7 +303,7 @@ export function TaxiRequest({
 function TaxiHistory({ rides }: { rides: TaxiRide[] }) {
   const { t } = useI18n();
   return (
-    <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+    <div className="overflow-hidden aero-tile rounded-[10px] border">
       <div className="border-b border-line px-4 py-3 text-sm font-semibold">
         {t("Trip history")}
       </div>

@@ -102,7 +102,7 @@ export default async function CityPage({
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[10px] border border-line bg-surface">
+            <div className="relative overflow-hidden aero-tile rounded-[10px] border">
               <MapView
                 points={mapPoints}
                 center={{ lat: city.lat, lng: city.lng }}

@@ -27,7 +27,10 @@ const VEHICLES = [
   "Other",
 ];
 
-export async function resizePhoto(file: File): Promise<string> {
+export async function resizePhoto(
+  file: File,
+  format: "jpeg" | "png" = "jpeg",
+): Promise<string> {
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
@@ -50,7 +53,9 @@ export async function resizePhoto(file: File): Promise<string> {
   const width = image.width * scale;
   const height = image.height * scale;
   context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
-  return canvas.toDataURL("image/jpeg", 0.82);
+  return format === "png"
+    ? canvas.toDataURL("image/png")
+    : canvas.toDataURL("image/jpeg", 0.82);
 }
 
 export function AccountProvisionModal({

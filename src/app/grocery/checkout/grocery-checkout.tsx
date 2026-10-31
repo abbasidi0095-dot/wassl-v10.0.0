@@ -267,7 +267,7 @@ export function GroceryCheckout() {
   return (
     <form onSubmit={submit} className="mt-6 grid gap-5 lg:grid-cols-[1fr_380px] lg:items-start">
       <div className="space-y-4">
-        <section className="rounded-[10px] border border-line bg-surface p-5">
+        <section className="aero-tile rounded-[10px] border p-5">
           <div className="flex flex-wrap gap-2">
             {(["delivery", "pickup"] as const).map((mode) => {
               const enabled =
@@ -368,7 +368,7 @@ export function GroceryCheckout() {
           </div>
         </section>
 
-        <section className="rounded-[10px] border border-line bg-surface p-5">
+        <section className="aero-tile rounded-[10px] border p-5">
           <h2 className="flex items-center justify-between border-b border-line pb-3 text-[15px] font-semibold">
             <span>{t("When?")}</span>
             <Clock3 size={15} className="text-muted" />
@@ -432,7 +432,7 @@ export function GroceryCheckout() {
           ) : null}
         </section>
 
-        <section className="rounded-[10px] border border-line bg-surface p-5">
+        <section className="aero-tile rounded-[10px] border p-5">
           <h2 className="border-b border-line pb-3 text-[15px] font-semibold">{t("Substitutions")}</h2>
           <p className="mt-2 text-[11px] text-muted">
             {t("Tell the store what to do if an item is out of stock.")}
@@ -460,7 +460,7 @@ export function GroceryCheckout() {
         </section>
       </div>
 
-      <aside className="rounded-[10px] border border-line bg-surface p-5 lg:sticky lg:top-24">
+      <aside className="aero-tile rounded-[10px] border p-5 lg:sticky lg:top-24">
         <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">{t("Order summary")}</h2>
         <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pe-1">
           {items.map((item) => (

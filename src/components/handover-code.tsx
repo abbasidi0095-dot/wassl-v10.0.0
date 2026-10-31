@@ -37,7 +37,7 @@ export function HandoverCode({
 
   return (
     <div
-      className={`rounded-[10px] border border-line bg-surface p-4 ${
+      className={`aero-tile rounded-[10px] border p-4 ${
         compact ? "sm:p-4" : "sm:p-5"
       } ${className}`}
     >

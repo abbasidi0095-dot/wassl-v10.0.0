@@ -29,6 +29,19 @@ and dark themes.
 
 ## Release history
 
+### 10.5.0 — 31 October 2026 — Aero glass and live branding
+- The mobile bottom bar is now a floating Aero-glass dock with a highlight,
+  blur, active pill and safe-area spacing; the footer reserves its height.
+- Headers, cards, panels, inputs, buttons and image tiles carry a restrained
+  Aero treatment: translucent surface gradients, inner highlights, layered
+  shadows and depth without washing out content.
+- Admin Settings can change the global primary and accent colours, choose a
+  Coastal / Aero / Midnight / Sand preset, upload a logo mark, set the default
+  light/dark preference and edit the Arabic brand name.
+- Brand colours are applied as CSS variables from the database at request time;
+  logo and wordmark update across the header, footer and auth screens.
+- All changes preserve dark mode, RTL and 320px layouts.
+
 ### 10.4.1 — 31 October 2026 — wassl.shop
 - The app now lives at <https://wassl.shop> with a Let’s Encrypt certificate
   for both `wassl.shop` and `www.wassl.shop`; `www` redirects to the apex.

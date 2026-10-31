@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useBrand } from "./brand-provider";
 
 /**
  * The Wassl mark: one route stroke that forms a W, ending at a saffron
@@ -34,18 +37,32 @@ export function Logo({
   /** Hide the wordmark below the `sm` breakpoint to leave room for header tools. */
   responsive?: boolean;
 }) {
+  const { brandName, brandNameAr, logoImage } = useBrand();
   return (
     <Link
       href="/"
       className="flex items-center gap-2.5"
-      aria-label="Wassl home"
+      aria-label={`${brandName} home`}
     >
       <span
-        className={`grid h-9 w-9 shrink-0 place-items-center rounded-[5px] ${
-          light ? "bg-white/10 text-on-dark" : "bg-teal text-on-dark"
+        className={`grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-[5px] ${
+          logoImage
+            ? "bg-[#f7f4ec]"
+            : light
+              ? "bg-white/10 text-on-dark"
+              : "bg-teal text-on-dark"
         }`}
       >
-        <LogoMark className="h-[21px] w-[21px]" />
+        {logoImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logoImage}
+            alt=""
+            className="h-full w-full object-contain p-0.5"
+          />
+        ) : (
+          <LogoMark className="h-[21px] w-[21px]" />
+        )}
       </span>
       {!compact ? (
         <span
@@ -58,14 +75,14 @@ export function Logo({
               light ? "text-on-dark" : "text-ink"
             }`}
           >
-            Wassl
+            {brandName}
           </span>
           <span
             className={`arabic text-[14px] font-medium leading-none ${
               light ? "text-on-dark/55" : "text-muted"
             }`}
           >
-            وصّل
+            {brandNameAr}
           </span>
         </span>
       ) : null}

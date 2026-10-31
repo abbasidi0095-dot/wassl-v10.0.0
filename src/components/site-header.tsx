@@ -143,7 +143,7 @@ export function SiteHeader({
 
   return (
     <>
-      <header className="relative z-40 border-b border-line bg-paper/95 pt-[env(safe-area-inset-top)] lg:sticky lg:top-0">
+      <header className="site-header relative z-40 border-b border-line pt-[env(safe-area-inset-top)] lg:sticky lg:top-0">
         <div className="container-wassl flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-7">
             <Logo responsive />
@@ -308,7 +308,7 @@ export function SiteHeader({
       </header>
 
       <nav
-        className="tabbar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line bg-surface md:hidden"
+        className="tabbar fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-40 grid grid-cols-6 overflow-hidden rounded-[18px] border border-line/80 md:hidden"
         aria-label="Sections"
       >
         {mobileNav.map((item) => (

@@ -356,6 +356,11 @@ export interface PlatformSettings {
   commissionRate: number;
   defaultDeliveryFee: number;
   primaryColor: string;
+  accentColor?: string;
+  themePreset?: "coastal" | "aero" | "midnight" | "sand" | "custom";
+  defaultTheme?: "system" | "light" | "dark";
+  /** Optional square or wordmark logo, stored as a data URL. */
+  logoImage?: string;
   cityWaitlistEnabled: boolean;
 }
 

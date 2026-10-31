@@ -224,7 +224,7 @@ export default async function StorePage({
           <aside className="space-y-4 lg:sticky lg:top-24">
             <CartMini storeId={store.id} />
 
-            <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+            <div className="overflow-hidden aero-tile rounded-[10px] border">
               <MapView
                 points={[
                   {
@@ -249,7 +249,7 @@ export default async function StorePage({
             </div>
 
             {store.openingHours?.length ? (
-              <div className="rounded-[10px] border border-line bg-surface p-4">
+              <div className="aero-tile rounded-[10px] border p-4">
                 <div className="flex items-center gap-1.5 text-[11px] text-muted">
                   <Clock3 size={12} /> Kitchen hours
                 </div>

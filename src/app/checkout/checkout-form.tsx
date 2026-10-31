@@ -255,7 +255,7 @@ export function CheckoutForm({
 
   if (!items.length) {
     return (
-      <div className="mt-8 rounded-[10px] border border-line bg-surface px-6 py-16 text-center">
+      <div className="mt-8 aero-tile rounded-[10px] border px-6 py-16 text-center">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-surface-2 text-brand">
           <ShoppingBag size={20} strokeWidth={1.6} />
         </div>
@@ -275,7 +275,7 @@ export function CheckoutForm({
   return (
     <form onSubmit={submit} className="mt-6 grid gap-6 pb-16 lg:grid-cols-[1fr_360px] lg:items-start">
       <div className="space-y-5">
-        <section className="rounded-[10px] border border-line bg-surface p-5">
+        <section className="aero-tile rounded-[10px] border p-5">
           <div className="flex items-baseline justify-between gap-3 border-b border-line pb-3">
             <h2 className="text-[15px] font-semibold">
               <span className="me-2 text-muted tnum">1</span>
@@ -299,7 +299,7 @@ export function CheckoutForm({
           </div>
         </section>
 
-        <section className="rounded-[10px] border border-line bg-surface p-5">
+        <section className="aero-tile rounded-[10px] border p-5">
           <div className="border-b border-line pb-3">
             <h2 className="text-[15px] font-semibold">
               <span className="me-2 text-muted tnum">2</span>
@@ -425,7 +425,7 @@ export function CheckoutForm({
           </div>
         </section>
 
-        <section className="rounded-[10px] border border-line bg-surface p-5">
+        <section className="aero-tile rounded-[10px] border p-5">
           <div className="flex items-center justify-between gap-3 border-b border-line pb-3">
             <h2 className="text-[15px] font-semibold">
               <span className="me-2 text-muted tnum">3</span>
@@ -461,7 +461,7 @@ export function CheckoutForm({
         </section>
       </div>
 
-      <aside className="rounded-[10px] border border-line bg-surface p-5 lg:sticky lg:top-24">
+      <aside className="aero-tile rounded-[10px] border p-5 lg:sticky lg:top-24">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">{t("Your order")}</h2>
           <Link href="/cart" className="inline-flex items-center gap-1 text-[11px] font-medium text-brand">

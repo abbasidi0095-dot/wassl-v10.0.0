@@ -115,7 +115,7 @@ export default async function AccountPage() {
 
         <div className="mt-8 grid items-start gap-4 pb-16 lg:grid-cols-[1.55fr_1fr]">
           <div className="space-y-4">
-            <section className="rounded-[10px] border border-line bg-surface p-5">
+            <section className="aero-tile rounded-[10px] border p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h2 className="font-display text-[22px] font-semibold tracking-[-0.025em]">
@@ -273,7 +273,7 @@ export default async function AccountPage() {
           </div>
 
           <aside className="space-y-4 lg:sticky lg:top-24">
-            <section className="rounded-[10px] border border-line bg-surface p-5">
+            <section className="aero-tile rounded-[10px] border p-5">
               <div className="flex items-center gap-3">
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-[8px] bg-brand-soft font-display text-[18px] font-semibold text-brand">
                   {initials(session.name)}
@@ -360,7 +360,7 @@ export default async function AccountPage() {
               </div>
             </section>
 
-            <section className="rounded-[10px] border border-line bg-surface-2/60 p-5">
+            <section className="aero-tile rounded-[10px] border-2/60 p-5">
               <div className="flex items-start gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-surface text-brand">
                   <UserRound size={16} />

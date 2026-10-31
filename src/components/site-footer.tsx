@@ -4,14 +4,16 @@ import Link from "next/link";
 import { ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { Logo } from "./logo";
+import { useBrand } from "./brand-provider";
 import { useI18n } from "./locale-provider";
 
 const CITIES = ["Dakhla", "Laayoune", "Boujdour", "Esmara", "Tarfaya"];
 
 export function SiteFooter() {
   const { t } = useI18n();
+  const { brandName, supportPhone } = useBrand();
   return (
-    <footer className="field-ink mt-20 border-t border-line pb-[calc(58px+env(safe-area-inset-bottom))] md:pb-0">
+    <footer className="field-ink mt-20 border-t border-line pb-[calc(86px+env(safe-area-inset-bottom))] md:pb-0">
       <div className="container-wassl">
         <div className="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
@@ -74,11 +76,11 @@ export function SiteFooter() {
               {t("Support")}
             </p>
             <a
-              href={`tel:${BRAND.supportPhone.replace(/\s/g, "")}`}
+              href={`tel:${supportPhone.replace(/\s/g, "")}`}
               className="mt-4 inline-flex items-center gap-2 text-sm font-medium"
             >
               <Phone size={14} className="opacity-50" />
-              {BRAND.supportPhone}
+              {supportPhone}
             </a>
             <p className="mt-3 text-[13px] leading-5 opacity-45">
               {t("Daily 09:00–23:00")}
@@ -99,7 +101,7 @@ export function SiteFooter() {
           <span>
             {t("© {year} {brand}. Built for Morocco.", {
               year: new Date().getFullYear(),
-              brand: BRAND.name,
+              brand: brandName,
             })}
           </span>
           <span>{t("Cash on delivery · Prices in MAD")}</span>

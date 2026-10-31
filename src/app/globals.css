@@ -123,13 +123,13 @@
   --muted: #5c6a64;
   --line: #dcd3c4;
   --line-strong: #c7bcaa;
-  --brand: #0b4a45;
-  --brand-deep: #07332f;
-  --brand-soft: #dfe9e4;
-  --brand-ink: #f7f4ec;
-  --signal: #955b0b;
-  --signal-ink: #7a4c0d;
-  --signal-soft: #f1e1c3;
+  --brand: var(--brand-custom, #0b4a45);
+  --brand-deep: var(--brand-deep-custom, #07332f);
+  --brand-soft: var(--brand-soft-custom, #dfe9e4);
+  --brand-ink: var(--brand-ink-custom, #f7f4ec);
+  --signal: var(--signal-custom, #955b0b);
+  --signal-ink: var(--signal-ink-custom, #7a4c0d);
+  --signal-soft: var(--signal-soft-custom, #f1e1c3);
   --danger: #a63a22;
   --danger-soft: #f6e2db;
   --success: #1e6b4f;
@@ -141,6 +141,12 @@
   --field-border: var(--line);
   --shadow: 0 24px 48px -32px rgba(12, 26, 23, 0.35);
   --shadow-float: 0 18px 40px -28px rgba(12, 26, 23, 0.5);
+  --glass-bg: color-mix(in srgb, var(--surface) 76%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 90%, transparent);
+  --glass-border: color-mix(in srgb, var(--line-strong) 58%, transparent);
+  --glass-top: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 24px 50px -30px rgba(12, 26, 23, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -182,13 +188,13 @@ html.dark {
   --muted: #94a59e;
   --line: #243430;
   --line-strong: #33473f;
-  --brand: #6fd8c9;
-  --brand-deep: #a7ece2;
-  --brand-soft: #122c28;
-  --brand-ink: #06201d;
-  --signal: #e9ae55;
-  --signal-ink: #f2c47c;
-  --signal-soft: #2a2114;
+  --brand: var(--brand-custom-dark, #6fd8c9);
+  --brand-deep: var(--brand-deep-custom-dark, #a7ece2);
+  --brand-soft: var(--brand-soft-custom-dark, #122c28);
+  --brand-ink: var(--brand-ink-custom-dark, #06201d);
+  --signal: var(--signal-custom-dark, #e9ae55);
+  --signal-ink: var(--signal-ink-custom-dark, #f2c47c);
+  --signal-soft: var(--signal-soft-custom-dark, #2a2114);
   --danger: #f08a72;
   --danger-soft: #2d1712;
   --success: #6fd3a8;
@@ -196,6 +202,12 @@ html.dark {
   --info: #8fc3dd;
   --shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.7);
   --shadow-float: 0 18px 40px -24px rgba(0, 0, 0, 0.8);
+  --glass-bg: color-mix(in srgb, var(--surface) 78%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 92%, transparent);
+  --glass-border: color-mix(in srgb, var(--line-strong) 62%, transparent);
+  --glass-top: rgba(255, 255, 255, 0.055);
+  --glass-shadow: 0 24px 50px -28px rgba(0, 0, 0, 0.78),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   /* Bridge fixed Tailwind status tones onto the dark palette. */
   --color-red-50: #2d1712;
   --color-red-200: #5a2a22;
@@ -418,11 +430,12 @@ html[dir="rtl"] .tnum {
 
 .card,
 .panel {
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
-  background: var(--surface);
-  box-shadow: none;
-  backdrop-filter: none;
+  background:
+    linear-gradient(180deg, var(--glass-top), transparent 58%),
+    var(--surface);
+  box-shadow: var(--glass-shadow);
 }
 
 .card-flat {
@@ -434,20 +447,20 @@ html[dir="rtl"] .tnum {
 .field-ink {
   background: var(--ink);
   color: var(--on-ink);
-  /* Saffron needs the light stop on an ink field. Scoping the Tailwind bridge
-     keeps `text-on-dark` cream here in dark mode, where the global token flips
-     to near-black. */
+  /* The ink field needs a lighter accent stop than the page surface. Scoping
+     the Tailwind bridge keeps `text-on-dark` cream here in dark mode, where the
+     global token flips to near-black. */
   --color-on-dark: #f7f4ec;
-  --signal: #e9ae55;
-  --signal-ink: #f2c47c;
+  --signal: var(--signal-on-dark, #e9ae55);
+  --signal-ink: var(--signal-on-dark, #f2c47c);
 }
 
 .field-ink .text-saffron {
-  color: #e9ae55;
+  color: var(--signal);
 }
 
 html.dark .field-ink .text-saffron {
-  color: #e9ae55;
+  color: var(--signal);
 }
 
 html.dark .field-ink {
@@ -457,8 +470,8 @@ html.dark .field-ink {
   color: #f7f4ec;
   border-color: var(--line);
   --on-ink: #f7f4ec;
-  --signal: #e9ae55;
-  --signal-ink: #f2c47c;
+  --signal: var(--signal-on-dark, #e9ae55);
+  --signal-ink: var(--signal-on-dark, #f2c47c);
 }
 
 .panel-quiet {
@@ -514,9 +527,12 @@ html.dark .field-ink {
 }
 
 .btn-primary {
-  background: var(--brand);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand) 82%, white 18%), var(--brand));
   color: var(--brand-ink);
   border-color: var(--brand);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 8px 18px -12px color-mix(in srgb, var(--brand) 70%, transparent);
 }
 
 .btn-primary:hover {
@@ -529,9 +545,10 @@ html.dark .btn-primary:hover {
 }
 
 .btn-ghost {
-  background: transparent;
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
   border-color: var(--line-strong);
   color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--glass-top);
 }
 
 .btn-ghost:hover {
@@ -591,6 +608,14 @@ html.dark .btn-primary:hover {
   .input:focus {
     border-color: var(--brand);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 14%, transparent);
+  }
+
+  .input:not(:focus) {
+    box-shadow: inset 0 1px 2px rgba(12, 26, 23, 0.05);
+  }
+
+  html.dark .input:not(:focus) {
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
   }
 
   .input::placeholder {
@@ -882,6 +907,14 @@ table.data tr:last-child td {
   background: var(--surface);
 }
 
+.site-header,
+.staff-header {
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+  box-shadow: inset 0 -1px 0 var(--glass-border);
+}
+
 .staff-nav {
   display: flex;
   gap: 2px;
@@ -920,8 +953,20 @@ table.data tr:last-child td {
 /* ---------------------------------------------------------------- */
 
 .tabbar {
-  padding-bottom: var(--safe-bottom);
-  padding-inline: 8px;
+  padding: 4px 6px;
+  border-color: var(--glass-border);
+  background:
+    linear-gradient(180deg, var(--glass-top), transparent 48%),
+    var(--glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  backdrop-filter: blur(22px) saturate(1.45);
+  box-shadow: 0 24px 50px -24px rgba(12, 26, 23, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+html.dark .tabbar {
+  box-shadow: 0 26px 54px -22px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .tabbar a {
@@ -931,24 +976,29 @@ table.data tr:last-child td {
   align-items: center;
   gap: 3px;
   min-width: 0;
-  padding: 8px 2px 7px;
-  font-size: 11px;
+  padding: 7px 2px 6px;
+  border-radius: 12px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--muted);
+  transition: color 160ms ease, background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
-.tabbar a[data-active="true"] {
+.tabbar a:hover {
   color: var(--ink);
 }
 
-.tabbar a[data-active="true"]::before {
-  content: "";
-  position: absolute;
-  inset-inline: 18%;
-  top: 0;
-  height: 2px;
-  background: var(--brand);
+.tabbar a[data-active="true"] {
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 45%, transparent);
+}
+
+html.dark .tabbar a[data-active="true"] {
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* ---------------------------------------------------------------- */
@@ -1053,4 +1103,13 @@ html.dark .maplibregl-ctrl-group button span {
   .taxi-ping {
     animation: none;
   }
+}
+
+/* Aero surface for image-led tiles that do not use the .card primitive. */
+.aero-tile {
+  border-color: var(--glass-border);
+  background:
+    linear-gradient(180deg, var(--glass-top), transparent 58%),
+    var(--surface);
+  box-shadow: var(--glass-shadow);
 }

@@ -15,7 +15,7 @@ export function StoreCard({ store }: { store: Store }) {
   const tags = [...new Set([...(store.dietaryTags ?? []), ...(store.tags ?? [])])];
 
   return (
-    <article className="group relative overflow-hidden rounded-[10px] border border-line bg-surface transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[var(--shadow)] focus-within:border-brand focus-within:shadow-[var(--shadow)] motion-reduce:transform-none">
+    <article className="aero-tile group relative overflow-hidden rounded-[10px] border transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[var(--shadow)] focus-within:border-brand focus-within:shadow-[var(--shadow)] motion-reduce:transform-none">
       <Link
         href={`/store/${store.slug}`}
         className="absolute inset-0 z-0"

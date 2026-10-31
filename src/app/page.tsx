@@ -367,7 +367,7 @@ export default async function HomePage() {
               <Link
                 key={door.label}
                 href={door.href}
-                className="group relative flex min-h-[148px] flex-col border-e border-b border-line bg-surface p-4 transition-colors after:absolute after:bottom-0 after:start-0 after:h-[2px] after:w-0 after:bg-brand after:transition-[width] after:duration-300 hover:bg-surface-2 hover:after:w-full sm:min-h-[160px] sm:p-5"
+                className="aero-tile group relative flex min-h-[148px] flex-col border-e border-b p-4 transition-colors after:absolute after:bottom-0 after:start-0 after:h-[2px] after:w-0 after:bg-brand after:transition-[width] after:duration-300 hover:bg-surface-2 hover:after:w-full sm:min-h-[160px] sm:p-5"
               >
                 <div className="flex items-start justify-between gap-2">
                   <door.icon
@@ -476,7 +476,7 @@ export default async function HomePage() {
         {/* Business: a real order row as the visual. */}
         <section className="container-wassl mt-16 lg:mt-24">
           <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr] lg:items-start">
-            <div className="rounded-[10px] border border-line bg-surface p-7 sm:p-10">
+            <div className="aero-tile rounded-[10px] border p-7 sm:p-10">
               <p className="text-[13px] font-medium text-brand">
                 {t("For local businesses")}
               </p>
@@ -497,7 +497,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="rounded-[10px] border border-line bg-surface p-7 sm:p-10">
+            <div className="aero-tile rounded-[10px] border p-7 sm:p-10">
               <div className="flex items-center justify-between text-[11px] text-muted">
                 <span>{t("Order board preview")}</span>
                 <span className="tnum">14:32</span>
@@ -606,7 +606,7 @@ export default async function HomePage() {
           </div>
 
           {featuredStore ? (
-            <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+            <div className="overflow-hidden aero-tile rounded-[10px] border">
               <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
                 <div className="flex min-w-0 items-center gap-2 text-[13px] font-medium">
                   <span className="status-dot live-dot text-success" />

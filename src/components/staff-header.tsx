@@ -36,7 +36,7 @@ export function StaffHeader({
         : "Operations";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/95 pt-[env(safe-area-inset-top)]">
+    <header className="staff-header sticky top-0 z-40 border-b border-line pt-[env(safe-area-inset-top)]">
       <div className="container-wassl flex h-14 items-center justify-between gap-3 lg:h-16">
         <div className="flex min-w-0 items-center gap-3">
           <Logo compact />
