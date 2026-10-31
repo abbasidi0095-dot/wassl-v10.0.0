@@ -184,7 +184,9 @@ export function GroceryAdmin({
                   </span>
                 </div>
                 <div className="truncate text-[10px] text-muted">
-                  {store.citySlug} · {store.landmark} · {money(store.deliveryFee)}
+                  {cities.find((city) => city.slug === store.citySlug)?.name ??
+                    store.citySlug}{" "}
+                  · {store.landmark} · {money(store.deliveryFee)} {t("Delivery")}
                 </div>
               </div>
               <div className="flex items-center gap-1">
