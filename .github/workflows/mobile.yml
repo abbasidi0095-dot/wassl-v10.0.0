@@ -1,0 +1,104 @@
+name: Mobile builds
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  android:
+    name: Android APK / AAB
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build
+        env:
+          WASSL_KEYSTORE_BASE64: ${{ secrets.WASSL_KEYSTORE_BASE64 }}
+          WASSL_KEYSTORE_PASSWORD: ${{ secrets.WASSL_KEYSTORE_PASSWORD }}
+          WASSL_KEY_ALIAS: ${{ secrets.WASSL_KEY_ALIAS }}
+          WASSL_KEY_PASSWORD: ${{ secrets.WASSL_KEY_PASSWORD }}
+        run: |
+          chmod +x android/gradlew
+          if [ -n "$WASSL_KEYSTORE_BASE64" ]; then
+            echo "$WASSL_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/wassl-release.keystore"
+            export WASSL_KEYSTORE_PATH="$RUNNER_TEMP/wassl-release.keystore"
+            cd android && ./gradlew bundleRelease
+          else
+            echo "No signing secrets configured — building a debug APK."
+            cd android && ./gradlew assembleDebug
+          fi
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: wassl-android-apk
+          path: android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: ignore
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: wassl-android-aab
+          path: android/app/build/outputs/bundle/**/*.aab
+          if-no-files-found: ignore
+
+  ios:
+    name: iOS archive
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Build unsigned archive
+        run: |
+          cd ios/App
+          xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
+          xcodebuild \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Wassl.xcarchive" \
+            archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: wassl-ios-xcarchive
+          path: ${{ runner.temp }}/Wassl.xcarchive
+          if-no-files-found: error

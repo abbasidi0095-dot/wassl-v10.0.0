@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wassl
+      POSTGRES_USER: wassl
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wassl}
+    volumes:
+      - wassl-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wassl -d wassl"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://wassl:${POSTGRES_PASSWORD:-wassl}@db:5432/wassl
+      WASSL_SECRET: ${WASSL_SECRET:?Set WASSL_SECRET in .env or the shell}
+      WASSL_PG_CACHE_MS: "100"
+      MAROCAPIS_API_KEY: ${MAROCAPIS_API_KEY:-}
+      SERPAPI_API_KEY: ${SERPAPI_API_KEY:-}
+      RESTAURANT_DATA_SOURCE: ${RESTAURANT_DATA_SOURCE:-locked}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  wassl-pgdata:

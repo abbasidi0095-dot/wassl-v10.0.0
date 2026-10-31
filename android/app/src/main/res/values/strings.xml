@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wassl</string>
+    <string name="title_activity_main">Wassl</string>
+    <string name="package_name">ma.wassl.app</string>
+    <string name="custom_url_scheme">ma.wassl.app</string>
+</resources>

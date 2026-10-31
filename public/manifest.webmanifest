@@ -1,0 +1,60 @@
+{
+  "name": "Wassl \u2014 \u0648\u0635\u0651\u0644",
+  "short_name": "Wassl",
+  "description": "Local delivery across Southern Morocco. Cash on delivery, live tracking.",
+  "lang": "en",
+  "dir": "ltr",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#f7f3eb",
+  "theme_color": "#0f6e6e",
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dakhla stores",
+      "url": "/city/dakhla"
+    },
+    {
+      "name": "My orders",
+      "url": "/orders"
+    },
+    {
+      "name": "Driver app",
+      "url": "/driver"
+    }
+  ]
+}

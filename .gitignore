@@ -1,0 +1,53 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# production
+build/
+
+# local runtime data
+/data/
+*.tsbuildinfo
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# environment
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+
+# misc
+.DS_Store
+
+# mobile native builds
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+ios/App/build/
+ios/App/DerivedData/
+ios/App/Pods/
+ios/App/App/public/
+ios/App/App/capacitor.config.json
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
