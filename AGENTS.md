@@ -97,6 +97,9 @@ persists; every mutation should add an audit entry via `recordAudit`.
 - Merchant dashboard: cover-photo upload on Store profile, item image in Add
   item and per-row Photo action. Admin store form and menu modal have uploads.
 - `src/lib/image-client.ts` resizes uploads to bounded JPEG/PNG data URLs.
+- Grocery landing has a “Popular in the aisles” product rail; the cart has a
+  minimum-order progress bar. The grocery manager's product modal supports the
+  same photo upload as restaurant menu items.
 - Checkout and taxi booking use `navigator.geolocation` with explicit errors.
   Driver dashboard auto-starts sharing when coming online; taxi queue has GPS.
 - iOS `NSLocationWhenInUseUsageDescription` and Android fine/coarse location

@@ -32,9 +32,12 @@ and dark themes.
 ### 10.7.0 — 31 October 2026 — photos and GPS
 - Store owners can upload a restaurant/store cover from the merchant profile;
   admins can upload the same cover from the store editor.
-- Products now support photos. Merchants can upload an item image when adding
-  it or from each menu row; admins can do the same from the store menu editor.
-  Images appear on the storefront, product sheet, cart, checkout and receipts.
+- Products now support photos, including the grocery catalogue editor. Merchants
+  can upload an item image when adding it or from each menu row; admins can do
+  the same from the store menu editor. Images appear on the storefront, product
+  sheet, cart, checkout and receipts.
+- Grocery discovery gains a “Popular in the aisles” product rail, and the cart
+  shows a minimum-order progress bar.
 - Customer checkout and taxi booking have a “Use my location” action that moves
   the pin to the device GPS position.
 - Drivers start live GPS sharing automatically when they go online; the taxi

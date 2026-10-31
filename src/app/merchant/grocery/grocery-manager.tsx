@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Clock3,
   Loader2,
+  Package,
   PackagePlus,
   Pencil,
   Plus,
@@ -29,11 +30,13 @@ import type {
 import { stockBadge } from "@/lib/grocery";
 import { useI18n } from "@/components/locale-provider";
 import { money } from "@/lib/utils";
+import { resizeImage } from "@/lib/image-client";
 
 type ProductDraft = {
   name: string;
   category: string;
   description: string;
+  image?: string;
   price: string;
   unit: string;
   sku: string;
@@ -52,6 +55,7 @@ function draftFrom(product?: Product): ProductDraft {
     name: product?.name ?? "",
     category: product?.category ?? "Fresh",
     description: product?.description ?? "",
+    image: product?.image,
     price: String(product?.price ?? ""),
     unit: product?.unit ?? "each",
     sku: product?.sku ?? "",
@@ -126,6 +130,7 @@ export function GroceryManager({
         name: draft.name,
         category: draft.category,
         description: draft.description,
+        image: draft.image,
         price: Number(draft.price),
         unit: draft.unit,
         sku: draft.sku,
@@ -316,7 +321,16 @@ export function GroceryManager({
                 const badge = stockBadge(stock, product.lowStockThreshold ?? settings.lowStockThreshold);
                 return (
                   <div key={product.id} className="flex flex-wrap items-center gap-3 p-3">
-                    <div className="min-w-0 flex-1 basis-full sm:basis-0">
+                    <div className="flex min-w-0 flex-1 basis-full items-center gap-2 sm:basis-0">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-[6px] bg-surface-2">
+                        {product.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={product.image} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <Package size={16} className="text-muted" />
+                        )}
+                      </span>
+                      <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="truncate text-[13px] font-semibold">{product.name}</span>
                         {product.variants?.length ? (
@@ -329,6 +343,7 @@ export function GroceryManager({
                         <span>{product.sku || t("No SKU")}</span>
                         <span>{product.unit || t("each")}</span>
                         <span className="tnum">{money(product.price)}</span>
+                      </div>
                       </div>
                     </div>
                     <span
@@ -662,6 +677,44 @@ function ProductModal({
           >
             <X size={16} />
           </button>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3 rounded-[8px] border border-line p-3">
+          {draft.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={draft.image} alt="Product preview" className="h-16 w-16 rounded-[6px] object-cover" />
+          ) : (
+            <span className="grid h-16 w-16 place-items-center rounded-[6px] bg-surface-2 text-muted">
+              <Package size={20} />
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <div className="text-[12px] font-semibold">{t("Product photo")}</div>
+            <div className="text-[11px] text-muted">{t("Shown in the aisle, basket and receipt.")}</div>
+          </div>
+          <label className="btn btn-ghost btn-sm cursor-pointer">
+            {t("Upload")}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                const image = await resizeImage(file, {
+                  width: 640,
+                  height: 640,
+                  fit: "cover",
+                });
+                set("image", image);
+              }}
+            />
+          </label>
+          {draft.image ? (
+            <button type="button" onClick={() => set("image", undefined)} className="btn btn-ghost btn-sm text-danger">
+              {t("Remove")}
+            </button>
+          ) : null}
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">

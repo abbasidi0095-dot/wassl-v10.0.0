@@ -3,10 +3,12 @@ import Link from "next/link";
 import { ArrowRight, Clock3, Heart, ListChecks, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getCities, getDrivers, getStores } from "@/lib/db";
+import { getCities, getDrivers, getProducts, getStores } from "@/lib/db";
 import { groceryAvailability, grocerySettings } from "@/lib/grocery";
 import { getTranslator } from "@/lib/i18n-server";
 import { storePhoto } from "@/lib/store-images";
+import { ProductTile } from "@/components/product-icon";
+import { money } from "@/lib/utils";
 import { GroceryBrowser } from "./grocery-browser";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +22,22 @@ export default async function GroceryPage() {
     getDrivers(),
   ]);
   const groceryStores = stores.filter((store) => store.category === "grocery");
+  const catalogues = await Promise.all(
+    groceryStores.map(async (store) => ({
+      store,
+      products: await getProducts(store.id),
+    })),
+  );
+  const popular = catalogues
+    .flatMap(({ store, products }) =>
+      products
+        .filter((product) => product.available)
+        .sort((a, b) => Number(b.popular) - Number(a.popular))
+        .slice(0, 2)
+        .map((product) => ({ product, store })),
+    )
+    .filter(({ product }) => product.popular)
+    .slice(0, 8);
 
   const items = groceryStores.map((store) => {
     const cityDrivers = drivers.filter(
@@ -136,7 +154,50 @@ export default async function GroceryPage() {
             <span>{t("Pay cash on delivery or at pickup")}</span>
           </div>
 
-          <div className="mt-6">
+          {popular.length ? (
+            <div className="mt-8">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="headline">{t("Popular in the aisles")}</h2>
+                  <p className="mt-1 text-[12px] text-muted">
+                    {t("What neighbours are adding to their baskets right now.")}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {popular.map(({ product, store }) => (
+                  <Link
+                    key={product.id}
+                    href={`/store/${store.slug}`}
+                    className="aero-tile group flex items-center gap-3 rounded-[10px] border p-3 transition-colors hover:border-line-strong"
+                  >
+                    <ProductTile
+                      name={product.name}
+                      category={product.category}
+                      image={product.image}
+                      className="h-14 w-14 rounded-[6px]"
+                      iconSize={22}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[12px] font-semibold">{product.name}</div>
+                      <div className="truncate text-[10px] text-muted">
+                        {store.name} · {product.unit || t("each")}
+                      </div>
+                      <div className="mt-0.5 text-[12px] font-semibold tnum">
+                        {money(product.price)}
+                      </div>
+                    </div>
+                    <ArrowRight
+                      size={13}
+                      className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100"
+                    />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-8">
             <div className="flex items-end justify-between gap-4">
               <h2 className="headline">{t("Shop by store")}</h2>
             </div>

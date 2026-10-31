@@ -61,6 +61,9 @@ export function CartView() {
   const minimum = minOrder || 0;
   const total = subtotal + fee;
   const belowMinimum = subtotal < minimum;
+  const minimumProgress = minimum
+    ? Math.min(100, Math.round((subtotal / minimum) * 100))
+    : 100;
 
   return (
     <div className="mt-8 grid gap-6 pb-16 lg:grid-cols-[1fr_340px] lg:items-start">
@@ -190,13 +193,35 @@ export function CartView() {
           </p>
         </div>
 
-        {belowMinimum ? (
-          <p className="mt-3 text-[11px] font-medium text-danger">
-            {t("Add {amount} more to meet the {minimum} minimum.", {
-              amount: money(minimum - subtotal),
-              minimum: money(minimum),
-            })}
-          </p>
+        {minimum > 0 ? (
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-[10px] font-medium text-muted">
+              <span>
+                {belowMinimum
+                  ? t("Add {amount} more to meet the {minimum} minimum.", {
+                      amount: money(minimum - subtotal),
+                      minimum: money(minimum),
+                    })
+                  : t("Minimum order reached")}
+              </span>
+              <span className="tnum">{minimumProgress}%</span>
+            </div>
+            <div
+              className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-2"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={minimumProgress}
+              aria-label={t("Minimum order progress")}
+            >
+              <div
+                className={`h-full rounded-full transition-[width] duration-300 ${
+                  belowMinimum ? "bg-signal" : "bg-brand"
+                }`}
+                style={{ width: `${minimumProgress}%` }}
+              />
+            </div>
+          </div>
         ) : null}
 
         <Link
