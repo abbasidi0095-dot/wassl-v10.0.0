@@ -98,28 +98,27 @@ export function GroceryAdmin({
 
   return (
     <div className="mt-5 space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-4">
         {[
-          { label: t("SKUs"), value: products.length, icon: Boxes, tone: "bg-teal/10 text-teal" },
-          { label: t("Low stock"), value: stats.low, icon: AlertTriangle, tone: "bg-saffron/20 text-saffron-deep" },
-          { label: t("Out of stock"), value: stats.out, icon: PackagePlus, tone: "bg-red-50 text-red-500" },
-          { label: t("Inventory value"), value: money(stats.value), icon: Banknote, tone: "bg-ink/5 text-ink" },
+          { label: t("SKUs"), value: products.length },
+          { label: t("Low stock"), value: stats.low },
+          { label: t("Out of stock"), value: stats.out },
+          { label: t("Inventory value"), value: money(stats.value) },
         ].map((item) => (
-          <div key={item.label} className="card-flat p-4">
-            <span className={`grid h-9 w-9 place-items-center rounded-xl ${item.tone}`}>
-              <item.icon size={16} />
-            </span>
-            <div className="mt-3 text-xl font-extrabold">{item.value}</div>
-            <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">{item.label}</div>
+          <div key={item.label}>
+            <div className="text-[11px] text-muted">{item.label}</div>
+            <div className="mt-1.5 font-display text-[24px] font-semibold leading-none tracking-[-0.03em] tnum">
+              {item.value}
+            </div>
           </div>
         ))}
       </div>
 
-      {message ? <div className="rounded-xl bg-teal/10 px-3 py-2 text-xs font-bold text-teal">{message}</div> : null}
+      {message ? <div className="border-s-2 border-brand ps-3 text-[12px] text-brand">{message}</div> : null}
 
       <section>
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-extrabold">{t("Low stock & restock")}</h2>
+          <h2 className="text-[13px] font-semibold">{t("Low stock & restock")}</h2>
           <span className="pill">{lowStock.length}</span>
         </div>
         <div className="card mt-3 overflow-hidden">
@@ -182,7 +181,7 @@ export function GroceryAdmin({
 
       <section>
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-extrabold">{t("Refund requests")}</h2>
+          <h2 className="text-[13px] font-semibold">{t("Refund requests")}</h2>
           <span className="pill">
             {refunds.filter((refund) => refund.status === "pending").length} {t("pending")}
           </span>

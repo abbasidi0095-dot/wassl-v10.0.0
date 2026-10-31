@@ -344,7 +344,7 @@ export function DriverDashboard({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="eyebrow">{driver.citySlug} · shift</div>
-          <h1 className="display mt-2 text-4xl sm:text-5xl">
+          <h1 className="display mt-2 text-[clamp(1.9rem,1.5rem+1.4vw,2.7rem)]">
             {online ? "You are on the road." : "You are offline."}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-bold text-ink/45">
@@ -406,20 +406,17 @@ export function DriverDashboard({
             tone: "bg-blue-50 text-blue-600",
           },
         ].map((item) => (
-          <div key={item.label} className="card-flat p-4">
-            <span className={`grid h-9 w-9 place-items-center rounded-xl ${item.tone}`}>
-              <item.icon size={16} />
-            </span>
-            <div className="mt-3 text-xl font-extrabold tracking-[-0.04em]">{item.value}</div>
-            <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
-              {item.label}
+          <div key={item.label}>
+            <div className="text-[11px] text-muted">{item.label}</div>
+            <div className="mt-1.5 font-display text-[24px] font-semibold leading-none tracking-[-0.03em] tnum">
+              {item.value}
             </div>
           </div>
         ))}
       </div>
 
       {driver.cashOnHand >= driver.cashLimit ? (
-        <div className="mt-3 rounded-2xl border border-eed-200 bg-red-50 px-4 py-3 text-[11px] font-bold text-red-700">
+        <div className="mt-3 border-s-2 border-danger ps-3 text-[12px] text-danger">
           You reached your cash limit. Hand over {money(driver.cashOnHand)} to dispatch before
           taking new COD orders.
         </div>
@@ -490,7 +487,7 @@ export function DriverDashboard({
                         </div>
                         <div className="text-end">
                           <div className="text-base font-extrabold">{money(order.total)}</div>
-                          <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">
+                          <div className="text-[10px] font-medium text-teal">
                             collect cash
                           </div>
                         </div>
@@ -568,7 +565,7 @@ export function DriverDashboard({
               <Banknote size={19} className="text-teal" />
             </div>
             <div className="mt-4 rounded-2xl bg-ink p-4 text-on-dark">
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-on-dark/40">
+              <div className="text-[10px] font-medium text-on-dark/40">
                 Cash currently with you
               </div>
               <div className="mt-1 text-3xl font-extrabold tracking-[-0.05em]">
@@ -610,7 +607,7 @@ export function DriverDashboard({
           <div className="card p-5">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-extrabold">Live city queue</h2>
-              <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-teal">
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-teal">
                 <span className="status-dot live-dot text-teal" /> Live
               </span>
             </div>

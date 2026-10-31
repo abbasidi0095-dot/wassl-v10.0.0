@@ -516,10 +516,10 @@ export function AdminConsole({
   }, [cities, cityQuery, cityFilter]);
 
   const statsCards = [
-    { label: "Live orders", value: `${stats.liveOrders}`, icon: Zap, tone: "bg-saffron/20 text-ink" },
-    { label: "Delivered GMV", value: money(stats.gmv), icon: CircleDollarSign, tone: "bg-teal/10 text-teal" },
-    { label: "Online drivers", value: `${stats.onlineDrivers}/${stats.drivers}`, icon: Bike, tone: "bg-blue-50 text-blue-600" },
-    { label: "Live cities", value: `${stats.liveCities}/${stats.cities}`, icon: MapPin, tone: "bg-ink/5 text-ink" },
+    { label: "Live orders", value: `${stats.liveOrders}` },
+    { label: "Delivered GMV", value: money(stats.gmv) },
+    { label: "Online drivers", value: `${stats.onlineDrivers}/${stats.drivers}` },
+    { label: "Live cities", value: `${stats.liveCities}/${stats.cities}` },
   ];
 
   return (
@@ -527,8 +527,8 @@ export function AdminConsole({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="eyebrow">Platform operations · {settings.brandName}</div>
-          <h1 className="display mt-2 text-4xl sm:text-5xl">Dispatch control room.</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-bold text-ink/45">
+          <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">Dispatch control room.</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted">
             <span className="inline-flex items-center gap-1">
               <span className="status-dot live-dot text-teal" /> Live across {stats.liveCities} cities
             </span>
@@ -589,30 +589,27 @@ export function AdminConsole({
         </div>
       ) : null}
 
-      <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-4">
         {statsCards.map((item) => (
-          <div key={item.label} className="card-flat p-4">
-            <span className={`grid h-9 w-9 place-items-center rounded-xl ${item.tone}`}>
-              <item.icon size={16} />
-            </span>
-            <div className="mt-3 text-2xl font-extrabold tracking-[-0.05em]">{item.value}</div>
-            <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
-              {item.label}
+          <div key={item.label}>
+            <div className="text-[11px] text-muted">{item.label}</div>
+            <div className="mt-1.5 font-display text-[28px] font-semibold leading-none tracking-[-0.03em] tnum">
+              {item.value}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="mt-7 flex gap-5 overflow-x-auto border-b border-line scrollbar-none">
         {TABS.map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => setTab(item.id)}
-            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-2 text-[11px] font-extrabold transition ${
+            className={`relative inline-flex items-center gap-2 whitespace-nowrap px-0.5 pb-2.5 pt-1 text-[13px] transition-colors ${
               tab === item.id
-                ? "bg-ink text-on-dark"
-                : "border border-ink/10 bg-white/50 text-ink/55 hover:text-ink"
+                ? "font-semibold text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-brand"
+                : "text-muted hover:text-ink"
             }`}
           >
             <item.icon size={14} />
@@ -622,7 +619,7 @@ export function AdminConsole({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl">
+        <div className="fixed bottom-6 start-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2 text-[12px] font-medium text-on-dark shadow-lg rtl:translate-x-1/2">
           {toast}
         </div>
       ) : null}
@@ -716,7 +713,7 @@ export function AdminConsole({
                 <span className="status-dot live-dot text-teal" />
                 {mapPoints.length} live markers · updated in real time
               </div>
-              <div className="flex flex-wrap gap-3 text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
+              <div className="flex flex-wrap gap-3 text-[10px] font-medium text-ink/35">
                 <span className="inline-flex items-center gap-1">
                   <StoreIcon size={10} /> store
                 </span>
@@ -1164,26 +1161,26 @@ export function AdminConsole({
                   content and cannot be edited at runtime.
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-wide text-ink/50">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-[10px] font-medium text-ink/50">
                 <Lock size={10} /> {dataSource.locked ? "Locked" : "Live"}
               </span>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
+                <div className="text-[10px] font-medium text-ink/35">
                   Restaurants
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">{dataSource.restaurantCount}</div>
               </div>
               <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
+                <div className="text-[10px] font-medium text-ink/35">
                   Menu items
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">{dataSource.menuItemCount}</div>
               </div>
               <div className="rounded-2xl bg-cream/70 p-3">
-                <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
+                <div className="text-[10px] font-medium text-ink/35">
                   Cities
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">
@@ -1949,7 +1946,7 @@ function AdminOrderCard({
         </div>
         <div className="text-end">
           <div className="text-base font-extrabold">{money(order.total)}</div>
-          <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">COD</div>
+          <div className="text-[10px] font-medium text-teal">COD</div>
         </div>
       </div>
 
@@ -2034,7 +2031,7 @@ function AdminOrderCard({
             ))}
           </select>
         ) : (
-          <span className="ms-auto text-[9px] font-extrabold uppercase tracking-wider text-ink/30">
+          <span className="ms-auto text-[10px] font-medium text-ink/30">
             closed
           </span>
         )}

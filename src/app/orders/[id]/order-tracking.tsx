@@ -142,7 +142,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             <ArrowLeft size={13} /> All orders
           </Link>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-extrabold tracking-[-0.055em] sm:text-4xl">
+            <h1 className="font-display text-[clamp(1.9rem,1.5rem+1.4vw,2.6rem)] font-semibold tracking-[-0.035em]">
               {delivered ? "Delivered. Enjoy!" : cancelled ? "Order cancelled" : "Your order is moving."}
             </h1>
             <span className="pill">{order.code}</span>
@@ -155,7 +155,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
         <div className="flex gap-2">
           {!delivered && !cancelled ? (
             <div className="rounded-2xl border border-teal/15 bg-teal/8 px-4 py-2.5 text-end">
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">
+              <div className="text-[10px] font-medium text-teal">
                 Estimated arrival
               </div>
               <div className="text-lg font-extrabold">{etaMinutes} min</div>
@@ -168,15 +168,15 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
       </div>
 
       {order.deliveryPin && !delivered && !cancelled ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-teal/20 bg-teal/8 px-4 py-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[6px] border border-line bg-surface px-4 py-3">
           <div>
-            <div className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-teal">
+            <div className="text-[10px] text-muted">
               {order.fulfillment === "pickup" ? "Pickup code" : "Delivery PIN"}
             </div>
-            <div className="mt-1 text-lg font-extrabold tracking-[0.12em]">
+            <div className="mt-1 font-display text-[22px] font-semibold tracking-[0.14em] tnum">
               {order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin}
             </div>
-            <div className="text-[10px] font-bold text-ink/40">
+            <div className="text-[11px] text-muted">
               {order.fulfillment === "pickup"
                 ? "Show this code to the store when you collect."
                 : "Share this PIN with the driver at handover."}
@@ -231,8 +231,8 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
 
           {order.driver ? (
             <div className="card flex flex-wrap items-center gap-3 p-4">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal text-on-dark">
-                <Bike size={22} />
+              <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-ink">
+                <Bike size={20} />
               </span>
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-extrabold">{order.driver.name}</div>
@@ -265,7 +265,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             </div>
           ) : (
             <div className="card flex items-center gap-3 p-4">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-saffron/20 text-saffron-deep"><Bike size={20} /></span>
+              <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-muted"><Bike size={20} /></span>
               <div>
                 <div className="text-sm font-extrabold">Finding your driver</div>
                 <div className="mt-0.5 text-[10px] font-bold text-ink/40">
@@ -276,7 +276,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           )}
 
           <div className="card p-5">
-            <h2 className="text-lg font-extrabold tracking-tight">Order timeline</h2>
+            <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">Order timeline</h2>
             <div className="mt-4">
               {cancelled ? (
                 <div className="rounded-xl bg-red-50 p-3 text-xs font-bold text-red-700">
@@ -298,24 +298,24 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                           />
                         ) : null}
                         <span
-                          className={`relative z-10 mt-0.5 grid h-[19px] w-[19px] shrink-0 place-items-center rounded-full border-2 ${
+                          className={`relative z-10 mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border-2 ${
                             done
-                              ? "border-teal bg-teal text-on-dark"
-                              : "border-ink/15 bg-paper text-transparent"
+                              ? "border-brand bg-brand text-paper"
+                              : "border-line-strong bg-paper text-transparent"
                           }`}
                         >
                           <Check size={10} strokeWidth={3} />
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <span className={`text-[12px] font-extrabold ${active ? "text-teal" : done ? "text-ink" : "text-ink/35"}`}>
+                            <span className={`text-[12px] ${active ? "font-semibold text-ink" : done ? "font-medium text-ink" : "text-muted/60"}`}>
                               {step.label}
                             </span>
                             <span className="text-[9px] font-bold text-ink/30">
                               {event ? clock(event.at) : ""}
                             </span>
                           </div>
-                          <div className="text-[10px] text-ink/35">{step.caption}</div>
+                          <div className="text-[11px] text-muted">{step.caption}</div>
                         </div>
                       </div>
                     );
@@ -329,17 +329,17 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
         <aside className="space-y-4">
           <div className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-extrabold tracking-tight">Receipt</h2>
-              <ReceiptText size={17} className="text-teal" />
+              <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">Receipt</h2>
+              <ReceiptText size={16} className="text-muted" />
             </div>
-            <div className="mt-3 text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
+            <div className="mt-1 text-[11px] text-muted">
               {order.store?.name}
             </div>
             <div className="mt-3 space-y-2">
               {order.items.map((item, index) => (
                 <div key={`${item.productId}-${index}`} className="flex items-center gap-2 text-[11px]">
                   <ProductTile name={item.name} className="h-7 w-7 rounded-lg" iconSize={14} />
-                  <span className="min-w-0 flex-1 font-bold text-ink/60">
+                  <span className="min-w-0 flex-1 font-medium">
                     <span className="block truncate">{item.qty}× {item.name}</span>
                     {item.options?.length ? (
                       <span className="block truncate text-[9px] text-ink/35">
@@ -347,31 +347,31 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                       </span>
                     ) : null}
                   </span>
-                  <span className="font-extrabold">{money(item.price * item.qty)}</span>
+                  <span className="font-semibold tnum">{money(item.price * item.qty)}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-4 space-y-1.5 border-t border-ink/8 pt-3 text-[11px]">
-              <div className="flex justify-between text-ink/45">
+            <div className="mt-4 space-y-1.5 border-t border-line pt-3 text-[12px]">
+              <div className="flex justify-between text-muted">
                 <span>Subtotal</span>
-                <span className="font-bold text-ink">{money(order.subtotal)}</span>
+                <span className="font-medium text-ink tnum">{money(order.subtotal)}</span>
               </div>
-              <div className="flex justify-between text-ink/45">
+              <div className="flex justify-between text-muted">
                 <span>Delivery</span>
-                <span className="font-bold text-ink">{money(order.deliveryFee)}</span>
+                <span className="font-medium text-ink tnum">{money(order.deliveryFee)}</span>
               </div>
-              <div className="flex justify-between pt-1 text-base font-extrabold">
+              <div className="flex justify-between border-t border-line pt-2 text-[15px] font-semibold">
                 <span>Total</span>
-                <span>{money(order.total)}</span>
+                <span className="tnum">{money(order.total)}</span>
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-saffron/15 p-3">
-              <Banknote size={17} className="text-ink/60" />
+            <div className="mt-4 flex items-center gap-2 border-s-2 border-signal ps-3">
+              <Banknote size={16} className="text-signal" />
               <div>
-                <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/55">
+                <div className="text-[12px] font-medium">
                   Cash on delivery
                 </div>
-                <div className="text-[10px] font-bold text-ink/40">
+                <div className="text-[11px] text-muted">
                   {order.cashCollected ? "Cash collected" : `Pay ${money(order.total)} on arrival`}
                 </div>
               </div>
@@ -379,12 +379,12 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           </div>
 
           <div className="card p-5">
-            <h2 className="text-sm font-extrabold">Delivery address</h2>
-            <div className="mt-3 flex items-start gap-2 text-[11px] leading-5 text-ink/55">
+            <h2 className="text-[13px] font-semibold">Delivery address</h2>
+            <div className="mt-3 flex items-start gap-2 text-[12px] leading-5 text-muted">
               <MapPin size={14} className="mt-0.5 shrink-0 text-teal" />
               <div>
-                <div className="font-bold text-ink">{order.address}</div>
-                <div className="text-ink/40">{order.landmark}</div>
+                <div className="font-medium text-ink">{order.address}</div>
+                <div>{order.landmark}</div>
                 {order.notes ? <div className="mt-1 italic text-ink/35">“{order.notes}”</div> : null}
               </div>
             </div>
@@ -404,7 +404,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           </div>
 
           <div className="rounded-2xl bg-ink p-5 text-on-dark">
-            <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-on-dark/40">
+            <div className="flex items-center gap-2 text-[11px] font-medium text-on-dark/40">
               <ShieldCheck size={13} className="text-saffron" /> Wassl support
             </div>
             <p className="mt-2 text-sm font-extrabold">Something wrong with your order?</p>

@@ -60,13 +60,13 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 text-ink transition hover:bg-white"
+        className="relative grid h-9 w-9 place-items-center rounded-[6px] text-ink/70 transition-colors hover:bg-surface-2 hover:text-ink"
         aria-label={t("Notifications")}
         aria-expanded={open}
       >
         {unread ? <BellRing size={18} /> : <Bell size={18} />}
         {unread ? (
-          <span className="absolute -end-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold text-on-dark">
+          <span className="absolute -end-0.5 -top-0.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-signal px-1 text-[9px] font-semibold text-[#fffaf1]">
             {unread > 9 ? "9+" : unread}
           </span>
         ) : null}
@@ -80,11 +80,11 @@ export function NotificationBell() {
             className="fixed inset-0 z-40 cursor-default"
             onClick={() => setOpen(false)}
           />
-          <div className="fixed end-2 top-[calc(70px+env(safe-area-inset-top))] z-50 w-[min(92vw,380px)] overflow-hidden rounded-2xl border border-ink/10 bg-paper shadow-2xl sm:absolute sm:end-0 sm:top-12">
-            <div className="flex items-center justify-between gap-2 border-b border-ink/8 px-4 py-3">
+          <div className="fixed end-2 top-[calc(64px+env(safe-area-inset-top))] z-50 w-[min(92vw,360px)] overflow-hidden rounded-[8px] border border-line bg-surface shadow-[0_18px_40px_-24px_rgba(12,26,23,.45)] sm:absolute sm:end-0 sm:top-11">
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
               <div>
-                <div className="text-sm font-extrabold">{t("Notifications")}</div>
-                <div className="text-[10px] font-bold text-ink/40">
+                <div className="text-[13px] font-semibold">{t("Notifications")}</div>
+                <div className="text-[10px] text-muted">
                   {pushState === "subscribed" || pushState === "granted"
                     ? t("Live updates are on")
                     : t("Turn on alerts for orders and rides")}
@@ -93,7 +93,7 @@ export function NotificationBell() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="grid h-8 w-8 place-items-center rounded-lg text-ink/40 hover:bg-cream hover:text-ink"
+                className="grid h-8 w-8 place-items-center rounded-[4px] text-muted hover:bg-surface-2 hover:text-ink"
                 aria-label={t("Close")}
               >
                 <X size={15} />
@@ -108,21 +108,21 @@ export function NotificationBell() {
                     href={item.url}
                     onClick={() => setOpen(false)}
                     className={cn(
-                      "flex gap-2.5 border-b border-ink/5 px-4 py-3 transition hover:bg-cream/60",
-                      !item.read && "bg-teal/5",
+                      "flex gap-2.5 border-b border-line px-4 py-3 transition-colors hover:bg-surface-2",
+                      !item.read && "bg-brand-soft/40",
                     )}
                   >
                     <span
                       className={cn(
                         "mt-1 h-2 w-2 shrink-0 rounded-full",
-                        item.kind === "taxi" ? "bg-saffron" : "bg-teal",
+                        item.kind === "taxi" ? "bg-signal" : "bg-brand",
                       )}
                     />
                     <span className="min-w-0">
-                      <span className="block truncate text-[12px] font-extrabold">
+                      <span className="block truncate text-[12px] font-semibold">
                         {item.title}
                       </span>
-                      <span className="mt-0.5 block text-[11px] leading-4 text-ink/55">
+                      <span className="mt-0.5 block text-[11px] leading-4 text-muted">
                         {item.body}
                       </span>
                       <span className="mt-1 block text-[9px] font-bold uppercase tracking-wider text-ink/30">
@@ -132,13 +132,13 @@ export function NotificationBell() {
                   </Link>
                 ))
               ) : (
-                <div className="px-4 py-10 text-center text-xs font-bold text-ink/40">
+                <div className="px-4 py-10 text-center text-[12px] text-muted">
                   {t("No notifications yet")}
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-between gap-2 border-t border-ink/8 bg-cream/50 px-3 py-2">
+            <div className="flex items-center justify-between gap-2 border-t border-line bg-surface px-3 py-2">
               <button
                 type="button"
                 onClick={turnOn}
@@ -171,7 +171,7 @@ export function NotificationBell() {
                 <button
                   type="button"
                   onClick={markAllRead}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-ink/40 hover:bg-white hover:text-ink"
+                  className="grid h-8 w-8 place-items-center rounded-[4px] text-muted hover:bg-surface-2 hover:text-ink"
                   aria-label={t("Mark all read")}
                 >
                   <CheckCheck size={14} />

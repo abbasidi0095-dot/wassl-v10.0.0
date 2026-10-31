@@ -40,6 +40,9 @@ function accountHref(account: AccountInfo) {
   return "/account";
 }
 
+const iconButton =
+  "grid h-9 w-9 place-items-center rounded-[6px] text-ink/70 transition-colors hover:bg-surface-2 hover:text-ink";
+
 export function SiteHeader({
   cities,
   currentCity,
@@ -68,72 +71,116 @@ export function SiteHeader({
       active = false;
     };
   }, [pathname]);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   const southern = cities.filter((city) => city.priority);
   const others = cities.filter((city) => !city.priority);
   const selected = currentCity?.slug || "dakhla";
 
   const nav = [
-    { href: currentCity ? `/city/${currentCity.slug}` : "/", label: t("Discover") },
-    { href: "/grocery", label: t("Grocery") },
-    { href: "/taxi", label: t("Taxi") },
-    { href: "/orders", label: t("My orders") },
-    { href: "/login?next=merchant", label: t("For business") },
+    {
+      href: currentCity ? `/city/${currentCity.slug}` : "/",
+      label: t("Discover"),
+      active: pathname.startsWith("/city/"),
+    },
+    { href: "/grocery", label: t("Grocery"), active: pathname === "/grocery" },
+    { href: "/taxi", label: t("Taxi"), active: pathname.startsWith("/taxi") },
+    {
+      href: "/orders",
+      label: t("My orders"),
+      active: pathname.startsWith("/orders"),
+    },
+    {
+      href: "/login?next=merchant",
+      label: t("For business"),
+      active: false,
+    },
+  ];
+
+  const cityOptions = (
+    <>
+      <optgroup label={t("Southern Morocco")}>
+        {southern.map((city) => (
+          <option key={city.slug} value={city.slug}>
+            {city.name} — {city.nameAr}
+          </option>
+        ))}
+      </optgroup>
+      <optgroup label={t("All Morocco")}>
+        {others.map((city) => (
+          <option key={city.slug} value={city.slug}>
+            {city.name}
+          </option>
+        ))}
+      </optgroup>
+    </>
+  );
+
+  const mobileNav = [
+    { href: "/", label: t("Home"), icon: MapPin },
+    {
+      href: currentCity ? `/city/${currentCity.slug}` : "/",
+      label: t("Stores"),
+      icon: Store,
+    },
+    { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
+    { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
+    { href: "/orders", label: t("Orders"), icon: ReceiptText },
+    {
+      href: account ? accountHref(account) : "/login",
+      label: account
+        ? account.status === "pending"
+          ? t("Pending")
+          : t("Account")
+        : t("Account"),
+      icon: UserRound,
+    },
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-ink/5 bg-cream/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
-        <div className="container-wassl flex h-[68px] items-center justify-between gap-3">
-          <Logo />
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 pt-[env(safe-area-inset-top)]">
+        <div className="container-wassl flex h-16 items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-7">
+            <Logo />
+            <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+              {nav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  data-active={item.active}
+                  className={cn(
+                    "relative px-3 py-2 text-[13px] font-medium text-muted transition-colors hover:text-ink",
+                    "after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:bg-transparent",
+                    item.active && "text-ink after:bg-brand",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "rounded-xl px-3 py-2 text-[13px] font-bold text-ink/65 transition hover:bg-white/60 hover:text-ink",
-                  pathname === item.href && "bg-white/75 text-ink shadow-sm",
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <label className="relative hidden sm:block">
               <MapPin
-                size={15}
-                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-teal"
+                size={14}
+                className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-muted"
               />
               <select
                 value={selected}
-                onChange={(event) => {
-                  router.push(`/city/${event.target.value}`);
-                  setOpen(false);
-                }}
-                className="h-10 max-w-[185px] appearance-none rounded-xl border border-ink/10 bg-white/70 ps-8 pe-8 text-xs font-extrabold text-ink outline-none transition hover:bg-white focus:border-teal"
+                onChange={(event) => router.push(`/city/${event.target.value}`)}
+                className="h-9 max-w-[190px] appearance-none rounded-[6px] border border-line bg-transparent ps-8 pe-7 text-[12px] font-medium text-ink outline-none transition-colors hover:border-line-strong focus:border-brand"
                 aria-label={t("Choose city")}
               >
-                <optgroup label={t("Southern Morocco")}>
-                  {southern.map((city) => (
-                    <option key={city.slug} value={city.slug}>
-                      {city.name} — {city.nameAr}
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label={t("All Morocco")}>
-                  {others.map((city) => (
-                    <option key={city.slug} value={city.slug}>
-                      {city.name}
-                    </option>
-                  ))}
-                </optgroup>
+                {cityOptions}
               </select>
               <ChevronDown
-                size={14}
-                className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-ink/40"
+                size={13}
+                className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-muted"
               />
             </label>
 
@@ -148,12 +195,12 @@ export function SiteHeader({
 
             <Link
               href="/cart"
-              className="relative grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 text-ink transition hover:bg-white"
+              className={cn("relative", iconButton)}
               aria-label={t("Cart")}
             >
               <ShoppingBag size={18} />
               {count > 0 ? (
-                <span className="absolute -end-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-on-dark">
+                <span className="absolute -end-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-signal px-1 text-[10px] font-semibold text-[#fffaf1] tnum">
                   {count}
                 </span>
               ) : null}
@@ -161,12 +208,12 @@ export function SiteHeader({
 
             <Link
               href={account ? accountHref(account) : "/login"}
-              className="hidden h-10 items-center gap-2 rounded-xl bg-ink px-3.5 text-xs font-extrabold text-on-dark transition hover:bg-teal-dark sm:flex"
+              className="hidden h-9 items-center gap-2 rounded-[6px] bg-ink px-3 text-[12px] font-semibold text-on-dark transition-colors hover:bg-brand sm:flex"
             >
               {account?.role === "customer" ? (
-                <UserRound size={15} />
+                <UserRound size={14} />
               ) : (
-                <LayoutDashboard size={15} />
+                <LayoutDashboard size={14} />
               )}
               {account
                 ? account.status === "pending"
@@ -180,53 +227,41 @@ export function SiteHeader({
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
-              className="grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 lg:hidden"
+              className={cn(iconButton, "lg:hidden")}
               aria-label={t("Menu")}
+              aria-expanded={open}
             >
-              {open ? <X size={19} /> : <Menu size={19} />}
+              {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
         {open ? (
-          <div className="container-wassl pb-4 lg:hidden">
-            <div className="card-flat grid gap-1 p-2">
-              <label className="relative mb-1 sm:hidden">
+          <div className="border-t border-line bg-surface lg:hidden">
+            <div className="container-wassl grid gap-1 py-3">
+              <label className="relative mb-2">
                 <MapPin
                   size={15}
-                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-teal"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
                 />
                 <select
                   value={selected}
-                  onChange={(event) => {
-                    router.push(`/city/${event.target.value}`);
-                    setOpen(false);
-                  }}
+                  onChange={(event) =>
+                    router.push(`/city/${event.target.value}`)
+                  }
                   className="input appearance-none ps-9"
                   aria-label={t("Choose city")}
                 >
-                  <optgroup label={t("Southern Morocco")}>
-                    {southern.map((city) => (
-                      <option key={city.slug} value={city.slug}>
-                        {city.name} — {city.nameAr}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label={t("All Morocco")}>
-                    {others.map((city) => (
-                      <option key={city.slug} value={city.slug}>
-                        {city.name}
-                      </option>
-                    ))}
-                  </optgroup>
+                  {cityOptions}
                 </select>
               </label>
-              <div className="mb-1 flex items-center gap-2 px-1">
-                <LanguageSwitcher />
-                <ThemeToggle />
-              </div>
               {[
                 { href: "/", label: t("Home"), icon: MapPin },
+                {
+                  href: currentCity ? `/city/${currentCity.slug}` : "/",
+                  label: t("Stores"),
+                  icon: Store,
+                },
                 { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
                 { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
                 { href: "/orders", label: t("My orders"), icon: ReceiptText },
@@ -245,57 +280,60 @@ export function SiteHeader({
                     ]
                   : [
                       { href: "/login", label: t("Sign in"), icon: UserRound },
-                      { href: "/signup", label: t("Create account"), icon: UserRound },
+                      {
+                        href: "/signup",
+                        label: t("Create account"),
+                        icon: UserRound,
+                      },
                     ]),
-                { href: "/login?next=merchant", label: t("Sell on Wassl"), icon: Store },
-                { href: "/login?next=admin", label: t("Admin"), icon: LayoutDashboard },
+                {
+                  href: "/login?next=merchant",
+                  label: t("Sell on Wassl"),
+                  icon: Store,
+                },
+                {
+                  href: "/login?next=admin",
+                  label: t("Admin"),
+                  icon: LayoutDashboard,
+                },
               ].map((item) => (
                 <Link
-                  key={item.href}
+                  key={`${item.href}-${item.label}`}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold hover:bg-cream"
+                  className="flex items-center gap-3 rounded-[6px] px-3 py-2.5 text-sm font-medium hover:bg-surface-2"
                 >
-                  <item.icon size={16} className="text-teal" />
+                  <item.icon size={16} className="text-muted" />
                   {item.label}
                 </Link>
               ))}
+              <div className="mt-2 flex items-center gap-2 border-t border-line pt-3">
+                <LanguageSwitcher />
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         ) : null}
       </header>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-cream/95 px-2 pb-[max(6px,env(safe-area-inset-bottom))] ps-[max(0.5rem,env(safe-area-inset-left))] pe-[max(0.5rem,env(safe-area-inset-right))] pt-1.5 backdrop-blur-xl md:hidden">
-        <div className="mx-auto flex max-w-md items-center justify-around">
-          {[
-            { href: "/", label: t("Home"), icon: MapPin },
-            { href: currentCity ? `/city/${currentCity.slug}` : "/", label: t("Stores"), icon: Store },
-            { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
-            { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
-            { href: "/orders", label: t("Orders"), icon: ReceiptText },
-            {
-              href: account ? accountHref(account) : "/login",
-              label: account
-                ? account.status === "pending"
-                  ? t("Pending")
-                  : t("Account")
-                : t("Sign in"),
-              icon: UserRound,
-            },
-          ].map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={cn(
-                "relative flex min-w-[48px] flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[8px] font-extrabold text-ink/55",
-                pathname === item.href && "bg-white text-teal shadow-sm",
-              )}
-            >
-              <item.icon size={17} />
-              {item.label}
-            </Link>
-          ))}
-        </div>
+      <nav
+        className="tabbar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line bg-surface md:hidden"
+        aria-label="Sections"
+      >
+        {mobileNav.map((item) => (
+          <Link
+            key={item.label}
+            href={item.href}
+            data-active={
+              item.href === "/"
+                ? pathname === "/"
+                : pathname === item.href || pathname.startsWith(`${item.href}/`)
+            }
+          >
+            <item.icon size={17} strokeWidth={1.75} />
+            <span className="truncate">{item.label}</span>
+          </Link>
+        ))}
       </nav>
     </>
   );

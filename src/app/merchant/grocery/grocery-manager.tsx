@@ -225,22 +225,22 @@ export function GroceryManager({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="eyebrow">{store.citySlug} · {t("Grocery")}</div>
-          <h1 className="display mt-2 text-4xl">{store.name}</h1>
+          <div className="text-[12px] text-muted">{store.citySlug} · {t("Grocery")}</div>
+          <h1 className="display mt-2 text-[clamp(1.8rem,1.5rem+1.2vw,2.4rem)]">{store.name}</h1>
           <p className="mt-1 text-sm text-ink/45">
             {t("Catalog, stock, delivery zones and 24/7 availability.")}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-5 border-b border-line">
           {(["catalog", "settings"] as const).map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => setTab(item)}
-              className={`rounded-xl px-3.5 py-2 text-[11px] font-extrabold ${
+              className={`relative px-0.5 pb-2.5 pt-1 text-[13px] transition-colors ${
                 tab === item
-                  ? "bg-ink text-on-dark"
-                  : "border border-ink/10 bg-white/60 text-ink/55"
+                  ? "font-semibold text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-brand"
+                  : "text-muted hover:text-ink"
               }`}
             >
               {item === "catalog" ? t("Catalog & stock") : t("Settings")}
@@ -249,20 +249,17 @@ export function GroceryManager({
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-4 lg:grid-cols-4">
         {[
-          { label: t("SKUs"), value: stats.count, icon: Boxes, tone: "bg-teal/10 text-teal" },
-          { label: t("Low stock"), value: stats.low, icon: AlertTriangle, tone: "bg-saffron/20 text-saffron-deep" },
-          { label: t("Out of stock"), value: stats.out, icon: PackagePlus, tone: "bg-red-50 text-red-500" },
-          { label: t("Inventory value"), value: money(stats.value), icon: Banknote, tone: "bg-ink/5 text-ink" },
+          { label: t("SKUs"), value: stats.count },
+          { label: t("Low stock"), value: stats.low },
+          { label: t("Out of stock"), value: stats.out },
+          { label: t("Inventory value"), value: money(stats.value) },
         ].map((item) => (
-          <div key={item.label} className="card-flat p-4">
-            <span className={`grid h-9 w-9 place-items-center rounded-xl ${item.tone}`}>
-              <item.icon size={16} />
-            </span>
-            <div className="mt-3 text-xl font-extrabold">{item.value}</div>
-            <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/35">
-              {item.label}
+          <div key={item.label}>
+            <div className="text-[11px] text-muted">{item.label}</div>
+            <div className="mt-1.5 font-display text-[24px] font-semibold leading-none tracking-[-0.03em] tnum">
+              {item.value}
             </div>
           </div>
         ))}
@@ -328,12 +325,12 @@ export function GroceryManager({
                       </div>
                     </div>
                     <span
-                      className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-extrabold uppercase ${
+                      className={`shrink-0 px-1.5 py-0.5 text-[10px] font-medium ${
                         badge.tone === "out"
-                          ? "bg-red-50 text-red-500"
+                          ? "text-danger"
                           : badge.tone === "low"
-                            ? "bg-saffron/20 text-saffron-deep"
-                            : "bg-teal/10 text-teal"
+                            ? "text-signal"
+                            : "text-muted"
                       }`}
                     >
                       {badge.tone === "low"

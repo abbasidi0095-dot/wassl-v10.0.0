@@ -113,7 +113,7 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
             <div className="flex items-start gap-2">
               <Circle size={14} className="mt-0.5 shrink-0 text-teal" />
               <div>
-                <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+                <div className="text-[10px] font-medium text-ink/40">
                   {t("Pickup point")}
                 </div>
                 <div className="font-bold">{ride.pickupLabel}</div>
@@ -122,7 +122,7 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
             <div className="flex items-start gap-2">
               <MapPin size={14} className="mt-0.5 shrink-0 text-coral" />
               <div>
-                <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+                <div className="text-[10px] font-medium text-ink/40">
                   {t("Destination")}
                 </div>
                 <div className="font-bold">{ride.dropoffLabel}</div>
@@ -131,19 +131,19 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
           </div>
           <div className="mt-4 grid grid-cols-3 gap-2 border-t border-ink/8 pt-3 text-center">
             <div>
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+              <div className="text-[10px] font-medium text-ink/40">
                 {t("Distance")}
               </div>
               <div className="text-sm font-extrabold">{ride.distanceKm.toFixed(1)} km</div>
             </div>
             <div>
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+              <div className="text-[10px] font-medium text-ink/40">
                 {t("Fare")}
               </div>
               <div className="text-sm font-extrabold">{money(ride.fare)}</div>
             </div>
             <div>
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+              <div className="text-[10px] font-medium text-ink/40">
                 {t("Payment")}
               </div>
               <div className="text-sm font-extrabold">{t("Cash")}</div>

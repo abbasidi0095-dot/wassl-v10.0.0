@@ -3,16 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import {
-  ArrowRight,
-  Clock3,
-  MapPin,
-  Search,
-  ShoppingBasket,
-  Sparkles,
-  Star,
-  Truck,
-} from "lucide-react";
+import { ArrowRight, Search, ShoppingBasket } from "lucide-react";
 import type { GrocerySettings, Store } from "@/lib/types";
 import type { GroceryAvailability } from "@/lib/grocery";
 import { useI18n } from "@/components/locale-provider";
@@ -63,132 +54,165 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
 
   return (
     <div>
-      <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
-        <div className="relative">
+      <div className="flex flex-col gap-3 border-y border-line py-3 md:flex-row md:items-center md:justify-between">
+        <div className="relative w-full md:max-w-[340px]">
           <Search
-            size={16}
-            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-ink/35"
+            size={15}
+            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
           />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="input h-11 ps-10"
+            className="input h-10 ps-9 text-[13px]"
             placeholder={t("Search supermarkets…")}
             aria-label={t("Search supermarkets")}
           />
         </div>
-        <select
-          value={sort}
-          onChange={(event) => setSort(event.target.value as "rating" | "name")}
-          className="input h-11 md:w-44"
-          aria-label={t("Sort stores")}
-        >
-          <option value="rating">{t("Top rated")}</option>
-          <option value="name">{t("Name A–Z")}</option>
-        </select>
+        <div className="flex max-w-full items-center gap-1 overflow-x-auto scrollbar-none">
+          {filters.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setFilter(item.id)}
+              className={`min-h-9 whitespace-nowrap px-2.5 py-2 text-[12px] transition-colors ${
+                filter === item.id
+                  ? "bg-ink font-semibold text-paper"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as "rating" | "name")}
+            className="ms-1 h-9 shrink-0 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand md:w-40"
+            aria-label={t("Sort stores")}
+          >
+            <option value="rating">{t("Top rated")}</option>
+            <option value="name">{t("Name A–Z")}</option>
+          </select>
+        </div>
       </div>
 
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {filters.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setFilter(item.id)}
-            className={`whitespace-nowrap rounded-full px-3.5 py-2 text-[11px] font-extrabold transition ${
-              filter === item.id
-                ? "bg-teal text-on-dark"
-                : "border border-ink/10 bg-white/60 text-ink/55 hover:text-ink"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <p className="mt-4 text-[12px] text-muted tnum">
+        {visible.length} {visible.length === 1 ? t("supermarket") : t("supermarkets")}
+      </p>
 
       {visible.length ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map(({ store, photo, availability, settings }) => (
-            <Link
-              key={store.id}
-              href={`/store/${store.slug}`}
-              className="card group overflow-hidden transition hover:-translate-y-1 hover:border-teal/25"
-            >
-              <div className="relative h-40 overflow-hidden">
-                <Image
-                  src={photo}
-                  alt={store.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 33vw"
-                  className="object-cover transition duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/10 to-transparent" />
-                <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2">
-                  <div>
-                    <div className="text-lg font-extrabold leading-tight text-on-dark">
+        <div className="mt-2 border-t border-line">
+          {visible.map(
+            ({ store, photo, availability, settings }, index) => (
+              <Link
+                key={store.id}
+                href={`/store/${store.slug}`}
+                className="group grid gap-4 border-b border-line py-5 transition-colors hover:bg-surface md:grid-cols-[240px_1fr_auto] md:items-center md:gap-7"
+              >
+                <div className="relative aspect-[16/9] overflow-hidden rounded-[6px] bg-surface-2 md:aspect-[4/3]">
+                  <Image
+                    src={photo}
+                    alt={store.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 240px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${
+                        availability.open ? "text-success" : ""
+                      }`}
+                    >
+                      <span
+                        className={`status-dot ${
+                          availability.open ? "live-dot" : ""
+                        }`}
+                      />
+                      {availability.open ? t("Open now") : t("Closed")}
+                      {availability.night ? ` · ${t("overnight")}` : ""}
+                    </span>
+                    <span className="text-line-strong">/</span>
+                    <span className="tnum">
+                      {store.prepTime}–{store.prepTime + 10} min
+                    </span>
+                    <span className="text-line-strong">/</span>
+                    <span className="tnum">
+                      {t("min {amount}", {
+                        amount: money(
+                          settings.deliveryZones[0]?.minOrder ?? store.minOrder,
+                        ),
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="mt-1.5 flex items-baseline gap-3">
+                    <h3 className="font-display text-[24px] font-semibold tracking-[-0.03em]">
                       {store.name}
-                    </div>
-                    <div className="mt-0.5 flex items-center gap-1.5 text-[10px] font-bold text-on-dark/70">
-                      <MapPin size={10} /> {store.citySlug}
-                      <span>·</span>
-                      <Star size={10} className="fill-saffron text-saffron" />
+                    </h3>
+                    <span className="arabic text-[13px] text-muted">
+                      {store.nameAr}
+                    </span>
+                    <span className="text-[11px] text-muted tnum">
                       {store.rating || "New"}
+                      {store.reviews ? ` · ${store.reviews}` : ""}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 max-w-[58ch] text-[12px] leading-5 text-muted" dir="auto">
+                    {store.tagline}
+                  </p>
+
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted">
+                    {availability.delivery ? <span>{t("Delivery")}</span> : null}
+                    {availability.pickup ? <span>{t("Pickup")}</span> : null}
+                    {availability.express ? (
+                      <span>
+                        {t("Express {minutes} min", {
+                          minutes: settings.expressMinutes,
+                        })}
+                      </span>
+                    ) : null}
+                    {availability.night ? (
+                      <span>
+                        {t("Night fee {amount}", {
+                          amount: money(settings.nightFee),
+                        })}
+                      </span>
+                    ) : null}
+                    <span>{store.landmark}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-6 md:flex-col md:items-end">
+                  <div className="text-end">
+                    <div className="text-[11px] text-muted">{t("Delivery from")}</div>
+                    <div className="text-[15px] font-semibold tnum">
+                      {money(
+                        settings.deliveryZones[0]?.fee ?? store.deliveryFee,
+                      )}
                     </div>
                   </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-extrabold uppercase tracking-wide ${
-                      availability.open
-                        ? "bg-teal text-on-dark"
-                        : "bg-ink/70 text-on-dark"
-                    }`}
-                  >
-                    {availability.open ? t("Open") : t("Closed")}
+                  <span className="inline-flex items-center gap-1 text-[12px] font-medium text-brand">
+                    {t("Shop")}
+                    <ArrowRight
+                      size={13}
+                      className="transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100"
+                    />
                   </span>
                 </div>
-              </div>
-              <div className="p-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {availability.night ? (
-                    <span className="pill pill-warm">{t("Night delivery")}</span>
-                  ) : null}
-                  {availability.delivery ? (
-                    <span className="pill">
-                      <Truck size={10} /> {t("Delivery")}
-                    </span>
-                  ) : null}
-                  {availability.pickup ? (
-                    <span className="pill">
-                      <ShoppingBasket size={10} /> {t("Pickup")}
-                    </span>
-                  ) : null}
-                  {availability.express ? (
-                    <span className="pill">
-                      <Sparkles size={10} /> {t("Express")}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-ink/40">
-                  <span>
-                    {t("Min. {amount}", { amount: money(settings.deliveryZones[0]?.minOrder ?? store.minOrder) })}
-                    <span className="mx-1">·</span>
-                    {t("{amount} delivery", { amount: money(settings.deliveryZones[0]?.fee ?? store.deliveryFee) })}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-teal">
-                    <Clock3 size={11} />
-                    {store.prepTime}–{store.prepTime + 10} min
-                  </span>
-                </div>
-                <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
-                  {t("Shop now")} <ArrowRight size={11} className="rtl:-scale-x-100" />
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ),
+          )}
         </div>
       ) : (
-        <div className="card mt-5 grid place-items-center px-6 py-16 text-center">
-          <ShoppingBasket size={28} className="text-teal" />
-          <h2 className="mt-3 text-xl font-extrabold">{t("No supermarkets match")}</h2>
-          <p className="mt-1 text-sm text-ink/45">
+        <div className="border-y border-line py-16 text-center">
+          <ShoppingBasket size={22} className="mx-auto text-muted" />
+          <h2 className="mt-3 font-display text-xl font-semibold">
+            {t("No supermarkets match")}
+          </h2>
+          <p className="mt-1 text-[13px] text-muted">
             {t("Try another filter or city — more partners are onboarding.")}
           </p>
         </div>

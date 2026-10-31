@@ -1,308 +1,485 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
+  ArrowUpRight,
   Bike,
-  CheckCircle2,
+  CarTaxiFront,
   Clock3,
   MapPin,
-  Phone,
-  ShieldCheck,
+  Pill,
   ShoppingBasket,
-  Sparkles,
-  Star,
-  Store as StoreIcon,
-  Truck,
+  UtensilsCrossed,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
 import { MapView } from "@/components/map-view";
-import { ProductTile } from "@/components/product-icon";
 import { getCities, getPriorityCities, getStores } from "@/lib/db";
 import { getTranslator } from "@/lib/i18n-server";
+import { storePhoto } from "@/lib/store-images";
 import { money } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const { t } = await getTranslator();
-  const cities = await getCities();
-  const priority = await getPriorityCities();
-  const stores = await getStores();
+  const { t, locale } = await getTranslator();
+  const [cities, priority, stores] = await Promise.all([
+    getCities(),
+    getPriorityCities(),
+    getStores(),
+  ]);
   const dakhla = cities.find((city) => city.slug === "dakhla") || priority[0];
-  const dakhlaStores = stores.filter((store) => store.citySlug === "dakhla");
+  const cityLabel = locale === "ar" ? dakhla.nameAr : dakhla.name;
+  const groceryStores = stores.filter((store) => store.category === "grocery");
+  const featuredGrocery =
+    groceryStores.find((store) => store.slug === "sahara-market") ?? groceryStores[0];
+  const featuredStore =
+    stores.find((store) => store.slug === "dakhla-grill") ??
+    stores.find((store) => store.citySlug === "dakhla") ??
+    stores[0];
   const storeCount = new Map<string, number>();
   for (const store of stores) {
     storeCount.set(store.citySlug, (storeCount.get(store.citySlug) ?? 0) + 1);
   }
 
+  const doors = [
+    {
+      href: "/grocery",
+      label: t("Grocery"),
+      note: t("Supermarkets, 24/7 where staffed"),
+      icon: ShoppingBasket,
+      count: groceryStores.length,
+    },
+    {
+      href: `/city/${dakhla.slug}`,
+      label: t("Restaurants"),
+      note: t("Local kitchens and cafés"),
+      icon: UtensilsCrossed,
+      count: stores.filter((store) => store.category === "restaurant").length,
+    },
+    {
+      href: `/city/${dakhla.slug}`,
+      label: t("Pharmacy"),
+      note: t("Essentials, late hours"),
+      icon: Pill,
+      count: stores.filter((store) => store.category === "pharmacy").length,
+    },
+    {
+      href: "/taxi",
+      label: t("Taxi"),
+      note: t("Cash fare, live route"),
+      icon: CarTaxiFront,
+      count: null,
+    },
+  ];
+
   return (
     <>
       <SiteHeader cities={cities} currentCity={dakhla} />
       <main>
-        <section className="container-wassl grid gap-8 pb-10 pt-9 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-12 lg:pb-16 lg:pt-14">
-          <div className="animate-rise">
-            <div className="inline-flex items-center gap-2 rounded-full border border-teal/15 bg-white/60 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-teal">
-              <span className="status-dot live-dot" />
-              {t("Now live in Dakhla & Laayoune")}
+        {/* Hero: type left, one real live panel right. */}
+        <section className="container-wassl grid gap-10 pb-12 pt-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:gap-14 lg:pb-16 lg:pt-16">
+          <div>
+            <div className="flex items-center gap-2 text-[12px] font-medium text-muted">
+              <span className="status-dot live-dot text-success" />
+              {t("Now delivering in {city}", { city: cityLabel })}
+              <span className="text-line-strong">/</span>
+              <span className="tnum">06:00–02:00</span>
             </div>
-            <h1 className="display mt-5 max-w-[620px] text-[52px] sm:text-[68px] lg:text-[78px]">
+
+            <h1 className="display mt-6">
               {t("The South,")}
               <br />
-              <span className="text-teal">{t("delivered.")}</span>
+              {t("delivered.").replace(".", "")}
+              <span className="text-signal">.</span>
             </h1>
-            <p className="mt-5 max-w-lg text-[15px] leading-7 text-ink/55">
-              {t("Local restaurants, groceries and pharmacy essentials from Dakhla to Tarfaya. Pay cash on delivery and follow your driver live, block by block.")}
+
+            <p className="lede mt-7 max-w-[46ch]" dir="auto">
+              {t(
+                "Restaurants, a full supermarket, pharmacy essentials and taxi rides — from Dakhla to Tarfaya. Cash on arrival, tracked live.",
+              )}
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link href={`/city/${dakhla.slug}`} className="btn btn-primary h-12 px-5">
-                {t("Browse {city} stores", { city: dakhla.name })}
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link href={`/city/${dakhla.slug}`} className="btn btn-primary btn-lg">
+                {t("Order from {city}", { city: cityLabel })}
                 <ArrowRight size={17} className="rtl:-scale-x-100" />
               </Link>
-              <Link href="/cities" className="btn btn-ghost h-12 px-5">
-                <MapPin size={16} />
-                {t("All Moroccan cities")}
-              </Link>
-              <Link href="/grocery" className="btn btn-ghost h-12 px-5">
-                <ShoppingBasket size={16} />
-                {t("Shop groceries")}
+              <Link
+                href="/grocery"
+                className="inline-flex min-h-11 items-center gap-1.5 text-[14px] font-medium text-ink underline decoration-line-strong decoration-1 underline-offset-4 transition-colors hover:decoration-ink"
+              >
+                {t("Shop 24/7 groceries")}
+                <ArrowUpRight size={15} className="rtl:-scale-x-100" />
               </Link>
             </div>
-            <div className="mt-8 grid max-w-lg grid-cols-3 gap-3">
+
+            <dl className="mt-10 grid max-w-xl grid-cols-2 gap-y-5 border-t border-line pt-6 sm:grid-cols-4 sm:gap-x-6">
               {[
-                { value: `${priority.length}`, label: t("priority cities") },
-                { value: `${stores.length}`, label: t("local stores") },
+                { value: String(priority.length), label: t("cities live") },
+                { value: String(stores.length), label: t("local stores") },
+                { value: "24/7", label: t("grocery where staffed") },
                 { value: "COD", label: t("cash on delivery") },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-ink/10 bg-white/50 p-4">
-                  <div className="text-2xl font-extrabold tracking-[-0.06em]">{item.value}</div>
-                  <div className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.12em] text-ink/40">
+                <div key={item.label}>
+                  <dt className="tnum font-display text-[26px] font-semibold leading-none tracking-[-0.03em]">
+                    {item.value}
+                  </dt>
+                  <dd className="mt-2 text-[11px] leading-4 text-muted">
                     {item.label}
-                  </div>
+                  </dd>
                 </div>
               ))}
-            </div>
+            </dl>
           </div>
 
-          <div className="animate-rise-delay relative">
-            <div className="absolute -start-3 -top-3 z-10 hidden rounded-2xl border border-ink/10 bg-paper/95 p-3 shadow-xl backdrop-blur sm:block">
-              <div className="flex items-center gap-2">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal text-on-dark">
-                  <Bike size={17} />
-                </span>
-                <div>
-                  <div className="text-[11px] font-extrabold">{t("Driver on the way")}</div>
-                  <div className="text-[9px] font-bold text-ink/40">8 min · Dakhla Grill</div>
+          {featuredStore ? (
+            <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+              <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2 text-[12px] font-medium">
+                  <span className="status-dot live-dot text-success" />
+                  <span className="truncate">
+                    {t("Live in {city}", { city: cityLabel })}
+                  </span>
                 </div>
+                <span className="shrink-0 text-[11px] text-muted tnum">
+                  {featuredStore.prepTime}–{featuredStore.prepTime + 10} min
+                </span>
               </div>
-            </div>
-            <div className="overflow-hidden rounded-[30px] border border-white/70 bg-white/50 p-2 shadow-[0_40px_100px_-50px_rgba(15,60,58,.55)]">
               <MapView
                 points={[
-                  { id: "store", lat: 23.6927, lng: -15.9439, kind: "store", label: "Dakhla Grill" },
-                  { id: "driver", lat: 23.6901, lng: -15.9478, kind: "driver", label: "Youssef · driver" },
-                  { id: "customer", lat: 23.6882, lng: -15.9528, kind: "customer", label: "Drop-off" },
+                  {
+                    id: "store",
+                    lat: featuredStore.lat,
+                    lng: featuredStore.lng,
+                    kind: "store",
+                    label: featuredStore.name,
+                  },
+                  {
+                    id: "driver",
+                    lat: featuredStore.lat - 0.003,
+                    lng: featuredStore.lng - 0.004,
+                    kind: "driver",
+                    label: "Youssef · driver",
+                  },
+                  {
+                    id: "customer",
+                    lat: featuredStore.lat - 0.006,
+                    lng: featuredStore.lng - 0.008,
+                    kind: "customer",
+                    label: t("Drop-off"),
+                  },
                 ]}
-                center={{ lat: 23.6905, lng: -15.948 }}
+                center={{
+                  lat: featuredStore.lat - 0.003,
+                  lng: featuredStore.lng - 0.004,
+                }}
                 zoom={14}
-                height={390}
+                height={330}
                 route={[
-                  [23.6927, -15.9439],
-                  [23.6901, -15.9478],
-                  [23.6882, -15.9528],
+                  [featuredStore.lat, featuredStore.lng],
+                  [featuredStore.lat - 0.003, featuredStore.lng - 0.004],
+                  [featuredStore.lat - 0.006, featuredStore.lng - 0.008],
                 ]}
                 followDriverId="driver"
                 interactive={false}
-                className="rounded-[24px]"
+                className="rounded-none"
               />
+              <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-3.5">
+                <div className="min-w-0">
+                  <div className="truncate text-[13px] font-semibold">
+                    {featuredStore.name}
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] text-muted">
+                    {featuredStore.landmark} · {t("Cash on delivery")}
+                  </div>
+                </div>
+                <Link
+                  href={`/store/${featuredStore.slug}`}
+                  className="inline-flex shrink-0 items-center gap-1 text-[12px] font-semibold text-brand"
+                >
+                  {t("Open store")}
+                  <ArrowRight size={13} className="rtl:-scale-x-100" />
+                </Link>
+              </div>
             </div>
-            <div className="absolute -bottom-4 end-3 z-10 max-w-[250px] rounded-2xl border border-ink/10 bg-paper/95 p-4 shadow-xl backdrop-blur">
-              <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-teal">
-                <span className="status-dot live-dot" />
-                {t("Live tracking")}
-              </div>
-              <div className="mt-2 text-sm font-extrabold leading-5">
-                {t("Your order is 2 streets away.")}
-              </div>
-              <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-ink/40">
-                <Star size={11} className="fill-saffron text-saffron" /> 4.9 {t("driver rating")}
-              </div>
-            </div>
-          </div>
+          ) : null}
         </section>
 
+        {/* Four doors, one per service. */}
         <section className="container-wassl">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                icon: Clock3,
-                title: t("Fast, local delivery"),
-                text: t("25–45 minutes in the city centre. Scheduled slots for longer routes."),
-              },
-              {
-                icon: ShieldCheck,
-                title: t("Cash on delivery"),
-                text: t("Pay the driver in cash. No card, no surprise fees."),
-              },
-              {
-                icon: Truck,
-                title: t("Live driver tracking"),
-                text: t("Watch your driver move on the map from pickup to your door."),
-              },
-              {
-                icon: Phone,
-                title: t("Human support"),
-                text: t("WhatsApp or call us in Arabic, French or English."),
-              },
-            ].map((item) => (
-              <div key={item.title} className="card-flat p-4">
-                <item.icon size={19} className="text-teal" />
-                <div className="mt-3 text-[13px] font-extrabold">{item.title}</div>
-                <p className="mt-1 text-[11px] leading-5 text-ink/45">{item.text}</p>
-              </div>
+          <div className="flex items-end justify-between gap-4 border-t border-line pt-6">
+            <h2 className="text-[13px] font-semibold text-muted">
+              {t("What do you need?")}
+            </h2>
+            <Link href="/cities" className="text-[12px] font-medium text-brand">
+              {t("All Moroccan cities")}
+            </Link>
+          </div>
+          <div className="mt-4 grid border-s border-t border-line sm:grid-cols-2 lg:grid-cols-4">
+            {doors.map((door) => (
+              <Link
+                key={door.label}
+                href={door.href}
+                className="group flex min-h-[132px] flex-col justify-between border-e border-b border-line bg-surface p-5 transition-colors hover:bg-surface-2"
+              >
+                <div className="flex items-start justify-between">
+                  <door.icon size={20} strokeWidth={1.6} className="text-ink/70" />
+                  <ArrowUpRight
+                    size={16}
+                    className="text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100"
+                  />
+                </div>
+                <div className="mt-8">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-display text-[24px] font-semibold tracking-[-0.03em]">
+                      {door.label}
+                    </span>
+                    {door.count !== null ? (
+                      <span className="text-[11px] text-muted tnum">
+                        {door.count}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-1 text-[12px] text-muted">{door.note}</p>
+                </div>
+              </Link>
             ))}
           </div>
         </section>
 
-        <section className="container-wassl mt-14 lg:mt-20" id="stores">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="eyebrow">{t("Open across the South")}</div>
-              <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.06em] lg:text-5xl">
-                {t("Local favourites,")} <span className="text-teal">{t("one tap away.")}</span>
-              </h2>
+        {/* Grocery feature on an ink field. */}
+        {featuredGrocery ? (
+          <section className="field-ink mt-16 border-y border-line lg:mt-24">
+            <div className="container-wassl grid gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 lg:py-16">
+              <div>
+                <p className="text-[12px] font-medium text-saffron">
+                  {t("Wassl Grocery")}
+                </p>
+                <h2 className="display-sm mt-3 max-w-[18ch] text-[clamp(2.1rem,1.5rem+2vw,3.4rem)]">
+                  {t("The whole supermarket, at your door.")}
+                </h2>
+                <p className="mt-5 max-w-[46ch] text-[15px] leading-6 opacity-60">
+                  {t(
+                    "Aisles, units, live stock, size variants and substitutions — delivery or pickup, express or scheduled. Open overnight only when the store is staffed.",
+                  )}
+                </p>
+                <dl className="mt-8 grid grid-cols-3 gap-4 border-t border-white/15 pt-5">
+                  {[
+                    { value: "21+", label: t("aisle products") },
+                    { value: "30", label: t("min express") },
+                    { value: "4", label: t("delivery windows") },
+                  ].map((item) => (
+                    <div key={item.label}>
+                      <dt className="tnum font-display text-[24px] font-semibold leading-none">
+                        {item.value}
+                      </dt>
+                      <dd className="mt-1.5 text-[10px] leading-4 opacity-50">
+                        {item.label}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <div className="mt-8 flex flex-wrap items-center gap-5">
+                  <Link
+                    href={`/store/${featuredGrocery.slug}`}
+                    className="btn btn-lg bg-white text-ink hover:bg-white/85"
+                  >
+                    {t("Shop {store}", { store: featuredGrocery.name })}
+                    <ArrowRight size={16} className="rtl:-scale-x-100" />
+                  </Link>
+                  <Link
+                    href="/grocery"
+                    className="text-[13px] font-medium text-saffron underline decoration-saffron/40 underline-offset-4 hover:decoration-saffron"
+                  >
+                    {t("All supermarkets")}
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-5 grid-rows-5 gap-3">
+                <div className="relative col-span-3 row-span-3 overflow-hidden rounded-[8px]">
+                  <Image
+                    src={storePhoto(featuredGrocery)}
+                    alt={featuredGrocery.name}
+                    fill
+                    sizes="(max-width: 1024px) 60vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="col-span-2 row-span-2 flex flex-col justify-between rounded-[8px] border border-white/15 p-4">
+                  <Clock3 size={17} className="text-saffron" />
+                  <div>
+                    <div className="text-[13px] font-medium">
+                      {t("Open overnight")}
+                    </div>
+                    <div className="mt-1 text-[10px] leading-4 opacity-50">
+                      {t("Delivery only with overnight staff and a driver online.")}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-2 row-span-3 flex flex-col justify-between rounded-[8px] border border-white/15 p-4">
+                  <Bike size={17} className="text-saffron" />
+                  <div>
+                    <div className="text-[13px] font-medium">
+                      {t("Pickup or delivery")}
+                    </div>
+                    <div className="mt-1 text-[10px] leading-4 opacity-50">
+                      {t("Pay cash at collection or on arrival.")}
+                    </div>
+                  </div>
+                </div>
+                <div className="relative col-span-3 row-span-2 overflow-hidden rounded-[8px]">
+                  <Image
+                    src={
+                      groceryStores[1]
+                        ? storePhoto(groceryStores[1])
+                        : storePhoto(featuredGrocery)
+                    }
+                    alt={groceryStores[1]?.name ?? featuredGrocery.name}
+                    fill
+                    sizes="(max-width: 1024px) 60vw, 40vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-ink/20" />
+                  <div className="absolute inset-x-3 bottom-3 text-[11px] font-medium text-on-dark">
+                    {groceryStores[1]?.name ?? featuredGrocery.name}
+                    <span className="ms-1 opacity-60">
+                      · {groceryStores[1]?.citySlug ?? featuredGrocery.citySlug}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="max-w-sm text-sm leading-6 text-ink/45">
-              {t("Restaurants, groceries, pharmacy and cafés. Every order is cash on delivery and tracked live.")}
-            </p>
+          </section>
+        ) : null}
+
+        <section className="container-wassl pt-14 lg:pt-20" id="stores">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="headline">{t("Open across the South")}</h2>
+              <p className="mt-2 max-w-[54ch] text-[14px] leading-6 text-muted">
+                {t(
+                  "Local kitchens, supermarkets, pharmacy and cafés. Every order is cash on delivery and tracked live.",
+                )}
+              </p>
+            </div>
+            <Link href={`/city/${dakhla.slug}`} className="text-[13px] font-medium text-brand">
+              {t("All {city} stores", { city: cityLabel })}
+            </Link>
           </div>
           <div className="mt-6">
             <StoreBrowser stores={stores} />
           </div>
         </section>
 
+        {/* Cities as a ruled index, not cards. */}
         <section className="container-wassl mt-16 lg:mt-24">
-          <div className="grid gap-4 md:grid-cols-5">
-            <div className="card relative overflow-hidden bg-ink p-6 text-on-dark md:col-span-2">
-              <div
-                className="absolute inset-0 opacity-40"
-                style={{
-                  background:
-                    "radial-gradient(circle at 100% 0%, rgba(232,163,61,.55), transparent 18rem)",
-                }}
-              />
-              <div className="relative">
-                <span className="pill pill-warm">{t("Southern corridor")}</span>
-                <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.055em]">
-                  {t("From the lagoon")}
-                  <br />
-                  {t("to the Atlantic.")}
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-on-dark/55">
-                  {t("Five priority cities, one local operating model. Each city gets its own stores, drivers, zones and delivery fees.")}
-                </p>
-                <Link
-                  href="/cities"
-                  className="mt-6 inline-flex items-center gap-2 text-xs font-extrabold text-saffron"
-                >
-                  {t("Explore all cities")} <ArrowRight size={14} className="rtl:-scale-x-100" />
-                </Link>
-              </div>
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div>
+              <h2 className="headline">{t("Five cities, one operating model.")}</h2>
+              <p className="mt-3 max-w-[42ch] text-[14px] leading-6 text-muted">
+                {t(
+                  "Each city keeps its own stores, drivers, zones and fees — so the promise on screen is the one we can keep.",
+                )}
+              </p>
+              <Link
+                href="/cities"
+                className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand"
+              >
+                {t("Explore all Moroccan cities")}
+                <ArrowRight size={14} className="rtl:-scale-x-100" />
+              </Link>
             </div>
-
-            <div className="grid gap-3 md:col-span-3 sm:grid-cols-2">
+            <ol className="border-t border-line">
               {priority.map((city) => {
                 const count = storeCount.get(city.slug) ?? 0;
                 return (
-                  <Link
-                    key={city.id}
-                    href={`/city/${city.slug}`}
-                    className="card group flex flex-col justify-between p-4 transition hover:-translate-y-1 hover:border-teal/25"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h3 className="text-lg font-extrabold tracking-[-0.04em]">{city.name}</h3>
-                        <p className="arabic mt-0.5 text-sm text-ink/35">{city.nameAr}</p>
-                      </div>
-                      <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal/10 text-teal">
-                        <MapPin size={16} />
+                  <li key={city.id}>
+                    <Link
+                      href={`/city/${city.slug}`}
+                      className="group flex items-baseline justify-between gap-4 border-b border-line py-4 transition-colors hover:text-brand"
+                    >
+                      <span className="flex min-w-0 items-baseline gap-3">
+                        <span className="font-display text-[20px] font-semibold tracking-[-0.02em]">
+                          {city.name}
+                        </span>
+                        <span className="arabic text-[13px] text-muted">
+                          {city.nameAr}
+                        </span>
                       </span>
-                    </div>
-                    <div className="mt-5 flex items-center justify-between text-[10px] font-bold text-ink/40">
-                      <span>{count ? t("{count} stores live", { count }) : t("Coming soon")}</span>
-                      <span className="inline-flex items-center gap-1 text-teal">
-                        {t("Open")} <ArrowRight size={11} className="transition group-hover:translate-x-0.5 rtl:-scale-x-100" />
+                      <span className="flex shrink-0 items-baseline gap-6 text-[12px] text-muted tnum">
+                        <span>
+                          {count
+                            ? t("{count} stores", { count })
+                            : t("Coming soon")}
+                        </span>
+                        <ArrowRight
+                          size={14}
+                          className="text-brand transition-transform group-hover:translate-x-1 rtl:-scale-x-100"
+                        />
                       </span>
-                    </div>
-                  </Link>
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
+            </ol>
           </div>
         </section>
 
+        {/* Business: a real order row as the visual. */}
         <section className="container-wassl mt-16 lg:mt-24">
-          <div className="card grid gap-8 overflow-hidden p-6 md:grid-cols-2 md:items-center md:p-10">
-            <div>
-              <div className="eyebrow">{t("For local businesses")}</div>
-              <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.06em]">
+          <div className="grid overflow-hidden rounded-[10px] border border-line bg-surface lg:grid-cols-[1fr_0.85fr]">
+            <div className="p-7 sm:p-10">
+              <p className="text-[12px] font-medium text-brand">
+                {t("For local businesses")}
+              </p>
+              <h2 className="headline mt-3 max-w-[20ch]">
                 {t("Your store. Your drivers. One dashboard.")}
               </h2>
-              <p className="mt-4 max-w-lg text-sm leading-6 text-ink/55">
-                {t("Join Wassl and get a live order board, menu controls, COD reconciliation and a direct line to local drivers. No upfront subscription for the pilot.")}
+              <p className="mt-4 max-w-[48ch] text-[14px] leading-6 text-muted">
+                {t(
+                  "A live order board, catalog and stock controls, COD reconciliation and a direct line to local drivers. No upfront subscription for the pilot.",
+                )}
               </p>
-              <div className="mt-6 grid gap-2">
-                {[
-                  t("Accept orders from a tablet or phone"),
-                  t("Set your own prep time, zones and fees"),
-                  t("Weekly settlement minus a transparent commission"),
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-xs font-bold text-ink/60">
-                    <CheckCircle2 size={15} className="text-teal" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-              <div className="mt-7 flex flex-wrap gap-2">
+              <div className="mt-7 flex flex-wrap gap-3">
                 <Link href="/login?next=merchant" className="btn btn-primary">
-                  <StoreIcon size={16} />
                   {t("Open store dashboard")}
                 </Link>
                 <Link href="/login?next=driver" className="btn btn-ghost">
-                  <Bike size={16} />
                   {t("Driver app")}
                 </Link>
               </div>
             </div>
-            <div className="relative rounded-3xl bg-cream p-5">
-              <div className="rounded-2xl bg-white p-4 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
-                    {t("New order · Dakhla Grill")}
-                  </span>
-                  <span className="pill pill-warm">COD</span>
-                </div>
-                <div className="mt-3 flex items-center gap-3">
-                  <ProductTile name="Dakhla Smash" category="Burgers" className="h-12 w-12 rounded-xl" iconSize={22} />
-                  <div>
-                    <div className="text-sm font-extrabold">Dakhla Smash × 1</div>
-                    <div className="text-[11px] text-ink/40">Loaded Fries × 1 · Lemonade</div>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-ink/5 pt-3">
-                  <span className="text-[11px] font-bold text-ink/40">{t("Collect from customer")}</span>
-                  <span className="text-lg font-extrabold">{money(114)}</span>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <span className="btn btn-primary btn-sm">{t("Accept order")}</span>
-                  <span className="btn btn-ghost btn-sm">{t("View details")}</span>
-                </div>
+            <div className="border-t border-line p-7 sm:p-10 lg:border-s lg:border-t-0">
+              <div className="flex items-center justify-between text-[11px] text-muted">
+                <span>{t("Order board preview")}</span>
+                <span className="tnum">14:32</span>
               </div>
-              <div className="absolute -bottom-4 -end-3 rounded-2xl bg-teal p-3 text-on-dark shadow-xl">
-                <div className="flex items-center gap-2 text-[10px] font-extrabold">
-                  <Sparkles size={13} className="text-saffron" />
-                  {t("Settled weekly")}
-                </div>
+              <div className="mt-4 divide-y divide-line border-y border-line">
+                {[
+                  { code: "WS-4821", label: t("2 items"), amount: 114, state: t("New") },
+                  { code: "WS-4820", label: t("Grocery pickup"), amount: 68, state: t("Ready") },
+                  { code: "WS-4819", label: t("1 item"), amount: 49, state: t("On route") },
+                ].map((row) => (
+                  <div key={row.code} className="flex items-center justify-between gap-3 py-3.5">
+                    <div className="min-w-0">
+                      <div className="text-[13px] font-medium">{row.code}</div>
+                      <div className="text-[11px] text-muted">{row.label}</div>
+                    </div>
+                    <div className="text-end">
+                      <div className="text-[13px] font-semibold tnum">
+                        {money(row.amount)}
+                      </div>
+                      <div className="text-[10px] text-muted">{row.state}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-[11px] text-muted">
+                <MapPin size={13} />
+                {t("Cash collected is reconciled at the end of each shift.")}
               </div>
             </div>
           </div>

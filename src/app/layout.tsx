@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s · Wassl",
   },
   description:
-    "Order from local stores in Dakhla, Laayoune, Boujdour, Esmara and Tarfaya. Cash on delivery, live driver tracking and one simple app.",
+    "Order from local stores and 24/7 supermarkets in Dakhla, Laayoune, Boujdour, Esmara and Tarfaya. Cash on delivery, live tracking and one app for delivery, grocery and taxi.",
   applicationName: "Wassl",
   keywords: ["Wassl", "delivery", "Dakhla", "Laayoune", "Morocco", "COD"],
   manifest: "/manifest.webmanifest",
@@ -47,7 +47,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   colorScheme: "light dark",
-  themeColor: "#0f6e6e",
+  themeColor: "#0b4a45",
 };
 
 export default async function RootLayout({
@@ -62,11 +62,19 @@ export default async function RootLayout({
             __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
           }}
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap"
-          rel="stylesheet"
+          rel="preload"
+          href="/fonts/instrument-sans-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/bricolage-grotesque-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
         />
       </head>
       <body>

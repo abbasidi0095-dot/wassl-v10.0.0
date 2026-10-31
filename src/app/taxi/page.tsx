@@ -23,18 +23,25 @@ export default async function TaxiPage() {
   return (
     <>
       <SiteHeader cities={cities} />
-      <main className="container-wassl py-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="eyebrow">{t("Taxi")}</div>
-            <h1 className="display mt-2 text-4xl sm:text-5xl">Wassl Taxi</h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-ink/50">
-              {t(
-                "Request a local ride and pay the driver in cash. Your fare is confirmed before you book.",
-              )}
-            </p>
+      <main className="container-wassl pb-16">
+        <div className="border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-[12px] text-muted">
+                <span className="status-dot live-dot text-success" />
+                {t("Cash to driver")}
+              </div>
+              <h1 className="display mt-3 text-[clamp(2.4rem,1.6rem+3vw,4rem)]">Wassl Taxi</h1>
+            </div>
+            <div className="text-[12px] text-muted">
+              {t("Fare confirmed before you book")}
+            </div>
           </div>
-          <span className="pill pill-warm">{t("Cash to driver")}</span>
+          <p className="mt-3 max-w-[52ch] text-[14px] leading-6 text-muted">
+            {t(
+              "Request a local ride, see the distance and fare, then pay the driver in cash when you arrive.",
+            )}
+          </p>
         </div>
 
         <div className="mt-6">

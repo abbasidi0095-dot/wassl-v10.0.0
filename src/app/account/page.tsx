@@ -85,7 +85,7 @@ export default async function AccountPage() {
               <div className="flex items-start gap-3">
                 <ReceiptText size={16} className="mt-0.5 text-teal" />
                 <div>
-                  <dt className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
+                  <dt className="text-[11px] font-medium text-ink/35">
                     Phone
                   </dt>
                   <dd className="font-semibold text-ink/75">
@@ -96,7 +96,7 @@ export default async function AccountPage() {
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="mt-0.5 text-teal" />
                 <div>
-                  <dt className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
+                  <dt className="text-[11px] font-medium text-ink/35">
                     City
                   </dt>
                   <dd className="font-semibold text-ink/75">
@@ -107,7 +107,7 @@ export default async function AccountPage() {
               <div className="flex items-start gap-3">
                 <ShoppingBag size={16} className="mt-0.5 text-teal" />
                 <div>
-                  <dt className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
+                  <dt className="text-[11px] font-medium text-ink/35">
                     Orders
                   </dt>
                   <dd className="font-semibold text-ink/75">
@@ -127,13 +127,13 @@ export default async function AccountPage() {
             </div>
           </section>
 
-          <section className="card p-5">
+          <section className="rounded-[10px] border border-line bg-surface p-5">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-extrabold tracking-[-0.03em]">
+                <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
                   Recent orders
                 </h2>
-                <p className="text-[11px] text-ink/40">
+                <p className="text-[11px] text-muted">
                   {activeOrders.length
                     ? `${activeOrders.length} order${activeOrders.length > 1 ? "s" : ""} in progress`
                     : "No orders in progress right now"}

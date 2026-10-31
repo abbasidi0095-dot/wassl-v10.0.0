@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Store } from "lucide-react";
+import { Search } from "lucide-react";
 import { getOpenState } from "@/lib/hours";
 import type { Store as StoreType } from "@/lib/types";
 import { categoryLabel } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 import { StoreCard } from "./store-card";
 
 const CATEGORIES = [
@@ -27,6 +28,7 @@ const SORTS: { value: Sort; label: string }[] = [
 ];
 
 export function StoreBrowser({ stores }: { stores: StoreType[] }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [tag, setTag] = useState("all");
@@ -35,8 +37,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
   const [dietary, setDietary] = useState("all");
 
   const dietaryOptions = useMemo(
-    () =>
-      [...new Set(stores.flatMap((store) => store.dietaryTags ?? []))].sort(),
+    () => [...new Set(stores.flatMap((store) => store.dietaryTags ?? []))].sort(),
     [stores],
   );
 
@@ -80,36 +81,37 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="relative w-full md:max-w-sm">
+      <div className="flex flex-col gap-3 border-y border-line py-3 md:flex-row md:items-center md:justify-between">
+        <div className="relative w-full md:max-w-[320px]">
           <Search
-            size={16}
-            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-ink/35"
+            size={15}
+            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
           />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search stores, dishes or a neighbourhood…"
-            className="input h-11 ps-10"
+            placeholder={t("Search stores, dishes or a neighbourhood…")}
+            className="input h-10 ps-9 text-[13px]"
+            aria-label={t("Search stores")}
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/60 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wide text-ink/50">
+          <label className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-line px-3 text-[12px] font-medium text-muted">
             <input
               type="checkbox"
               checked={openOnly}
               onChange={(event) => setOpenOnly(event.target.checked)}
-              className="h-3 w-3 accent-teal"
+              className="h-3.5 w-3.5 accent-[var(--brand)]"
             />
-            Open only
+            {t("Open only")}
           </label>
           <select
             value={dietary}
             onChange={(event) => setDietary(event.target.value)}
-            className="rounded-full border border-ink/10 bg-white/60 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wide text-ink/50 outline-none"
+            className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand"
             aria-label="Dietary filter"
           >
-            <option value="all">Any diet</option>
+            <option value="all">{t("Any diet")}</option>
             {dietaryOptions.map((option) => (
               <option key={option} value={option}>
                 {option}
@@ -119,7 +121,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
           <select
             value={sort}
             onChange={(event) => setSort(event.target.value as Sort)}
-            className="rounded-full border border-ink/10 bg-white/60 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wide text-ink/50 outline-none"
+            className="h-10 rounded-[6px] border border-line bg-surface px-2.5 text-[12px] font-medium text-muted outline-none focus:border-brand"
             aria-label="Sort stores"
           >
             {SORTS.map((option) => (
@@ -131,10 +133,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-        <span className="hidden items-center gap-1 whitespace-nowrap text-[10px] font-extrabold uppercase tracking-wider text-ink/35 sm:flex">
-          <SlidersHorizontal size={12} /> Type
-        </span>
+      <div className="mt-4 flex items-center gap-1 overflow-x-auto scrollbar-none">
         {CATEGORIES.map((item) => (
           <button
             key={item.value}
@@ -143,34 +142,34 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
               setCategory(item.value);
               setTag("all");
             }}
-            className={`whitespace-nowrap rounded-full border px-3.5 py-2 text-[11px] font-extrabold transition ${
+            className={`relative whitespace-nowrap px-3 py-2 text-[13px] font-medium transition-colors ${
               category === item.value
-                ? "border-teal bg-teal text-on-dark"
-                : "border-ink/10 bg-white/60 text-ink/55 hover:border-teal/30 hover:text-ink"
+                ? "text-ink after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:bg-brand"
+                : "text-muted hover:text-ink"
             }`}
           >
-            {item.label}
+            {t(item.label)}
           </button>
         ))}
       </div>
 
-      <div className="mt-2 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+      <div className="mt-1 flex items-center gap-4 overflow-x-auto border-t border-line pt-2.5 scrollbar-none">
         <button
           type="button"
           onClick={() => setTag("all")}
-          className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold transition ${
-            tag === "all" ? "bg-ink text-on-dark" : "bg-white/60 text-ink/45 hover:text-ink"
+          className={`whitespace-nowrap text-[12px] transition-colors ${
+            tag === "all" ? "font-semibold text-ink" : "text-muted hover:text-ink"
           }`}
         >
-          All cuisines
+          {t("All cuisines")}
         </button>
         {TAGS.map((item) => (
           <button
             key={item}
             type="button"
             onClick={() => setTag(tag === item ? "all" : item)}
-            className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold transition ${
-              tag === item ? "bg-ink text-on-dark" : "bg-white/60 text-ink/45 hover:text-ink"
+            className={`whitespace-nowrap text-[12px] transition-colors ${
+              tag === item ? "font-semibold text-ink" : "text-muted hover:text-ink"
             }`}
           >
             {item}
@@ -178,32 +177,24 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-between">
-        <p className="text-xs font-bold text-ink/45">
-          {filtered.length} {filtered.length === 1 ? "store" : "stores"}
-          {storeCategoryLabel(category)}
-          {tag !== "all" ? ` · ${tag}` : ""}
-          {dietary !== "all" ? ` · ${dietary}` : ""}
-        </p>
-        <span className="hidden text-[10px] font-extrabold uppercase tracking-wider text-teal sm:block">
-          {SORTS.find((option) => option.value === sort)?.label}
-        </span>
-      </div>
+      <p className="mt-5 text-[12px] text-muted tnum">
+        {filtered.length} {filtered.length === 1 ? t("store") : t("stores")}
+        {storeCategoryLabel(category, t)}
+        {tag !== "all" ? ` · ${tag}` : ""}
+        {dietary !== "all" ? ` · ${dietary}` : ""}
+      </p>
 
       {filtered.length ? (
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((store) => (
             <StoreCard key={store.id} store={store} />
           ))}
         </div>
       ) : (
-        <div className="mt-6 grid place-items-center rounded-3xl border border-dashed border-ink/15 bg-white/40 px-6 py-14 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-teal/10 text-teal">
-            <Store size={24} />
-          </span>
-          <h3 className="mt-4 text-lg font-extrabold tracking-tight">No stores match</h3>
-          <p className="mt-1 max-w-sm text-sm leading-6 text-ink/50">
-            Try another category or search term. New stores are joining every week.
+        <div className="mt-4 border-y border-line py-16 text-center">
+          <h3 className="font-display text-xl font-semibold">{t("No stores match")}</h3>
+          <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted">
+            {t("Try another category or search term. New stores are joining every week.")}
           </p>
           <button
             type="button"
@@ -214,9 +205,9 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
               setDietary("all");
               setOpenOnly(false);
             }}
-            className="btn btn-ghost mt-4"
+            className="btn btn-ghost mt-5"
           >
-            Clear filters
+            {t("Clear filters")}
           </button>
         </div>
       )}
@@ -224,6 +215,6 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
   );
 }
 
-function storeCategoryLabel(category: string) {
-  return category === "all" ? "" : ` in ${categoryLabel(category)}`;
+function storeCategoryLabel(category: string, t: (value: string) => string) {
+  return category === "all" ? "" : ` · ${t(categoryLabel(category))}`;
 }

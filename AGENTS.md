@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.0.0** (31 October 2026; grocery module included)
+- Release: **10.1.0** (31 October 2026; Coastal Manifest redesign)
 - Live: <https://wassl-34-preview.fly.dev>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -75,15 +75,34 @@ persists; every mutation should add an audit entry via `recordAudit`.
    Unlayered rules override Tailwind utilities (this caused two regressions).
 7. Prefer logical utilities (`ms/me/ps/pe/start/end`, `text-start/end`) so Arabic
    RTL keeps working. Centered toasts intentionally keep `left-1/2`.
-8. Grocery stock is decremented/reserved inside `mutate()` only. Never trust
+8. UI follows `DESIGN-SYSTEM.md`: tokens only, no gradient washes or glass, no
+   emoji, sentence-case labels, tabular figures, 44px controls.
+9. Grocery stock is decremented/reserved inside `mutate()` only. Never trust
    client price/stock; use `resolveProductStock` and `groceryFees`. Release on
    cancellation, commit on delivery, restock on refund.
-9. Customer-facing strings should go through `t()`; the English string is the
-   dictionary key and missing translations fall back safely.
-10. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
+10. Customer-facing strings should go through `t()`; the English string is the
+    dictionary key and missing translations fall back safely.
+11. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.1.0 — Coastal Manifest redesign
+- Added `DESIGN-SYSTEM.md` (tokens, type, spacing, components, motion, a11y) and
+  rewrote `src/app/globals.css` around it.
+- Self-hosted Bricolage Grotesque, Instrument Sans and IBM Plex Sans Arabic in
+  `public/fonts`; removed the runtime Google Fonts request and preload the two
+  Latin faces.
+- Rebuilt the shared shell: new route "W" mark, flat header, six-tab bottom bar,
+  flat footer, page header and staff header.
+- Customer: home, grocery hall, store/menu, product sheet, cart, unified
+  checkout (both flows), orders, tracking, taxi, account, favourites, lists,
+  login and signup.
+- Operations: KPI tiles replaced with ruled type bands, tinted icon chips
+  removed, workspace tabs moved to underlines, table status labels de-cased.
+- RTL: numeric runs are bidi-isolated, tabs have short labels, Arabic city names
+  in the hero, `dir="auto"` on mixed-language copy.
+- Checked at 320/390/768/1440, light/dark, EN/AR; 66 unit + 10 e2e tests pass.
 
 ### 10.0.0 — grocery module + repository consolidation
 - Grocery data model: `Store.grocery` settings, product SKU/barcode/unit/stock/

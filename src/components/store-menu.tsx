@@ -7,7 +7,7 @@ import { money } from "@/lib/utils";
 import { tapFeedback } from "@/lib/haptics";
 import { useCart } from "./cart-provider";
 import { ProductSheet } from "./product-sheet";
-import { ProductTile, productVisual } from "./product-icon";
+import { ProductTile } from "./product-icon";
 import { useI18n } from "./locale-provider";
 import { useLiveActivity } from "./live-activity-provider";
 
@@ -35,7 +35,9 @@ export function StoreMenu({
     return products
       .filter((product) => (term ? true : product.category === active))
       .filter((product) =>
-        term ? `${product.name} ${product.description}`.toLowerCase().includes(term) : true,
+        term
+          ? `${product.name} ${product.description}`.toLowerCase().includes(term)
+          : true,
       );
   }, [products, active, query]);
 
@@ -90,34 +92,37 @@ export function StoreMenu({
 
   return (
     <div className="min-w-0">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold tracking-[-0.04em]">{t("Menu")}</h2>
-          <p className="text-[11px] font-bold text-ink/35">
+          <h2 className="font-display text-[22px] font-semibold tracking-[-0.025em]">
+            {t("Menu")}
+          </h2>
+          <p className="mt-1 text-[11px] text-muted tnum">
             {t("{count} items · prices in MAD", { count: products.length })}
           </p>
         </div>
         {store.locked ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-wide text-ink/45">
+          <span className="inline-flex items-center gap-1.5 text-[10px] text-muted">
             <Lock size={10} /> {t("Locked menu · demo prices")}
           </span>
         ) : null}
       </div>
 
-      <div className="sticky top-[calc(68px+env(safe-area-inset-top))] z-20 mx-0 w-full min-w-0 bg-cream/90 py-3 backdrop-blur">
+      <div className="sticky top-[calc(60px+env(safe-area-inset-top))] z-20 -mx-1 mt-3 bg-paper/95 px-1 py-2">
         <div className="relative">
           <Search
-            size={16}
-            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-ink/35"
+            size={15}
+            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
           />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t("Search {store}…", { store: store.name })}
-            className="input h-11 w-full min-w-0 bg-white/80 ps-10"
+            className="input h-10 w-full min-w-0 ps-9 text-[13px]"
+            aria-label={t("Search menu")}
           />
         </div>
-        <div className="mt-3 flex w-full min-w-0 max-w-full gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="mt-1 flex w-full min-w-0 max-w-full gap-1 overflow-x-auto border-b border-line scrollbar-none">
           {categories.map((category) => (
             <button
               key={category}
@@ -126,10 +131,10 @@ export function StoreMenu({
                 setActive(category);
                 setQuery("");
               }}
-              className={`whitespace-nowrap rounded-full px-3.5 py-2 text-[11px] font-extrabold transition ${
+              className={`relative whitespace-nowrap px-2.5 py-2 text-[12px] transition-colors ${
                 active === category && !query
-                  ? "bg-teal text-on-dark"
-                  : "bg-white/70 text-ink/55 hover:text-ink"
+                  ? "font-semibold text-ink after:absolute after:inset-x-2.5 after:bottom-0 after:h-[2px] after:bg-brand"
+                  : "text-muted hover:text-ink"
               }`}
             >
               {category}
@@ -141,8 +146,8 @@ export function StoreMenu({
       {!query && upsell.length ? (
         <section className="mt-4">
           <div className="flex items-center gap-1.5">
-            <Sparkles size={13} className="text-saffron" />
-            <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-ink/45">
+            <Sparkles size={12} className="text-signal" />
+            <h3 className="text-[11px] font-medium text-muted">
               {t("Goes well with your order")}
             </h3>
           </div>
@@ -152,94 +157,96 @@ export function StoreMenu({
                 key={product.id}
                 type="button"
                 onClick={() => quickAdd(product)}
-                className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-ink/8 bg-white/80 p-2 text-start transition hover:border-teal/30 sm:w-[190px] sm:shrink-0"
+                className="flex min-w-0 items-center gap-2.5 rounded-[6px] border border-line bg-surface p-2 text-start transition-colors hover:border-line-strong sm:w-[190px] sm:shrink-0"
               >
                 <ProductTile
                   name={product.name}
                   category={product.category}
-                  className="h-9 w-9 rounded-xl"
+                  className="h-9 w-9 rounded-[4px]"
                   iconSize={16}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[11px] font-extrabold">{product.name}</span>
-                  <span className="text-[10px] font-bold text-ink/40">{money(product.price)}</span>
+                  <span className="block truncate text-[11px] font-medium">
+                    {product.name}
+                  </span>
+                  <span className="text-[10px] text-muted tnum">
+                    {money(product.price)}
+                  </span>
                 </span>
-                <Plus size={13} className="shrink-0 text-teal" />
+                <Plus size={13} className="shrink-0 text-muted" />
               </button>
             ))}
           </div>
         </section>
       ) : null}
 
-      <div className="mt-3 space-y-6">
+      <div className="mt-6 space-y-7">
         {grouped.map(([category, list]) => (
           <section key={category}>
-            <div className="flex items-end justify-between">
-              <h2 className="text-xl font-extrabold tracking-[-0.04em]">{category}</h2>
-              <span className="text-[10px] font-bold text-ink/30">{t("{count} items", { count: list.length })}</span>
+            <div className="flex items-baseline justify-between border-b border-line pb-2">
+              <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
+                {category}
+              </h2>
+              <span className="text-[11px] text-muted tnum">
+                {t("{count} items", { count: list.length })}
+              </span>
             </div>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {list.map((product) => (
                 <article
                   key={product.id}
-                  className={`card-flat group flex gap-3 p-3 transition ${
-                    product.available ? "hover:border-teal/25 hover:shadow-md" : "opacity-55"
+                  className={`group flex gap-3 rounded-[8px] border border-line bg-surface p-3 transition-colors hover:border-line-strong ${
+                    product.available ? "" : "opacity-55"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => product.available && setSheet(product)}
-                    className="h-[86px] w-[86px] shrink-0 overflow-hidden rounded-2xl ring-1 ring-inset ring-ink/5 transition hover:ring-teal/25"
+                    className="h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[6px] bg-surface-2"
                     aria-label={t("Open {product}", { product: product.name })}
                   >
                     <ProductTile
                       name={product.name}
                       category={product.category}
-                      className="h-full w-full rounded-2xl"
-                      iconSize={34}
+                      className="h-full w-full"
+                      iconSize={30}
                     />
                   </button>
                   <div className="flex min-w-0 flex-1 flex-col">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h3 className="text-[13px] font-extrabold leading-5">{product.name}</h3>
-                        <p className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-ink/45">
+                        <h3 className="text-[13px] font-semibold leading-tight">
+                          {product.name}
+                        </h3>
+                        <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-muted">
                           {product.description}
                         </p>
-                        {product.tags?.length ? (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {product.tags.slice(0, 2).map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full bg-teal/8 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wide text-teal"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
                       </div>
                       {product.popular ? (
-                        <span className="flex shrink-0 items-center gap-1 rounded-full bg-saffron/20 px-2 py-1 text-[8px] font-extrabold uppercase tracking-wide text-ink/70">
-                          <Sparkles size={9} /> {t("Popular")}
+                        <span className="shrink-0 text-[10px] text-signal">
+                          {t("Popular")}
                         </span>
                       ) : null}
                     </div>
                     <div className="mt-auto flex items-center justify-between pt-2">
-                      <span className="text-sm font-extrabold">
+                      <span className="text-[14px] font-semibold tnum">
                         {money(product.price)}
                         {product.modifiers?.length ? (
-                          <span className="ms-1 text-[9px] font-bold text-ink/35">{t("+ options")}</span>
+                          <span className="ms-1 text-[10px] font-normal text-muted">
+                            {t("+ options")}
+                          </span>
                         ) : null}
                       </span>
                       <button
                         type="button"
                         disabled={!product.available || !store.isOpen}
                         onClick={() => quickAdd(product)}
-                        className="grid h-8 w-8 place-items-center rounded-xl bg-ink text-on-dark transition hover:bg-teal disabled:cursor-not-allowed disabled:bg-ink/20"
-                        aria-label={t("Add {product} to cart", { product: product.name })}
+                        className="grid h-8 w-8 place-items-center rounded-[4px] border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:border-line disabled:text-muted/40 disabled:hover:bg-transparent"
+                        aria-label={t("Add {product} to cart", {
+                          product: product.name,
+                        })}
                       >
-                        <Plus size={16} />
+                        <Plus size={15} />
                       </button>
                     </div>
                   </div>
@@ -249,7 +256,7 @@ export function StoreMenu({
           </section>
         ))}
         {!grouped.length ? (
-          <div className="rounded-2xl border border-dashed border-ink/15 p-10 text-center text-sm text-ink/45">
+          <div className="border-y border-line py-12 text-center text-[13px] text-muted">
             {t("No items match your search.")}
           </div>
         ) : null}
@@ -269,14 +276,14 @@ export function StoreMenu({
         >
           <a
             href="/cart"
-            className="flex items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-3 text-on-dark shadow-2xl"
+            className="flex items-center justify-between gap-3 rounded-[8px] bg-ink px-4 py-3 text-on-dark shadow-lg"
           >
-            <span className="text-xs font-extrabold">
+            <span className="text-[12px] font-medium tnum">
               {t(count === 1 ? "{count} item" : "{count} items", { count })} ·{" "}
               {money(items.reduce((sum, item) => sum + item.price * item.qty, 0))}
             </span>
-            <span className="flex items-center gap-1 text-xs font-extrabold text-saffron">
-              {t("View cart")} <Plus size={13} className="rtl:-scale-x-100" />
+            <span className="flex items-center gap-1 text-[12px] font-semibold text-saffron">
+              {t("View cart")}
             </span>
           </a>
         </div>

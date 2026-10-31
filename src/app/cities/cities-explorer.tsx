@@ -72,7 +72,7 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
                 <ArrowUpRight size={15} className="text-teal transition group-hover:translate-x-0.5 rtl:-scale-x-100" />
               </div>
               <div className="arabic mt-1 text-sm text-ink/40">{city.nameAr}</div>
-              <div className="mt-5 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-teal">
+              <div className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-teal">
                 <span className="status-dot live-dot" /> {t("Live")}
               </div>
             </Link>
@@ -108,7 +108,7 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
               </div>
               <div className="ms-3 flex shrink-0 items-center gap-2">
                 <span
-                  className={`rounded-full px-2 py-1 text-[9px] font-extrabold uppercase tracking-wide ${
+                  className={`rounded-full px-2 py-1 text-[10px] font-medium ${
                     city.launchStatus === "live"
                       ? "bg-teal/10 text-teal"
                       : "bg-ink/5 text-ink/35"

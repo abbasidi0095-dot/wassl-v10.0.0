@@ -1,89 +1,111 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Phone, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { Logo } from "./logo";
 import { useI18n } from "./locale-provider";
 
+const CITIES = ["Dakhla", "Laayoune", "Boujdour", "Esmara", "Tarfaya"];
+
 export function SiteFooter() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   return (
-    <footer className="mt-16 border-t border-ink/10 bg-ink text-on-dark/75">
-      <div className="container-wassl grid gap-8 py-12 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr]">
-        <div>
-          <Logo light />
-          <p className="mt-4 max-w-xs text-sm leading-6 text-on-dark/55">
-            {t(
-              "Local stores, local drivers, one simple way to get what you need across Southern Morocco.",
-            )}
-          </p>
-          <p className="arabic mt-2 text-sm font-semibold text-saffron/80">
-            {BRAND.taglineAr}
-          </p>
-          <div className="mt-5 flex items-center gap-2 text-xs font-bold text-on-dark/50">
-            <ShieldCheck size={15} className="text-saffron" />
-            {t("Cash on delivery · Verified partners")}
+    <footer className="field-ink mt-20 border-t border-line">
+      <div className="container-wassl">
+        <div className="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div>
+            <Logo light />
+            <p className="mt-5 max-w-xs text-[15px] leading-6 opacity-60">
+              {t(
+                "Local stores, local drivers, one simple way to get what you need across Southern Morocco.",
+              )}
+            </p>
+            <p className="arabic mt-3 text-[15px] font-medium text-saffron">
+              {BRAND.taglineAr}
+            </p>
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[12px] opacity-50">
+              <span>{t("Cash on delivery")}</span>
+              <span>{t("Verified partners")}</span>
+              <span>{t("Prices in MAD")}</span>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-on-dark/40">
-            {t("Southern Morocco")}
-          </p>
-          <div className="mt-3 grid gap-2 text-sm">
-            {["Dakhla", "Laayoune", "Boujdour", "Esmara", "Tarfaya"].map((city) => (
-              <Link
-                key={city}
-                href={`/city/${city.toLowerCase().replace("â", "a")}`}
-                className="inline-flex items-center gap-1.5 text-on-dark/65 hover:text-on-dark"
-              >
-                <MapPin size={12} className="text-saffron" />
-                {city}
+          <div>
+            <p className="text-[13px] font-semibold opacity-40">
+              {t("Southern Morocco")}
+            </p>
+            <div className="mt-4 grid gap-2.5 text-sm">
+              {CITIES.map((city) => (
+                <Link
+                  key={city}
+                  href={`/city/${city.toLowerCase().replace("â", "a")}`}
+                  className="inline-flex w-fit items-center gap-1.5 opacity-70 transition-opacity hover:opacity-100"
+                >
+                  <MapPin size={12} className="opacity-50" />
+                  {city}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[13px] font-semibold opacity-40">
+              {t("Platform")}
+            </p>
+            <div className="mt-4 grid gap-2.5 text-sm opacity-70">
+              <Link href="/grocery" className="hover:opacity-100">
+                {t("Grocery")}
               </Link>
-            ))}
+              <Link href="/taxi" className="hover:opacity-100">
+                {t("Wassl Taxi")}
+              </Link>
+              <Link href="/login?next=merchant" className="hover:opacity-100">
+                {t("Store dashboard")}
+              </Link>
+              <Link href="/login?next=driver" className="hover:opacity-100">
+                {t("Driver app")}
+              </Link>
+              <Link href="/login?next=admin" className="hover:opacity-100">
+                {t("Admin console")}
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[13px] font-semibold opacity-40">
+              {t("Support")}
+            </p>
+            <a
+              href={`tel:${BRAND.supportPhone.replace(/\s/g, "")}`}
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium"
+            >
+              <Phone size={14} className="opacity-50" />
+              {BRAND.supportPhone}
+            </a>
+            <p className="mt-3 text-[12px] leading-5 opacity-45">
+              {t("Daily 09:00–23:00")}
+              <br />
+              {t("Arabic · Français · English")}
+            </p>
+            <Link
+              href="/login?next=merchant"
+              className="mt-6 inline-flex items-center gap-1 text-[13px] font-medium text-saffron"
+            >
+              {t("Sell on Wassl")}
+              <ArrowUpRight size={13} className="rtl:-scale-x-100" />
+            </Link>
           </div>
         </div>
 
-        <div>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-on-dark/40">
-            {t("Platform")}
-          </p>
-          <div className="mt-3 grid gap-2 text-sm text-on-dark/65">
-            <Link href="/login?next=merchant">{t("Store dashboard")}</Link>
-            <Link href="/login?next=driver">{t("Driver app")}</Link>
-            <Link href="/login?next=admin">{t("Admin console")}</Link>
-            <Link href="/cart">{t("Your cart")}</Link>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-on-dark/40">
-            {t("Support")}
-          </p>
-          <a
-            href={`tel:${BRAND.supportPhone.replace(/\s/g, "")}`}
-            className="mt-3 flex items-center gap-2 text-sm font-bold text-on-dark"
-          >
-            <Phone size={15} className="text-saffron" />
-            {BRAND.supportPhone}
-          </a>
-          <p className="mt-2 text-xs leading-5 text-on-dark/45">
-            {t("Daily 09:00–23:00")}
-            <br />
-            {t("Arabic · Français · English")}
-          </p>
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <div className="container-wassl flex flex-col gap-2 py-5 text-[11px] text-on-dark/35 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-[12px] opacity-40 sm:flex-row sm:items-center sm:justify-between">
           <span>
             {t("© {year} {brand}. Built for Morocco.", {
               year: new Date().getFullYear(),
               brand: BRAND.name,
             })}
           </span>
-          <span>{t("Demo environment · COD only · Prices in MAD")}</span>
+          <span>{t("Cash on delivery · Prices in MAD")}</span>
         </div>
       </div>
     </footer>

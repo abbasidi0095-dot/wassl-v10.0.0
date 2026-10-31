@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -70,161 +71,173 @@ export function LoginForm({
   }
 
   return (
-    <main className="grid min-h-screen bg-cream lg:grid-cols-[1.05fr_0.95fr]">
+    <main className="grid min-h-screen bg-paper lg:grid-cols-[1.02fr_0.98fr]">
       <section className="relative hidden overflow-hidden bg-ink p-10 text-on-dark lg:flex lg:flex-col lg:justify-between">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{
-            background:
-              "radial-gradient(circle at 20% 20%, rgba(232,163,61,.55), transparent 30rem), radial-gradient(circle at 80% 80%, rgba(15,110,110,.9), transparent 34rem)",
-          }}
+        <Image
+          src="/images/stores/moroccan-2.jpg"
+          alt=""
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover opacity-30"
         />
+        <div className="absolute inset-0 bg-ink/60" aria-hidden="true" />
+
         <div className="relative">
           <Logo light />
         </div>
-        <div className="relative max-w-lg">
-          <span className="pill pill-warm">{t("One account, every workspace")}</span>
-          <h1 className="display mt-6 text-6xl">
+
+        <div className="relative max-w-[30rem]">
+          <h1 className="display text-[clamp(2.8rem,1.6rem+3.4vw,4.6rem)]">
             {t("One platform.")}
             <br />
             {t("Every side of")}
             <br />
             {t("delivery.")}
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-6 text-on-dark/60">
-            {t("Customers track orders, stores manage their menu, drivers run their route and operations keeps the city moving — all from the same sign-in.")}
+          <p className="mt-6 max-w-md text-[14px] leading-6 opacity-60">
+            {t(
+              "Customers track orders, stores manage their menu, drivers run their route and operations keeps the city moving — all from the same sign-in.",
+            )}
           </p>
-          <div className="mt-8 grid grid-cols-3 gap-3">
+          <dl className="mt-8 grid grid-cols-3 gap-4 border-t border-white/20 pt-5">
             {[
               ["4", t("workspaces")],
               ["COD", t("cash flow")],
               ["Live", t("GPS tracking")],
             ].map(([value, label]) => (
-              <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="text-2xl font-extrabold tracking-tight">{value}</div>
-                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-on-dark/40">
-                  {label}
-                </div>
+              <div key={label}>
+                <dt className="tnum font-display text-[22px] font-semibold leading-none">
+                  {value}
+                </dt>
+                <dd className="mt-1.5 text-[10px] leading-4 opacity-50">{label}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
-        <p className="relative text-[11px] text-on-dark/30">
-          {t("Password sign-in · Customer, store, driver and operations accounts")}
+
+        <p className="relative text-[11px] opacity-40">
+          {t("Customer, store, driver and operations accounts")}
         </p>
       </section>
 
-      <section className="flex min-h-screen items-center justify-center p-5 sm:p-10">
-        <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center justify-between lg:hidden">
+      <section className="flex min-h-screen items-center justify-center px-5 py-10 sm:px-10">
+        <div className="w-full max-w-[400px]">
+          <div className="mb-10 flex items-center justify-between lg:hidden">
             <Logo />
-            <Link href="/" className="inline-flex items-center gap-1 text-xs font-bold text-ink/55">
-              <ArrowLeft size={14} className="rtl:-scale-x-100" /> {t("Storefront")}
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 text-[12px] text-muted"
+            >
+              <ArrowLeft size={13} className="rtl:-scale-x-100" /> {t("Storefront")}
             </Link>
           </div>
 
-          <div className="mb-4 flex items-center justify-end gap-2">
+          <div className="mb-6 flex items-center justify-end gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
           </div>
 
-          <div className="card p-6 sm:p-8">
-            <div className="eyebrow">{t("Welcome back")}</div>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-[-0.05em]">
-              {t("Sign in")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-ink/55">
-              {t("Use the email and password you signed up with. New customers, stores and drivers can create an account in a minute.")}
-            </p>
+          <p className="text-[12px] text-muted">{t("Welcome back")}</p>
+          <h2 className="display mt-2 text-[clamp(2rem,1.6rem+1.4vw,2.7rem)]">
+            {t("Sign in")}
+          </h2>
+          <p className="mt-3 text-[13px] leading-6 text-muted">
+            {t(
+              "Use the email and password you signed up with. New customers, stores and drivers can create an account in a minute.",
+            )}
+          </p>
 
-            <form onSubmit={submit} className="mt-6 space-y-4">
-              <label className="block">
-                <span className="label">{t("Email")}</span>
+          <form onSubmit={submit} className="mt-7 space-y-4">
+            <label className="block">
+              <span className="label">{t("Email")}</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="input"
+                placeholder="you@example.ma"
+                autoComplete="email"
+                autoFocus
+                required
+              />
+            </label>
+
+            <label className="block">
+              <span className="label">{t("Password")}</span>
+              <div className="relative">
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="input"
-                  placeholder="you@example.ma"
-                  autoComplete="email"
-                  autoFocus
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="input pe-11"
+                  placeholder={t("Your password")}
+                  autoComplete="current-password"
                   required
                 />
-              </label>
-
-              <label className="block">
-                <span className="label">{t("Password")}</span>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="input pe-11"
-                    placeholder={t("Your password")}
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((value) => !value)}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-ink/35 hover:text-ink"
-                    aria-label={showPassword ? t("Hide password") : t("Show password")}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </label>
-
-              {error ? (
-                <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
-                  {error}
-                </p>
-              ) : null}
-
-              <button
-                type="submit"
-                disabled={!canSubmit || loading}
-                className="btn btn-primary w-full disabled:opacity-50"
-              >
-                {loading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <ShieldCheck size={16} />
-                )}
-                {loading ? t("Signing in…") : t("Sign in")}
-              </button>
-            </form>
-
-            <div className="mt-6 border-t border-ink/10 pt-5">
-              <p className="text-xs font-bold text-ink/50">{t("New to Wassl?")}</p>
-              <div className="mt-2 grid gap-2 sm:grid-cols-3">
-                {[
-                  { href: "/signup?role=customer", label: t("Customer") },
-                  { href: "/signup?role=merchant", label: t("Store owner") },
-                  { href: "/signup?role=driver", label: t("Driver") },
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-xl border border-ink/10 bg-white/60 px-2 py-2 text-center text-[11px] font-extrabold text-ink/60 transition hover:border-teal hover:text-teal"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="absolute end-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[4px] text-muted hover:bg-surface-2 hover:text-ink"
+                  aria-label={
+                    showPassword ? t("Hide password") : t("Show password")
+                  }
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
-              <p className="mt-3 text-[11px] leading-5 text-ink/40">
-                {t("Store owner and driver accounts are activated after a Wassl operator approves them. Admin accounts are provisioned by operations only.")}
+            </label>
+
+            {error ? (
+              <p className="border-s-2 border-danger ps-3 text-[12px] leading-5 text-danger">
+                {error}
               </p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={!canSubmit || loading}
+              className="btn btn-primary w-full disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <ShieldCheck size={16} />
+              )}
+              {loading ? t("Signing in…") : t("Sign in")}
+            </button>
+          </form>
+
+          <div className="mt-8 border-t border-line pt-5">
+            <p className="text-[12px] text-muted">{t("New to Wassl?")}</p>
+            <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+              {[
+                { href: "/signup?role=customer", label: t("Customer") },
+                { href: "/signup?role=merchant", label: t("Store owner") },
+                { href: "/signup?role=driver", label: t("Driver") },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="inline-flex items-center gap-1 text-[12px] font-medium text-brand"
+                >
+                  {item.label}
+                  <ArrowRight size={11} className="rtl:-scale-x-100" />
+                </Link>
+              ))}
             </div>
+            <p className="mt-4 text-[11px] leading-5 text-muted">
+              {t(
+                "Store owner and driver accounts are activated after a Wassl operator approves them. Admin accounts are provisioned by operations only.",
+              )}
+            </p>
           </div>
 
-          <div className="mt-6 flex items-center justify-between text-xs font-bold text-ink/45">
+          <div className="mt-8 flex items-center justify-between text-[11px] text-muted">
             <Link href="/" className="inline-flex items-center gap-1 hover:text-ink">
-              <ArrowLeft size={14} className="rtl:-scale-x-100" /> {t("Back to storefront")}
+              <ArrowLeft size={12} className="rtl:-scale-x-100" /> {t("Back to storefront")}
             </Link>
-            <span className="inline-flex items-center gap-1">
-              <ArrowRight size={12} className="text-teal rtl:-scale-x-100" /> Wassl · {t("Southern Morocco")}
-            </span>
+            <span>Wassl · {t("Southern Morocco")}</span>
           </div>
         </div>
       </section>

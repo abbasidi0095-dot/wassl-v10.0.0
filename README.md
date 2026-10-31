@@ -29,6 +29,19 @@ and dark themes.
 
 ## Release history
 
+### 10.1.0 — 31 October 2026 — "Coastal Manifest" redesign
+- New art direction and design system: Bricolage Grotesque + Instrument Sans +
+  IBM Plex Sans Arabic (self-hosted), limestone paper, Atlantic ink, one saffron
+  signal, tone-based surfaces, 6/10/16px radii, no glass or gradient washes.
+- Rebuilt customer surfaces: home, grocery hall, store and menu, cart, unified
+  checkout, orders, live tracking, taxi, account, favourites, lists and auth.
+- Rebuilt operational surfaces on one staff language: quiet KPI bands, ruled
+  tables and underlined workspace navigation for merchant, driver and admin.
+- Full RTL and dark-mode pass with numeric bidi isolation, shorter tab labels,
+  contrast-checked tokens (AA on all text pairs) and 320px support.
+- Product/hero imagery uses the existing real store photography; no placeholder
+  stock or emoji introduced.
+
 ### 10.0.0 — 31 October 2026 — grocery module + consolidated release
 - **Wassl Grocery**: dedicated supermarket discovery and storefronts, aisles,
   search, variants, SKU/barcode, stock badges and favourites.
@@ -361,6 +374,20 @@ staff out.
 - Arabic brand and city names, MAD pricing, `+212`, Africa/Casablanca assumptions
 
 ---
+
+## Design system
+
+Wassl uses the **Coastal Manifest** design language: an Atlantic port authority's
+wayfinding system crossed with a well-set market manifest. Warm limestone paper,
+deep green ink, one saffron signal, real photography, tabular figures and
+deliberate white space.
+
+- Full tokens, type scale, component anatomy and accessibility rules:
+  [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
+- Fonts are self-hosted WOFF2 in `public/fonts` (no runtime Google request):
+  Bricolage Grotesque (display), Instrument Sans (UI), IBM Plex Sans Arabic.
+- The visual language is shared by the customer storefront, grocery, taxi,
+  merchant workspace, driver app and admin console.
 
 ## Grocery module
 

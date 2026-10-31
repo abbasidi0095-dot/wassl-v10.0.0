@@ -36,7 +36,7 @@ export default async function AdminGroceryPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="eyebrow">Wassl Grocery</div>
-            <h1 className="display mt-2 text-4xl">{t("Supermarket operations")}</h1>
+            <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">{t("Supermarket operations")}</h1>
             <p className="mt-1 text-sm text-ink/45">
               {t("Live inventory across {count} grocery stores.", { count: groceryStores.length })}
             </p>

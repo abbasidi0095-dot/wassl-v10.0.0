@@ -255,10 +255,10 @@ export function CheckoutForm({
 
   if (!items.length) {
     return (
-      <div className="card mt-8 grid place-items-center px-6 py-14 text-center">
-        <span className="grid h-16 w-16 place-items-center rounded-2xl bg-teal/10 text-teal"><ShoppingBag size={26} /></span>
-        <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{t("Nothing to check out")}</h2>
-        <p className="mt-2 text-sm text-ink/45">{t("Add a few items from a local store first.")}</p>
+      <div className="mt-8 border-y border-line py-20 text-center">
+        <ShoppingBag size={22} className="mx-auto text-muted" />
+        <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">{t("Nothing to check out")}</h2>
+        <p className="mt-2 text-[13px] text-muted">{t("Add a few items from a local store first.")}</p>
         <Link href="/city/dakhla" className="btn btn-primary mt-5">
           {t("Browse stores")} <ArrowRight size={14} className="rtl:-scale-x-100" />
         </Link>
@@ -267,55 +267,59 @@ export function CheckoutForm({
   }
 
   return (
-    <form onSubmit={submit} className="mt-8 grid gap-5 lg:grid-cols-[1fr_370px] lg:items-start">
-      <div className="space-y-4">
-        <section className="card p-5">
-          <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-teal text-on-dark">
-              <MapPin size={15} />
-            </span>
-            <div>
-              <h2 className="text-sm font-extrabold">{t("Where should we deliver?")}</h2>
-              <p className="text-[10px] font-bold text-ink/35">{t("Tap the map to move the pin.")}</p>
-            </div>
+    <form onSubmit={submit} className="mt-6 grid gap-6 pb-16 lg:grid-cols-[1fr_360px] lg:items-start">
+      <div className="space-y-5">
+        <section className="rounded-[10px] border border-line bg-surface p-5">
+          <div className="flex items-baseline justify-between gap-3 border-b border-line pb-3">
+            <h2 className="text-[15px] font-semibold">
+              <span className="me-2 text-muted tnum">1</span>
+              {t("Where should we deliver?")}
+            </h2>
+            <span className="text-[11px] text-muted">{t("Tap the map to move the pin.")}</span>
           </div>
-          <div className="mt-4 overflow-hidden rounded-2xl">
+          <div className="mt-4 overflow-hidden rounded-[6px]">
             <MapView
               points={points}
               center={{ lat: pin.lat, lng: pin.lng }}
               zoom={14}
-              height={245}
+              height={200}
               onPick={(lat, lng) => setPin({ lat, lng })}
             />
           </div>
-          <div className="mt-3 flex items-center gap-2 rounded-xl bg-cream px-3 py-2 text-[10px] font-bold text-ink/45">
-            <MapPin size={13} className="text-teal" />
+          <div className="mt-2.5 flex items-center gap-2 text-[11px] text-muted tnum">
+            <MapPin size={13} />
             Pin: {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)}
             <span className="ms-auto hidden sm:block">{t("Tap anywhere on the map")}</span>
           </div>
         </section>
 
-        <section className="card p-5">
+        <section className="rounded-[10px] border border-line bg-surface p-5">
+          <div className="border-b border-line pb-3">
+            <h2 className="text-[15px] font-semibold">
+              <span className="me-2 text-muted tnum">2</span>
+              {t("Contact and address")}
+            </h2>
+          </div>
           {savedAddresses.length ? (
-            <div className="mb-4">
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
+            <div className="mt-4">
+              <div className="text-[11px] text-muted">
                 {t("Saved addresses")}
               </div>
               <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
                 {savedAddresses.map((entry) => (
                   <div
                     key={entry.id}
-                    className="flex shrink-0 items-stretch overflow-hidden rounded-2xl border border-ink/10 bg-white/60"
+                    className="flex shrink-0 items-stretch overflow-hidden rounded-[6px] border border-line bg-surface"
                   >
                     <button
                       type="button"
                       onClick={() => applySavedAddress(entry)}
-                      className="px-3 py-2 text-start transition hover:bg-teal/6"
+                      className="px-3 py-2 text-start transition-colors hover:bg-surface-2"
                     >
-                      <span className="block text-[10px] font-extrabold text-teal">
+                      <span className="block text-[11px] font-semibold text-brand">
                         {entry.label}
                       </span>
-                      <span className="mt-0.5 block max-w-[160px] truncate text-[9px] font-bold text-ink/45">
+                      <span className="mt-0.5 block max-w-[160px] truncate text-[10px] text-muted">
                         {entry.landmark}
                       </span>
                     </button>
@@ -332,7 +336,7 @@ export function CheckoutForm({
               </div>
             </div>
           ) : null}
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <label className="block">
               <span className="label">{t("Full name")}</span>
               <input
@@ -415,28 +419,31 @@ export function CheckoutForm({
           </div>
         </section>
 
-        <section className="card p-5">
-          <div className="flex items-center gap-2">
-            <Clock3 size={16} className="text-teal" />
-            <h2 className="text-sm font-extrabold">{t("When?")}</h2>
+        <section className="rounded-[10px] border border-line bg-surface p-5">
+          <div className="flex items-center justify-between gap-3 border-b border-line pb-3">
+            <h2 className="text-[15px] font-semibold">
+              <span className="me-2 text-muted tnum">3</span>
+              {t("When?")}
+            </h2>
+            <Clock3 size={15} className="text-muted" />
           </div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <button
               type="button"
               onClick={() => setScheduled("")}
-              className={`rounded-2xl border p-3 text-start transition ${
-                !scheduled ? "border-teal bg-teal/8" : "border-ink/10 bg-white/50"
+              className={`rounded-[6px] border p-3 text-start transition-colors ${
+                !scheduled ? "border-ink bg-surface-2" : "border-line hover:border-line-strong"
               }`}
             >
-              <div className="text-xs font-extrabold">{t("As soon as possible")}</div>
-              <div className="mt-0.5 text-[10px] text-ink/40">{t("Usually 25–45 minutes")}</div>
+              <div className="text-[12px] font-semibold">{t("As soon as possible")}</div>
+              <div className="mt-0.5 text-[11px] text-muted">{t("Usually 25–45 minutes")}</div>
             </button>
             <label
-              className={`rounded-2xl border p-3 transition ${
-                scheduled ? "border-teal bg-teal/8" : "border-ink/10 bg-white/50"
+              className={`rounded-[6px] border p-3 transition-colors ${
+                scheduled ? "border-ink bg-surface-2" : "border-line hover:border-line-strong"
               }`}
             >
-              <div className="text-xs font-extrabold">{t("Schedule for later")}</div>
+              <div className="text-[12px] font-semibold">{t("Schedule for later")}</div>
               <input
                 type="datetime-local"
                 value={scheduled}
@@ -448,19 +455,19 @@ export function CheckoutForm({
         </section>
       </div>
 
-      <aside className="card p-5 lg:sticky lg:top-24">
+      <aside className="rounded-[10px] border border-line bg-surface p-5 lg:sticky lg:top-24">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-extrabold tracking-tight">{t("Your order")}</h2>
-          <Link href="/cart" className="inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
-            <ArrowLeft size={12} /> Edit
+          <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">{t("Your order")}</h2>
+          <Link href="/cart" className="inline-flex items-center gap-1 text-[11px] font-medium text-brand">
+            <ArrowLeft size={12} className="rtl:-scale-x-100" /> Edit
           </Link>
         </div>
-        <div className="mt-2 text-[11px] font-bold text-ink/40">{storeName}</div>
+        <div className="mt-1 text-[11px] text-muted">{storeName}</div>
         <div className="mt-4 max-h-56 space-y-2 overflow-y-auto pe-1">
           {items.map((item) => (
             <div key={item.lineId} className="flex items-center gap-2 text-[11px]">
               <ProductTile name={item.name} className="h-7 w-7 rounded-lg" iconSize={14} />
-              <span className="min-w-0 flex-1 truncate font-bold text-ink/65">
+              <span className="min-w-0 flex-1 truncate font-medium">
                 {item.qty}× {item.name}
                 {item.options.length ? (
                   <span className="block truncate text-[9px] font-bold text-ink/35">
@@ -468,22 +475,22 @@ export function CheckoutForm({
                   </span>
                 ) : null}
               </span>
-              <span className="font-extrabold">{money(item.price * item.qty)}</span>
+              <span className="font-semibold tnum">{money(item.price * item.qty)}</span>
             </div>
           ))}
         </div>
         <div className="mt-4 border-t border-ink/8 pt-4">
           {activePromo ? (
-            <div className="flex items-center justify-between gap-2 rounded-xl bg-teal/8 px-3 py-2">
-              <div className="flex min-w-0 items-center gap-2 text-[11px] font-extrabold text-teal">
+            <div className="flex items-center justify-between gap-2 rounded-[4px] bg-surface-2 px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2 text-[11px] font-semibold text-brand">
                 <Tag size={13} />
                 <span>{activePromo.code}</span>
-                <span className="truncate font-bold text-ink/40">{activePromo.label}</span>
+                <span className="truncate font-normal text-muted">{activePromo.label}</span>
               </div>
               <button
                 type="button"
                 onClick={removePromo}
-                className="shrink-0 text-[10px] font-extrabold text-ink/40 hover:text-red-500"
+                className="shrink-0 text-[10px] text-muted hover:text-danger"
               >
                 Remove
               </button>
@@ -509,7 +516,7 @@ export function CheckoutForm({
                   aria-label={t("Promo code")}
                 />
               </div>
-              <button type="button" onClick={applyPromo} className="btn btn-ghost btn-sm">
+              <button type="button" onClick={applyPromo} className="btn btn-ghost btn-sm h-10">
                 Apply
               </button>
             </div>
@@ -520,18 +527,18 @@ export function CheckoutForm({
             </p>
           ) : null}
         </div>
-        <div className="mt-4 space-y-2 border-t border-ink/8 pt-4 text-[12px]">
-          <div className="flex justify-between text-ink/50">
+        <div className="mt-4 space-y-2 border-t border-line pt-4 text-[12px]">
+          <div className="flex justify-between text-muted">
             <span>{t("Subtotal")}</span>
-            <span className="font-extrabold text-ink">{money(subtotal)}</span>
+            <span className="font-medium text-ink tnum">{money(subtotal)}</span>
           </div>
-          <div className="flex justify-between text-ink/50">
+          <div className="flex justify-between text-muted">
             <span>{t("Delivery")}</span>
-            <span className="font-extrabold text-ink">
+            <span className="font-medium text-ink tnum">
               {activePromo?.freeDelivery ? (
                 <>
-                  <s className="me-1 text-ink/30">{money(deliveryFee)}</s>
-                  <span className="text-teal">{t("Free")}</span>
+                  <s className="me-1 text-muted">{money(deliveryFee)}</s>
+                  <span className="text-brand">{t("Free")}</span>
                 </>
               ) : (
                 money(deliveryFee)
@@ -539,41 +546,39 @@ export function CheckoutForm({
             </span>
           </div>
           {discount > 0 ? (
-            <div className="flex justify-between text-teal">
+            <div className="flex justify-between text-brand">
               <span>{t("Promo {code}", { code: activePromo?.code || "" })}</span>
-              <span className="font-extrabold">−{money(discount)}</span>
+              <span className="font-semibold tnum">−{money(discount)}</span>
             </div>
           ) : null}
-          <div className="flex justify-between pt-1 text-base font-extrabold">
+          <div className="flex justify-between border-t border-line pt-3 text-[15px] font-semibold">
             <span>{t("Total")}</span>
-            <span>{money(total)}</span>
+            <span className="tnum">{money(total)}</span>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-teal/8 p-3">
-          <Banknote size={18} className="shrink-0 text-teal" />
+        <div className="mt-4 flex items-start gap-2 border-s-2 border-signal ps-3">
+          <Banknote size={15} className="mt-0.5 shrink-0 text-signal" />
           <div>
-            <div className="text-[10px] font-extrabold uppercase tracking-wider text-teal">
-              {t("Cash on delivery")}
-            </div>
-            <div className="mt-0.5 text-[10px] leading-4 text-ink/45">
-              Pay {money(total)} to the driver.
+            <div className="text-[12px] font-medium">{t("Cash on delivery")}</div>
+            <div className="mt-0.5 text-[11px] leading-5 text-muted">
+              {t("Pay {amount} to the driver.", { amount: money(total) })}
             </div>
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-ink/35">
-          <ShieldCheck size={13} className="text-teal" />
+        <div className="mt-3 flex items-center gap-2 text-[10px] text-muted">
+          <ShieldCheck size={12} />
           Your number is shared only with the driver.
         </div>
 
         {belowMinimum ? (
-          <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700">
+          <p className="mt-3 text-[11px] font-medium text-danger">
             {t("This store has a {minimum} minimum order.", { minimum: money(minOrder) })}
           </p>
         ) : null}
         {error ? (
-          <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700">
+          <p className="mt-3 text-[11px] font-medium text-danger">
             {error}
           </p>
         ) : null}
@@ -586,7 +591,7 @@ export function CheckoutForm({
           {loading ? t("Placing order…") : t("Place COD order · {price}", { price: money(total) })}
           {!loading ? <CheckCircle2 size={15} /> : null}
         </button>
-        <p className="mt-3 text-center text-[9px] font-bold text-ink/30">
+        <p className="mt-3 text-center text-[10px] text-muted">
           No account needed · Confirm by phone if we need you
         </p>
       </aside>

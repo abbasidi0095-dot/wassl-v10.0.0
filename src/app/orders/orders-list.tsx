@@ -143,8 +143,8 @@ export function OrdersList() {
   }
 
   return (
-    <div className="mt-7">
-      <div className="flex flex-wrap gap-2">
+    <div className="mt-6">
+      <div className="flex gap-5 border-b border-line">
         {[
           { id: "orders" as const, label: t("Deliveries"), count: orders.length },
           { id: "taxi" as const, label: t("Taxi rides"), count: rides.length },
@@ -153,21 +153,21 @@ export function OrdersList() {
             key={item.id}
             type="button"
             onClick={() => setTab(item.id)}
-            className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[11px] font-extrabold transition ${
+            className={`relative inline-flex items-center gap-2 px-1 pb-3 pt-1 text-[13px] transition-colors ${
               tab === item.id
-                ? "bg-ink text-on-dark"
-                : "border border-ink/10 bg-white/60 text-ink/55 hover:text-ink"
+                ? "font-semibold text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-brand"
+                : "text-muted hover:text-ink"
             }`}
           >
             {item.id === "taxi" ? <CarTaxiFront size={14} /> : <ReceiptText size={14} />}
             {item.label}
-            <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[9px]">{item.count}</span>
+            <span className="text-[11px] text-muted tnum">{item.count}</span>
           </button>
         ))}
       </div>
 
       {tab === "orders" ? (
-        <form onSubmit={openCode} className="card-flat mt-4 flex max-w-xl gap-2 p-2">
+        <form onSubmit={openCode} className="mt-4 flex max-w-xl gap-2 border-y border-line py-2">
         <div className="relative flex-1">
           <Search
             size={15}
@@ -176,7 +176,7 @@ export function OrdersList() {
           <input
             value={code}
             onChange={(event) => setCode(event.target.value)}
-            className="input h-10 border-0 bg-transparent ps-9 shadow-none focus:shadow-none"
+            className="input h-10 border-0 bg-transparent ps-9 focus:shadow-none"
             placeholder="Enter order code, e.g. WSL-84F2A1"
           />
         </div>
@@ -189,24 +189,24 @@ export function OrdersList() {
       {tab === "orders" ? (
         <>
       {loading ? (
-        <div className="mt-5 grid gap-3">
-          <div className="card h-24 animate-pulse" />
-          <div className="card h-24 animate-pulse" />
+        <div className="mt-4 border-t border-line">
+          <div className="h-24 animate-pulse rounded-[10px] bg-surface-2" />
+          <div className="h-24 animate-pulse rounded-[10px] bg-surface-2" />
         </div>
       ) : orders.length ? (
-        <div className="mt-5 grid gap-3">
+        <div className="mt-4 border-t border-line">
           {orders.map((order) => {
             const meta = STATUS_META[order.status];
             return (
               <div
                 key={order.id}
-                className="card flex flex-wrap items-center gap-4 p-4 transition hover:border-teal/25"
+                className="flex flex-wrap items-center gap-4 border-b border-line py-4 transition-colors hover:bg-surface"
               >
                 <Link
                   href={`/orders/${order.id}`}
                   className="group flex min-w-0 flex-1 flex-wrap items-center gap-4"
                 >
-                  <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-cream">
+                  <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[4px] bg-surface-2">
                     {order.storeImage ? (
                       <Image
                         src={order.storeImage}
@@ -223,22 +223,22 @@ export function OrdersList() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-extrabold">{order.storeName}</span>
-                      <span className="pill">
+                      <span className="text-[14px] font-semibold">{order.storeName}</span>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
                         <span className="status-dot" /> {meta.label}
                       </span>
                     </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-bold text-ink/40">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-muted tnum">
                       <span>{order.code}</span>
-                      <span>·</span>
+                      <span className="text-line-strong">/</span>
                       <span>{order.itemCount} items</span>
-                      <span>·</span>
+                      <span className="text-line-strong">/</span>
                       <span>{timeAgo(order.createdAt)}</span>
                     </div>
                   </div>
                   <div className="text-end">
-                    <div className="text-base font-extrabold">{money(order.total)}</div>
-                    <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
+                    <div className="text-[14px] font-semibold tnum">{money(order.total)}</div>
+                    <div className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-brand">
                       Track{" "}
                       <ArrowRight
                         size={11}
@@ -260,12 +260,10 @@ export function OrdersList() {
           })}
         </div>
       ) : (
-        <div className="card mt-5 grid place-items-center px-6 py-16 text-center">
-          <span className="grid h-16 w-16 place-items-center rounded-2xl bg-teal/10 text-teal">
-            <PackageCheck size={26} />
-          </span>
-          <h2 className="mt-4 text-2xl font-extrabold tracking-tight">No orders yet</h2>
-          <p className="mt-2 max-w-sm text-sm leading-6 text-ink/50">
+        <div className="mt-5 border-y border-line py-16 text-center">
+          <PackageCheck size={22} className="mx-auto text-muted" />
+          <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">No orders yet</h2>
+          <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted">
             Your local orders will appear here. Try Dakhla Grill or Sahara Market to
             see the full flow.
           </p>
@@ -276,30 +274,30 @@ export function OrdersList() {
       )}
         </>
       ) : rides.length ? (
-        <div className="mt-5 grid gap-3">
+        <div className="mt-4 border-t border-line">
           {rides.map((ride) => {
             const active = !["completed", "cancelled"].includes(ride.status);
             return (
               <Link
                 key={ride.id}
                 href={`/taxi/${ride.id}`}
-                className={`card flex flex-wrap items-center gap-4 p-4 transition hover:border-teal/25 ${
+                className={`flex flex-wrap items-center gap-4 border-b border-line py-4 transition-colors hover:bg-surface ${
                   active ? "" : "opacity-80"
                 }`}
               >
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-teal/10 text-teal">
-                  <CarTaxiFront size={20} />
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[4px] bg-surface-2 text-ink">
+                  <CarTaxiFront size={18} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="truncate text-sm font-extrabold">
+                    <span className="truncate text-[14px] font-semibold">
                       {ride.pickupLabel} → {ride.dropoffLabel}
                     </span>
-                    <span className="pill">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] text-muted">
                       <span className="status-dot" /> {t(TAXI_STATUS_TEXT[ride.status])}
                     </span>
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-bold text-ink/40">
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted tnum">
                     <span>{ride.distanceKm.toFixed(1)} km</span>
                     <span>·</span>
                     <span>{timeAgo(ride.createdAt)}</span>
@@ -312,8 +310,8 @@ export function OrdersList() {
                   </div>
                 </div>
                 <div className="text-end">
-                  <div className="text-base font-extrabold">{money(ride.fare)}</div>
-                  <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
+                  <div className="text-[14px] font-semibold tnum">{money(ride.fare)}</div>
+                  <div className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-brand">
                     {t(active ? "Track" : "View")} <ArrowRight size={11} className="rtl:-scale-x-100" />
                   </div>
                 </div>
@@ -322,11 +320,9 @@ export function OrdersList() {
           })}
         </div>
       ) : (
-        <div className="card mt-5 grid place-items-center px-6 py-16 text-center">
-          <span className="grid h-16 w-16 place-items-center rounded-2xl bg-teal/10 text-teal">
-            <CarTaxiFront size={26} />
-          </span>
-          <h2 className="mt-4 text-2xl font-extrabold tracking-tight">
+        <div className="mt-5 border-y border-line py-16 text-center">
+          <CarTaxiFront size={22} className="mx-auto text-muted" />
+          <h2 className="mt-4 font-display text-2xl font-semibold tracking-[-0.03em]">
             {t("No taxi rides yet")}
           </h2>
           <p className="mt-2 max-w-sm text-sm leading-6 text-ink/50">

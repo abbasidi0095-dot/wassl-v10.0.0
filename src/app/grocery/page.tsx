@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Clock3, Heart, ListChecks, ShoppingBasket, Sparkles } from "lucide-react";
+import { ArrowRight, Clock3, Heart, ListChecks, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities, getDrivers, getStores } from "@/lib/db";
@@ -31,69 +32,116 @@ export default async function GroceryPage() {
       availability: groceryAvailability(store, cityDrivers),
     };
   });
+  const featured = items[0];
+  const openNow = items.filter((item) => item.availability.open).length;
 
   return (
     <>
       <SiteHeader cities={cities} />
-      <main className="container-wassl py-8">
-        <section className="relative overflow-hidden rounded-[28px] bg-ink px-6 py-8 text-on-dark sm:px-10 sm:py-12">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-50"
-            style={{
-              background:
-                "radial-gradient(circle at 85% 10%, rgba(232,163,61,.5), transparent 22rem), radial-gradient(circle at 10% 90%, rgba(15,110,110,.8), transparent 28rem)",
-            }}
-          />
-          <div className="relative max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-extrabold text-saffron">
-              <ShoppingBasket size={12} /> {t("Wassl Grocery")}
+      <main>
+        <section className="container-wassl">
+          <div className="grid gap-8 border-b border-line py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-12 lg:py-12">
+            <div>
+              <div className="flex items-center gap-2 text-[12px] text-muted">
+                <span className="status-dot live-dot text-success" />
+                {t("{count} supermarkets open now", { count: openNow })}
+              </div>
+
+              <h1 className="display mt-5 max-w-[16ch] text-[clamp(2.5rem,1.5rem+4.4vw,5rem)]">
+                {t("The whole supermarket,")} {t("at your door.")}
+              </h1>
+
+              <p className="lede mt-6 max-w-[52ch]" dir="auto">
+                {t(
+                  "Aisles, units and live stock from local supermarkets. Delivery or pickup, express or scheduled — with overnight availability only when it is really staffed.",
+                )}
+              </p>
+
+              <dl className="mt-8 grid max-w-lg grid-cols-3 gap-5 border-t border-line pt-5">
+                {[
+                  { value: `${items.length}`, label: t("supermarkets") },
+                  { value: `${openNow}`, label: t("open right now") },
+                  {
+                    value: t("30"),
+                    label: t("min express"),
+                  },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <dt className="tnum font-display text-[24px] font-semibold leading-none">
+                      {item.value}
+                    </dt>
+                    <dd className="mt-1.5 text-[11px] text-muted">{item.label}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link href="/grocery/favorites" className="btn btn-ghost btn-sm h-9">
+                  <Heart size={13} /> {t("Favourites")}
+                </Link>
+                <Link href="/grocery/lists" className="btn btn-ghost btn-sm h-9">
+                  <ListChecks size={13} /> {t("Shopping lists")}
+                </Link>
+                <Link href="/cities" className="text-[12px] text-muted hover:text-ink">
+                  {t("Change city")}
+                </Link>
+              </div>
+            </div>
+
+            {featured ? (
+              <div className="relative">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] bg-surface-2">
+                  <Image
+                    src={featured.photo}
+                    alt={featured.store.name}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-[12px] font-semibold">
+                      {featured.store.name}
+                    </div>
+                    <div className="text-[10px] text-muted">
+                      {featured.store.landmark}
+                    </div>
+                  </div>
+                  <Link
+                    href={`/store/${featured.store.slug}`}
+                    className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-brand"
+                  >
+                    {t("Shop")}
+                    <ArrowRight size={11} className="rtl:-scale-x-100" />
+                  </Link>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] text-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <Clock3 size={13} className="text-brand" />
+              {t("Scheduled windows and express")}
             </span>
-            <h1 className="display mt-4 text-4xl sm:text-6xl">
-              {t("The whole supermarket,")}
-              <br />
-              <span className="text-saffron">{t("at your door.")}</span>
-            </h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-on-dark/60">
-              {t(
-                "Fresh produce, pantry staples and household essentials from local supermarkets. Delivery, pickup, express and scheduled windows — with live stock.",
-              )}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-extrabold">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                <Clock3 size={12} className="text-saffron" />
-                {t("Open 24/7 where staffed")}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                <Sparkles size={12} className="text-saffron" />
-                {t("Express & scheduled")}
-              </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Sparkles size={13} className="text-signal" />
+              {t("Live stock and substitutions")}
+            </span>
+            <span>{t("Pay cash on delivery or at pickup")}</span>
+          </div>
+
+          <div className="mt-6">
+            <div className="flex items-end justify-between gap-4">
+              <h2 className="headline">{t("Shop by store")}</h2>
+            </div>
+            <div className="mt-4">
+              <GroceryBrowser items={items} />
             </div>
           </div>
         </section>
-
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="eyebrow">{t("Local supermarkets")}</div>
-            <h2 className="mt-1 text-2xl font-extrabold tracking-[-0.04em]">
-              {t("Shop by store")}
-            </h2>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href="/grocery/favorites" className="btn btn-ghost btn-sm">
-              <Heart size={13} /> {t("Favourites")}
-            </Link>
-            <Link href="/grocery/lists" className="btn btn-ghost btn-sm">
-              <ListChecks size={13} /> {t("Lists")}
-            </Link>
-            <Link href="/cities" className="text-xs font-extrabold text-teal">
-              {t("Change city")} <ArrowRight size={12} className="inline rtl:-scale-x-100" />
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <GroceryBrowser items={items} />
-        </div>
       </main>
       <SiteFooter />
     </>

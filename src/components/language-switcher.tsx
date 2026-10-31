@@ -11,20 +11,20 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <label
       className={cn(
-        "relative inline-flex h-10 items-center rounded-xl border border-ink/10 bg-white/70 text-ink transition hover:bg-white",
+        "relative inline-flex h-9 items-center rounded-[6px] text-ink transition-colors hover:bg-surface-2",
         className,
       )}
       title={t("Language")}
     >
       <Languages
         size={15}
-        className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-teal"
+        className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-muted"
       />
       <select
         value={locale}
         onChange={(event) => setLocale(event.target.value as Locale)}
         aria-label={t("Language")}
-        className="h-full appearance-none bg-transparent ps-9 pe-7 text-xs font-extrabold text-ink outline-none"
+        className="h-full appearance-none bg-transparent ps-8 pe-6 text-[12px] font-medium text-ink outline-none"
       >
         {LOCALES.map((code) => (
           <option key={code} value={code} lang={code} title={LOCALE_META[code].native}>

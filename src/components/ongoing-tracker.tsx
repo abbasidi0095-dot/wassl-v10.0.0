@@ -109,7 +109,7 @@ export function OngoingTracker() {
       <button
         type="button"
         onClick={() => setCollapsed(false)}
-        className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] end-3 z-40 flex items-center gap-2 rounded-full border border-teal/25 bg-ink px-3.5 py-2.5 text-xs font-extrabold text-on-dark shadow-2xl transition hover:-translate-y-0.5 md:bottom-6 md:end-6"
+        className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] end-3 z-40 flex items-center gap-2 rounded-[6px] border border-line bg-ink px-3.5 py-2.5 text-[11px] font-medium text-on-dark shadow-lg transition-colors hover:bg-brand md:bottom-6 md:end-6"
         aria-label={t("Show live progress")}
       >
         <span className="relative flex h-2.5 w-2.5">
@@ -124,46 +124,45 @@ export function OngoingTracker() {
 
   return (
     <div className="fixed inset-x-3 bottom-[calc(82px+env(safe-area-inset-bottom))] z-40 md:inset-x-auto md:bottom-6 md:end-6 md:w-[370px]">
-      <div className="overflow-hidden rounded-2xl border border-teal/20 bg-paper/95 shadow-[0_24px_60px_-24px_rgba(15,60,58,.55)] backdrop-blur-xl">
+      <div className="overflow-hidden rounded-[8px] border border-line bg-surface shadow-[0_18px_40px_-28px_rgba(12,26,23,.5)]">
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           className="flex w-full items-center gap-3 px-3.5 py-3 text-start"
         >
-          <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal text-on-dark">
-            <Icon size={18} />
-            <span className="absolute -end-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-paper bg-saffron" />
+          <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-[4px] bg-surface-2 text-ink">
+            <Icon size={17} />
+            <span className="absolute -end-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-surface bg-signal" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-[0.14em] text-teal">
-              <span className="status-dot live-dot" />
+            <span className="flex items-center gap-1.5 text-[10px] text-muted">
+              <span className="status-dot live-dot text-success" />
               {current.kind === "taxi" ? t("Taxi in progress") : t("Order in progress")}
             </span>
-            <span className="mt-0.5 block truncate text-[13px] font-extrabold">
+            <span className="mt-0.5 block truncate text-[13px] font-semibold">
               {current.title}
             </span>
-            <span className="block truncate text-[10px] font-bold text-ink/45">
+            <span className="block truncate text-[10px] text-muted">
               {label} · {money(current.amount)}
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-1">
-            <span className="text-[9px] font-bold text-ink/30">{timeAgo(current.createdAt)}</span>
+            <span className="text-[10px] text-muted">{timeAgo(current.createdAt)}</span>
             {open ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
           </span>
         </button>
 
         <div className="px-3.5 pb-2">
-          <div className="relative h-1.5 overflow-hidden rounded-full bg-ink/10">
+          <div className="relative h-1 overflow-hidden rounded-[1px] bg-surface-2">
             <div
-              className="absolute inset-y-0 start-0 rounded-full bg-gradient-to-r from-teal to-saffron transition-[width] duration-700"
+              className="absolute inset-y-0 start-0 rounded-[1px] bg-brand transition-[width] duration-700"
               style={{ width: `${progress}%` }}
             />
-            <div className="absolute inset-0 animate-shimmer bg-[linear-gradient(110deg,transparent_20%,rgba(255,255,255,.55)_45%,transparent_70%)]" />
           </div>
         </div>
 
         {open ? (
-          <div className="border-t border-ink/8 px-3.5 py-3">
+          <div className="border-t border-line px-3.5 py-3">
             {items.length > 1 ? (
               items
                 .filter((item) => item.id !== current.id)
@@ -171,21 +170,21 @@ export function OngoingTracker() {
                   <Link
                     key={`${item.kind}-${item.id}`}
                     href={item.href}
-                    className="flex items-center gap-2 rounded-xl px-1 py-2 text-xs transition hover:bg-cream/60"
+                    className="flex items-center gap-2 rounded-[4px] px-1 py-2 text-[12px] transition-colors hover:bg-surface-2"
                   >
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-teal/10 text-teal">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[4px] bg-surface-2 text-ink">
                       {item.kind === "taxi" ? <CarTaxiFront size={14} /> : <Bike size={14} />}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-extrabold">{item.title}</span>
-                      <span className="block truncate text-[10px] text-ink/40">{item.subtitle}</span>
+                      <span className="block truncate font-semibold">{item.title}</span>
+                      <span className="block truncate text-[10px] text-muted">{item.subtitle}</span>
                     </span>
-                    <ArrowRight size={13} className="shrink-0 text-ink/30 rtl:-scale-x-100" />
+                    <ArrowRight size={13} className="shrink-0 text-muted rtl:-scale-x-100" />
                   </Link>
                 ))
             ) : (
-              <div className="flex items-center gap-2 rounded-xl bg-cream/60 px-2 py-2 text-[11px] font-bold text-ink/55">
-                <MapPin size={13} className="shrink-0 text-teal" />
+              <div className="flex items-center gap-2 rounded-[4px] bg-surface-2 px-2 py-2 text-[11px] text-muted">
+                <MapPin size={13} className="shrink-0" />
                 <span className="truncate">{current.subtitle}</span>
               </div>
             )}

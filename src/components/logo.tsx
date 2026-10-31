@@ -1,5 +1,29 @@
 import Link from "next/link";
 
+/**
+ * The Wassl mark: one route stroke that forms a W, ending at a saffron
+ * destination dot. Drawn rather than illustrated so it stays sharp at 16px.
+ */
+export function LogoMark({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M5 8.5 10.2 23.5 16 13.2 21.8 23.5 27 8.5"
+        stroke="currentColor"
+        strokeWidth="2.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="27" cy="8.5" r="2.6" className="fill-saffron" />
+    </svg>
+  );
+}
+
 export function Logo({
   compact = false,
   light = false,
@@ -8,40 +32,30 @@ export function Logo({
   light?: boolean;
 }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label="Wassl home">
+    <Link
+      href="/"
+      className="flex items-center gap-2.5"
+      aria-label="Wassl home"
+    >
       <span
-        className={`grid h-10 w-10 place-items-center rounded-2xl ${
-          light ? "bg-white/15 text-on-dark" : "bg-teal text-on-dark"
-        } shadow-lg shadow-teal/20`}
+        className={`grid h-9 w-9 place-items-center rounded-[5px] ${
+          light ? "bg-white/10 text-on-dark" : "bg-teal text-on-dark"
+        }`}
       >
-        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M5 18.5c2.3-4.1 4.1-4.1 6.1-1.2 1.9 2.7 3.6 2.5 5.1-.5 1-2.1 2.2-2.9 3.3-3.3"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray="1 4"
-          />
-          <circle cx="5" cy="18.5" r="2.4" fill="currentColor" />
-          <path
-            d="M14.6 3.8c2.2 0 3.9 1.7 3.9 3.8 0 3-3.9 6.3-3.9 6.3s-3.8-3.3-3.8-6.3c0-2.1 1.7-3.8 3.8-3.8Z"
-            fill="currentColor"
-          />
-          <circle cx="14.6" cy="7.6" r="1.3" fill={light ? "#0f6e6e" : "#f7f3eb"} />
-        </svg>
+        <LogoMark className="h-[21px] w-[21px]" />
       </span>
       {!compact ? (
         <span className="flex items-baseline gap-2">
           <span
-            className={`text-[21px] font-extrabold tracking-[-0.06em] ${
+            className={`font-display text-[22px] font-semibold leading-none tracking-[-0.04em] ${
               light ? "text-on-dark" : "text-ink"
             }`}
           >
             Wassl
           </span>
           <span
-            className={`arabic text-[15px] font-semibold ${
-              light ? "text-on-dark/70" : "text-teal"
+            className={`arabic text-[14px] font-medium leading-none ${
+              light ? "text-on-dark/55" : "text-muted"
             }`}
           >
             وصّل

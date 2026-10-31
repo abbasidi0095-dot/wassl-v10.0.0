@@ -122,7 +122,7 @@ export function ProductSheet({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/50 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-6"
       onClick={onClose}
       role="presentation"
     >
@@ -130,7 +130,7 @@ export function ProductSheet({
         role="dialog"
         aria-modal="true"
         aria-label={product.name}
-        className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl"
+        className="sheet-in flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-[16px] bg-surface shadow-2xl sm:rounded-[12px]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="relative shrink-0">
@@ -152,7 +152,7 @@ export function ProductSheet({
           <button
             type="button"
             onClick={onClose}
-            className="absolute end-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-ink/60 shadow-sm hover:text-ink"
+            className="absolute end-3 top-3 grid h-9 w-9 place-items-center rounded-[4px] bg-surface/90 text-muted hover:text-ink"
             aria-label={t("Close")}
           >
             <X size={17} />
@@ -164,19 +164,19 @@ export function ProductSheet({
             {product.tags?.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-teal/10 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-teal"
+                className="rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-ink"
               >
                 {tag}
               </span>
             ))}
             {product.calories ? (
-              <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-ink/40">
+              <span className="rounded-[2px] bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-muted">
                 {product.calories} kcal
               </span>
             ) : null}
           </div>
           <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.04em]">{product.name}</h2>
-          <p className="mt-1 text-sm leading-6 text-ink/55">{product.description}</p>
+          <p className="mt-1 text-[13px] leading-6 text-muted">{product.description}</p>
           <div className="mt-2 text-base font-extrabold">{money(product.price)}</div>
 
           <div className="mt-5 space-y-5">
@@ -203,7 +203,7 @@ export function ProductSheet({
                           type="button"
                           disabled={disabled}
                           onClick={() => toggle(group.id, option.id, group.max)}
-                          className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-start transition ${
+                          className={`flex w-full items-center gap-3 rounded-[6px] border px-3 py-2.5 text-start transition-colors ${
                             checked
                               ? "border-teal bg-teal/6"
                               : dimmed
@@ -213,7 +213,7 @@ export function ProductSheet({
                         >
                           <span
                             className={`grid h-4 w-4 shrink-0 place-items-center border ${
-                              group.max === 1 ? "rounded-full" : "rounded"
+                              group.max === 1 ? "rounded-full" : "rounded-[4px]"
                             } ${checked ? "border-teal bg-teal text-on-dark" : "border-ink/25"}`}
                           >
                             {checked ? <Check size={10} strokeWidth={3} /> : null}
@@ -221,7 +221,7 @@ export function ProductSheet({
                           <span className="flex-1 text-[12px] font-bold">
                             {option.name}
                             {option.soldOut ? (
-                              <span className="ms-2 text-[9px] uppercase text-red-500">{t("Sold out")}</span>
+                              <span className="ms-2 text-[10px] text-danger">{t("Sold out")}</span>
                             ) : null}
                           </span>
                           <span className="text-[11px] font-extrabold text-ink/45">
@@ -239,11 +239,11 @@ export function ProductSheet({
 
         <div className="shrink-0 border-t border-ink/8 bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 rounded-xl border border-ink/10 p-1">
+            <div className="flex items-center gap-1 rounded-[4px] border border-line p-1">
               <button
                 type="button"
                 onClick={() => setQty((value) => Math.max(1, value - 1))}
-                className="grid h-9 w-9 place-items-center rounded-lg hover:bg-cream"
+                className="grid h-9 w-9 place-items-center rounded-[4px] hover:bg-surface-2"
                 aria-label={t("Decrease quantity")}
               >
                 <Minus size={15} />
@@ -252,7 +252,7 @@ export function ProductSheet({
               <button
                 type="button"
                 onClick={() => setQty((value) => Math.min(20, value + 1))}
-                className="grid h-9 w-9 place-items-center rounded-lg hover:bg-cream"
+                className="grid h-9 w-9 place-items-center rounded-[4px] hover:bg-surface-2"
                 aria-label={t("Increase quantity")}
               >
                 <Plus size={15} />

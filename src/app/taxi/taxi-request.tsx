@@ -108,43 +108,43 @@ export function TaxiRequest({
   if (activeRide) {
     return (
       <div className="space-y-4">
-        <div className="card overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/8 bg-cream/60 px-5 py-3">
-            <span className="inline-flex items-center gap-2 text-xs font-extrabold">
-              <span className="status-dot live-dot text-teal" />
+        <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
+            <span className="inline-flex items-center gap-2 text-[12px] font-medium">
+              <span className="status-dot live-dot text-success" />
               {t(TAXI_STATUS_TEXT[activeRide.status])}
             </span>
-            <span className="pill">{money(activeRide.fare)}</span>
+            <span className="text-[13px] font-semibold tnum">{money(activeRide.fare)}</span>
           </div>
           <div className="grid gap-4 p-5 sm:grid-cols-2">
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-2">
-                <CircleDot size={15} className="mt-0.5 shrink-0 text-teal" />
+                <CircleDot size={15} className="mt-0.5 shrink-0 text-brand" />
                 <div>
-                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/40">
+                  <div className="text-[11px] text-muted">
                     {t("Pickup point")}
                   </div>
-                  <div className="font-bold">{activeRide.pickupLabel}</div>
+                  <div className="font-medium">{activeRide.pickupLabel}</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <MapPin size={15} className="mt-0.5 shrink-0 text-coral" />
+                <MapPin size={15} className="mt-0.5 shrink-0 text-danger" />
                 <div>
-                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/40">
+                  <div className="text-[11px] text-muted">
                     {t("Destination")}
                   </div>
-                  <div className="font-bold">{activeRide.dropoffLabel}</div>
+                  <div className="font-medium">{activeRide.dropoffLabel}</div>
                 </div>
               </div>
             </div>
             <div className="flex flex-col justify-end gap-2">
               {activeRide.driverName ? (
-                <div className="rounded-xl bg-cream p-3 text-xs">
-                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/40">
+                <div className="rounded-[6px] bg-surface-2 p-3 text-[12px]">
+                  <div className="text-[11px] text-muted">
                     {t("Your driver")}
                   </div>
-                  <div className="mt-0.5 font-extrabold">{activeRide.driverName}</div>
-                  <div className="text-ink/45">
+                  <div className="mt-0.5 font-medium">{activeRide.driverName}</div>
+                  <div className="text-muted">
                     {activeRide.vehicle} · {activeRide.plate}
                   </div>
                 </div>
@@ -165,7 +165,7 @@ export function TaxiRequest({
   return (
     <div className="space-y-5">
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="card order-2 overflow-hidden p-2 lg:order-1">
+        <div className="order-2 overflow-hidden rounded-[10px] border border-line bg-surface p-2 lg:order-1">
           <MapView
             points={[
               {
@@ -187,14 +187,16 @@ export function TaxiRequest({
             zoom={13.5}
             height={360}
             onPick={pick}
-            className="rounded-[20px]"
+            className="rounded-[6px]"
           />
         </div>
 
-        <div className="card order-1 p-5 lg:order-2">
-          <div className="flex items-center gap-2 text-sm font-extrabold">
-            <CarTaxiFront size={18} className="text-teal" />
-            {t("Request a ride")}
+        <div className="order-1 rounded-[10px] border border-line bg-surface p-5 lg:order-2">
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div className="text-[15px] font-semibold">
+              {t("Request a ride")}
+            </div>
+            <CarTaxiFront size={16} className="text-muted" />
           </div>
 
           <label className="mt-4 block">
@@ -218,13 +220,13 @@ export function TaxiRequest({
                 key={item}
                 type="button"
                 onClick={() => setTarget(item)}
-                className={`rounded-xl border px-3 py-2 text-start text-xs font-extrabold transition ${
+                className={`rounded-[6px] border px-3 py-2 text-start text-[12px] transition-colors ${
                   target === item
-                    ? "border-teal bg-teal/10 text-teal"
-                    : "border-ink/10 text-ink/55 hover:text-ink"
+                    ? "border-ink bg-surface-2 font-medium text-ink"
+                    : "border-line text-muted hover:text-ink"
                 }`}
               >
-                <span className="block text-[9px] uppercase tracking-wider opacity-70">
+                <span className="block text-[10px] text-muted">
                   {item === "pickup" ? t("Pickup") : t("Drop-off")}
                 </span>
                 {item === "pickup" ? pickupLabel || t("Pickup point") : dropoffLabel || t("Destination")}
@@ -232,7 +234,7 @@ export function TaxiRequest({
             ))}
           </div>
 
-          <p className="mt-2 text-[11px] font-bold text-ink/40">
+          <p className="mt-2 text-[11px] text-muted">
             {t("Tap the map to move the")} {target === "pickup" ? t("Pickup point") : t("Destination")}.
           </p>
 
@@ -259,13 +261,13 @@ export function TaxiRequest({
 
           <div className="mt-4 flex items-end justify-between rounded-xl bg-cream p-3">
             <div>
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+              <div className="text-[10px] font-medium text-ink/40">
                 {t("Distance")}
               </div>
               <div className="text-sm font-extrabold">{distance.toFixed(1)} km</div>
             </div>
             <div className="text-end">
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">
+              <div className="text-[10px] font-medium text-ink/40">
                 {t("Estimated fare")}
               </div>
               <div className="text-2xl font-extrabold tracking-[-0.04em]">{money(fare)}</div>
@@ -301,7 +303,7 @@ export function TaxiRequest({
 function TaxiHistory({ rides }: { rides: TaxiRide[] }) {
   const { t } = useI18n();
   return (
-    <div className="card overflow-hidden">
+    <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
       <div className="border-b border-ink/8 px-4 py-3 text-sm font-extrabold">
         {t("Trip history")}
       </div>

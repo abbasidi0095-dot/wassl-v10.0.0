@@ -9,7 +9,7 @@ const STORAGE_KEY = "wassl.theme";
 /** Keep the native status bar and PWA theme colour in sync with the page. */
 function syncShell(dark: boolean) {
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", dark ? "#0b1211" : "#0f6e6e");
+  if (meta) meta.setAttribute("content", dark ? "#0b1211" : "#0b4a45");
 
   if (typeof window === "undefined") return;
   void import("@capacitor/core")
@@ -17,7 +17,7 @@ function syncShell(dark: boolean) {
       if (!Capacitor.isNativePlatform()) return;
       const { StatusBar, Style } = await import("@capacitor/status-bar");
       await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark }).catch(() => {});
-      await StatusBar.setBackgroundColor({ color: dark ? "#0b1211" : "#f7f3eb" }).catch(
+      await StatusBar.setBackgroundColor({ color: dark ? "#0b1211" : "#f3eee3" }).catch(
         () => {},
       );
     })
@@ -51,11 +51,11 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-pressed={dark}
       title={dark ? "Light mode" : "Dark mode"}
       className={cn(
-        "grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 text-ink transition hover:bg-white",
+        "grid h-9 w-9 place-items-center rounded-[6px] text-ink/70 transition-colors hover:bg-surface-2 hover:text-ink",
         className,
       )}
     >
-      {dark ? <Sun size={18} /> : <Moon size={18} />}
+      {dark ? <Sun size={17} /> : <Moon size={17} />}
     </button>
   );
 }
