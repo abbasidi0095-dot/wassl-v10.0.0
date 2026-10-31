@@ -13,7 +13,7 @@ delivery and cash fares only. Live order/ride tracking, a persistent activity
 dock, web push notifications, four languages (EN/FR/ES/AR) with RTL, and light
 and dark themes.
 
-- **Live:** <https://141.145.192.23.nip.io>
+- **Live:** <https://wassl.shop>
 - **Repository:** <https://github.com/abbasidi0095-dot/wassl-v10.0.0>
 - **Agent guide:** [AGENTS.md](AGENTS.md) — architecture, constraints and the
   complete change history written for future agents.
@@ -28,6 +28,13 @@ and dark themes.
 ---
 
 ## Release history
+
+### 10.4.1 — 31 October 2026 — wassl.shop
+- The app now lives at <https://wassl.shop> with a Let’s Encrypt certificate
+  for both `wassl.shop` and `www.wassl.shop`; `www` redirects to the apex.
+- The Namecheap A/CNAME records, Caddy site blocks, mobile shell, App Links,
+  Universal Links and documentation all point at the new domain.
+- Short link: <https://tinyurl.com/wasslshop>.
 
 ### 10.4.0 — 31 October 2026 — handover codes and fleet provisioning
 - Every delivery and taxi ride now gets a four-digit handover code. The customer
@@ -47,7 +54,7 @@ and dark themes.
 
 ### 10.3.3 — 31 October 2026 — self-hosted on OCI
 - Fly is retired; Wassl runs on the OCI VPS at
-  <https://141.145.192.23.nip.io>.
+  <https://wassl.shop>.
 - Next.js binds `127.0.0.1:3000`; Caddy terminates Let's Encrypt TLS on
   `80/443` and proxies to loopback.
 - JSON data lives on the persistent `/var/lib/wassl` volume; systemd units
@@ -641,7 +648,7 @@ This is a demo, deliberately scoped. Before a real pilot:
 
 Wassl 10.0.0 ships as a Capacitor native shell around the production Next.js app
 (app ID `ma.wassl.app`). The native projects live in `android/` and `ios/`; the
-shell loads `https://141.145.192.23.nip.io` so auth, live orders, maps and dashboards
+shell loads `https://wassl.shop` so auth, live orders, maps and dashboards
 stay identical to the web app. Native additions: splash/icons, safe-area layout,
 offline fallback, deep links, Android back handling, haptic add-to-cart, dark
 mode with native status-bar sync, and push token registration.

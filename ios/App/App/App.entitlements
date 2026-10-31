@@ -6,8 +6,8 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:141.145.192.23.nip.io</string>
-		<string>webcredentials:141.145.192.23.nip.io</string>
+		<string>applinks:wassl.shop</string>
+		<string>webcredentials:wassl.shop</string>
 	</array>
 </dict>
 </plist>

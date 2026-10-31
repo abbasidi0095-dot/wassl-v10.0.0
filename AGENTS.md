@@ -16,8 +16,8 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.4.0** (31 October 2026; handover codes and fleet provisioning)
-- Live: <https://141.145.192.23.nip.io>
+- Release: **10.4.1** (31 October 2026; wassl.shop domain)
+- Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
 - Product: local delivery + **Wassl Grocery** + **Wassl Taxi**, cash only (COD / cash fare).
@@ -91,6 +91,16 @@ persists; every mutation should add an audit entry via `recordAudit`.
 
 ## Change history (newest first)
 
+### 10.4.1 — wassl.shop
+- Namecheap BasicDNS now serves `wassl.shop` (`A @ → 141.145.192.23`) and
+  `www` (`CNAME → wassl.shop`); the registrar URL redirect was removed.
+- Caddy serves both names with a Let's Encrypt certificate and redirects
+  `www` to the apex. The old `nip.io` name remains available as a fallback.
+- `NEXT_PUBLIC_SITE_URL`, mobile shell URL, App Links, Universal Links, README,
+  AGENTS and hosting docs were updated to `https://wassl.shop`.
+- Brevo domain authentication records for `wassl.shop` still need to be added
+  before switching `BREVO_SENDER_EMAIL` from the Gmail sender.
+
 ### 10.4.0 — handover codes and fleet provisioning
 - `Order.deliveryPin` is now generated for every order, not only grocery.
   `updateOrderStatus` requires a matching four-digit proof for non-admin
@@ -119,7 +129,7 @@ persists; every mutation should add an audit entry via `recordAudit`.
 - App moved to OCI `instance-20261024-2302`; `/opt/wassl` checkout,
   `/var/lib/wassl` JSON store, `/etc/wassl.env` runtime env.
 - `wassl.service` runs Next on `127.0.0.1:3000`; `caddy.service` serves
-  `https://141.145.192.23.nip.io` with Let's Encrypt and proxies loopback.
+  `https://wassl.shop` with Let's Encrypt and proxies loopback.
 - OCI security list opened for `80`/`443`; no NSG. Host firewalld allows only
   `ssh`, `http`, `https`.
 - Mobile shell, App Links, Universal Links, README, AGENTS and
@@ -298,7 +308,7 @@ persists; every mutation should add an audit entry via `recordAudit`.
 
 - Host: OCI VPS `instance-20261024-2302`, region `eu-paris-1`, public IP
   `141.145.192.23`, private IP `10.0.0.125`.
-- Live: <https://141.145.192.23.nip.io>.
+- Live: <https://wassl.shop>.
 - App checkout `/opt/wassl`; JSON data `/var/lib/wassl`; env `/etc/wassl.env`
   (root `600`). The Fly deployment and volume are retired.
 - `wassl.service` runs `next start -H 127.0.0.1 -p 3000`; `caddy.service`

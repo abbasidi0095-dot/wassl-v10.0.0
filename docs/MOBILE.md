@@ -2,7 +2,7 @@
 
 Wassl 10.0.0 ships as a **Capacitor native shell** around the production Next.js
 app. The web app stays the single source of truth: the native projects load
-`https://141.145.192.23.nip.io`, so auth cookies, live order events (SSE), MapLibre
+`https://wassl.shop`, so auth cookies, live order events (SSE), MapLibre
 and the admin/merchant dashboards all behave exactly as on the web.
 
 - App ID / bundle ID: `ma.wassl.app`
@@ -107,7 +107,7 @@ fly secrets set ANDROID_APP_CERT_SHA256="AA:BB:...:FF,11:22:...:EE"
 `ANDROID_APP_CERT_SHA256` accepts a comma-separated list (upload key + Play App
 Signing key). Deep links supported today:
 
-- `https://141.145.192.23.nip.io/orders/<id>` (verified App Link / Universal Link)
+- `https://wassl.shop/orders/<id>` (verified App Link / Universal Link)
 - `wassl://orders/<id>` (custom scheme)
 
 `NativeShell` routes both forms inside the app, and Android's back button

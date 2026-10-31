@@ -5,11 +5,11 @@ retired.
 
 ## Live
 
-- App: <https://141.145.192.23.nip.io>
+- App: <https://wassl.shop>
 - Instance: `instance-20261024-2302` · region `eu-paris-1`
 - Public IP: `141.145.192.23` · private IP `10.0.0.125`
 - TLS: Let's Encrypt via Caddy, HTTP-01/ALPN on the direct hostname
-  (`141.145.192.23.nip.io`). Ports `80` and `443` are open in the VCN
+  (`wassl.shop`). Ports `80` and `443` are open in the VCN
   default security list; no NSG is attached to the VNIC.
 
 ## Layout
@@ -60,7 +60,7 @@ sudo systemctl reload caddy
 ```text
 WASSL_DATA_DIR=/var/lib/wassl
 WASSL_SECRET=...
-NEXT_PUBLIC_SITE_URL=https://141.145.192.23.nip.io
+NEXT_PUBLIC_SITE_URL=https://wassl.shop
 HOSTNAME=127.0.0.1
 PORT=3000
 BREVO_API_KEY=...
@@ -85,15 +85,24 @@ sudo install -d -m 700 /var/backups/wassl
 sudo tar -czf "/var/backups/wassl/wassl-$(date +%F-%H%M).tgz" -C /var/lib wassl
 ```
 
-## Migrating to a real domain
+## DNS and TLS
 
-1. Point the domain's A record at `141.145.192.23`.
-2. Replace `141.145.192.23.nip.io` in `/etc/caddy/Caddyfile` with the domain.
-3. Update `NEXT_PUBLIC_SITE_URL` in `/etc/wassl.env`.
-4. Update `capacitor.config.ts`, `AndroidManifest.xml`, `App.entitlements` and
-   the generated Capacitor JSON files.
-5. `sudo systemctl reload caddy && sudo systemctl restart wassl`.
-6. Publish `/.well-known/assetlinks.json` and the AASA file for the new host.
+Namecheap BasicDNS holds:
+
+```text
+A      @     141.145.192.23
+CNAME  www   wassl.shop
+```
+
+The URL Redirect record for `@` must stay deleted; Caddy handles the
+`www` → apex redirect. Caddy obtains and renews the Let's Encrypt certificate
+for both names through HTTP-01/ALPN on ports `80`/`443`.
+
+## Email sender
+
+Brevo authenticates `wassl.shop` with DKIM, a Brevo TXT verification code and
+DMARC. Keep `BREVO_SENDER_EMAIL` on the verified sender
+(`noreply@wassl.shop` once the domain is authenticated).
 
 ## Cloudflare tunnel
 
