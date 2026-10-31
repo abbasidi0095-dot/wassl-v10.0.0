@@ -12,7 +12,6 @@ import {
   MapPin,
   Pill,
   Route,
-  ShieldCheck,
   ShoppingBasket,
   UtensilsCrossed,
 } from "lucide-react";
@@ -323,16 +322,22 @@ export default async function HomePage() {
 
               <div className="relative order-first min-h-[320px] overflow-hidden bg-ink lg:order-none lg:min-h-full">
                 <Image
-                  src="/images/taxi/taxi-night.jpg"
-                  alt={t("A Wassl taxi moving through the city at night")}
+                  src="/images/taxi/driver-night.jpg"
+                  alt={t("A Wassl driver at dusk")}
                   fill
                   sizes="(max-width: 1024px) 100vw, 48vw"
                   className="object-cover opacity-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#07120f]/75 via-transparent to-[#07120f]/10" />
                 <div className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-[8px] border border-white/20 bg-[#07120f]/75 p-3 text-on-dark backdrop-blur-[2px] sm:inset-x-6 sm:bottom-6">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-[#f7f4ec] text-[#0c1a17]">
-                    <ShieldCheck size={18} />
+                  <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-[6px] bg-[#f7f4ec]">
+                    <Image
+                      src="/images/taxi/taxi-night.jpg"
+                      alt=""
+                      fill
+                      sizes="40px"
+                      className="object-cover"
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold">{t("Fare agreed before you move")}</div>

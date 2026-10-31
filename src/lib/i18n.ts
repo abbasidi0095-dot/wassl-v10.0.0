@@ -657,6 +657,7 @@ const fr: Record<string, string> = {
   "Cash to the driver · tracked live · code on arrival":
     "Paiement au chauffeur · suivi en direct · code à l'arrivée",
   "A Wassl taxi moving through the city at night": "Un taxi Wassl dans la ville, la nuit",
+  "A Wassl driver at dusk": "Un chauffeur Wassl au crépuscule",
 };
 
 const es: Record<string, string> = {
@@ -1290,6 +1291,7 @@ const es: Record<string, string> = {
   "Cash to the driver · tracked live · code on arrival":
     "Pago al conductor · seguimiento en directo · código al llegar",
   "A Wassl taxi moving through the city at night": "Un taxi de Wassl por la ciudad de noche",
+  "A Wassl driver at dusk": "Un conductor de Wassl al atardecer",
 };
 
 const ar: Record<string, string> = {
@@ -1920,6 +1922,7 @@ const ar: Record<string, string> = {
   "Cash to the driver · tracked live · code on arrival":
     "الدفع للسائق · تتبع مباشر · رمز عند الوصول",
   "A Wassl taxi moving through the city at night": "تاكسي وصل في المدينة ليلاً",
+  "A Wassl driver at dusk": "سائق وصل عند الغروب",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {
