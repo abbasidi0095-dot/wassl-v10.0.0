@@ -657,6 +657,9 @@ const fr: Record<string, string> = {
   "Looking to order instead?": "Vous souhaitez commander ?",
   "Customer sign up": "Inscription client",
   "Driver / taxi": "Chauffeur / taxi",
+  "Taxi partner": "Partenaire taxi",
+  "Delivery driver": "Livreur",
+  "Taxi driver": "Chauffeur de taxi",
   "Create your store account, then operations verifies your details and opens your dashboard. You keep your own menu, stock and payout view.":
     "Créez votre compte boutique, puis nos opérations vérifient vos informations et ouvrent votre tableau de bord. Vous gardez votre carte, votre stock et vos paiements.",
   "Apply as a delivery courier or taxi driver. Operations reviews your vehicle and documents, then unlocks your route and cash tools.":
@@ -1306,6 +1309,9 @@ const es: Record<string, string> = {
   "Looking to order instead?": "¿Prefieres pedir?",
   "Customer sign up": "Registro de cliente",
   "Driver / taxi": "Conductor / taxi",
+  "Taxi partner": "Socio taxi",
+  "Delivery driver": "Repartidor",
+  "Taxi driver": "Taxista",
   "Create your store account, then operations verifies your details and opens your dashboard. You keep your own menu, stock and payout view.":
     "Crea tu cuenta de tienda; operaciones verificará tus datos y abrirá tu panel. Mantienes tu carta, stock y pagos.",
   "Apply as a delivery courier or taxi driver. Operations reviews your vehicle and documents, then unlocks your route and cash tools.":
@@ -1954,6 +1960,9 @@ const ar: Record<string, string> = {
   "Looking to order instead?": "تفضل الطلب بدلاً من ذلك؟",
   "Customer sign up": "تسجيل عميل",
   "Driver / taxi": "سائق / تاكسي",
+  "Taxi partner": "شريك تاكسي",
+  "Delivery driver": "موصّل",
+  "Taxi driver": "سائق تاكسي",
   "Create your store account, then operations verifies your details and opens your dashboard. You keep your own menu, stock and payout view.":
     "أنشئ حساب متجرك، ثم تتحقق العمليات من بياناتك وتفتح لوحتك. تحتفظ بقائمتك ومخزونك ومدفوعاتك.",
   "Apply as a delivery courier or taxi driver. Operations reviews your vehicle and documents, then unlocks your route and cash tools.":

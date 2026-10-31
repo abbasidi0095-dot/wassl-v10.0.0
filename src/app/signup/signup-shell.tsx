@@ -10,7 +10,13 @@ import { SignupForm } from "./signup-form";
 
 export type SignupMode = "customer" | "merchant" | "driver";
 
-export async function SignupShell({ mode }: { mode: SignupMode }) {
+export async function SignupShell({
+  mode,
+  defaultKind = "delivery",
+}: {
+  mode: SignupMode;
+  defaultKind?: "delivery" | "taxi" | "both";
+}) {
   const [cities, { t }] = await Promise.all([getCities(), getTranslator()]);
   const copy =
     mode === "merchant"
@@ -94,6 +100,7 @@ export async function SignupShell({ mode }: { mode: SignupMode }) {
 
           <SignupForm
             initialRole={mode}
+            initialKind={defaultKind}
             lockedRole
             cities={cities.map((city) => ({
               slug: city.slug,

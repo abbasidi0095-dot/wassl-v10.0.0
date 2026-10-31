@@ -223,7 +223,8 @@ export function LoginForm({
               {[
                 { href: "/signup", label: t("Customer") },
                 { href: "/signup/store", label: t("Store owner") },
-                { href: "/signup/driver", label: t("Driver / taxi") },
+                { href: "/signup/driver", label: t("Delivery driver") },
+                { href: "/signup/taxi", label: t("Taxi driver") },
               ].map((item) => (
                 <Link
                   key={item.href}

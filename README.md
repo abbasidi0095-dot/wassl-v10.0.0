@@ -32,9 +32,10 @@ and dark themes.
 ### 10.6.0 — 31 October 2026 — fleet, analytics and access
 - Admin Fleet now shows **Delivery boys** and **Taxi drivers** side by side,
   each with its own “Generate credentials” action and driver profile list.
-- Driver sign-up is split from customer sign-up: `/signup` is customer-only,
-  `/signup/store` is the store partner application and `/signup/driver` covers
-  delivery, taxi and both. Customers, stores and drivers all use `/login`.
+- Sign-up is split by audience: `/signup` is customer-only, `/signup/store` is
+  the store application, `/signup/driver` covers delivery/both and
+  `/signup/taxi` is the dedicated taxi application. Customers, stores and
+  drivers all use `/login`.
 - Taxi and delivery sign-up captures role, vehicle and plate; approval creates
   the matching driver profile.
 - Admin Analytics shows total Wassl profit, delivery margin (5 MAD per

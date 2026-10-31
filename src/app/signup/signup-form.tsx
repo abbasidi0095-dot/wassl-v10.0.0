@@ -46,23 +46,27 @@ type CityOption = { slug: string; name: string; priority: boolean };
 
 export function SignupForm({
   initialRole,
+  initialKind = "delivery",
   lockedRole = false,
   cities,
 }: {
   initialRole: Role;
+  initialKind?: "delivery" | "taxi" | "both";
   lockedRole?: boolean;
   cities: CityOption[];
 }) {
   const router = useRouter();
   const [role, setRole] = useState<Role>(initialRole);
-  const [kind, setKind] = useState<"delivery" | "taxi" | "both">("delivery");
+  const [kind, setKind] = useState<"delivery" | "taxi" | "both">(initialKind);
   const [plate, setPlate] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [citySlug, setCitySlug] = useState("dakhla");
   const [storeName, setStoreName] = useState("");
-  const [vehicle, setVehicle] = useState("Motorbike");
+  const [vehicle, setVehicle] = useState(
+    initialKind === "taxi" ? "Dacia Logan" : "Motorbike",
+  );
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -140,7 +144,9 @@ export function SignupForm({
         {role === "merchant"
           ? "Store partner"
           : role === "driver"
-            ? "Driver partner"
+            ? kind === "taxi"
+              ? "Taxi partner"
+              : "Driver partner"
             : "Customer account"}
       </div>
       <h2 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
@@ -289,9 +295,13 @@ export function SignupForm({
               <span className="label">Works as</span>
               <select
                 value={kind}
-                onChange={(event) =>
-                  setKind(event.target.value as "delivery" | "taxi" | "both")
-                }
+                onChange={(event) => {
+                  const next = event.target.value as "delivery" | "taxi" | "both";
+                  setKind(next);
+                  if (next !== "delivery" && vehicle === "Motorbike") {
+                    setVehicle("Dacia Logan");
+                  }
+                }}
                 className="input"
               >
                 <option value="delivery">Delivery courier</option>

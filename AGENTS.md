@@ -94,9 +94,10 @@ persists; every mutation should add an audit entry via `recordAudit`.
 ### 10.6.0 — fleet, signup separation, analytics and access
 - Admin Fleet is two side-by-side panels, `DriverPanel` for delivery and taxi,
   each provisioning via `AccountProvisionModal` with a preselected kind.
-- `/signup` is customer-only; `/signup/store` and `/signup/driver` reuse
-  `SignupShell`. `/login` remains the single login for every role. Driver
-  applications capture `requestedKind` and `requestedPlate`.
+- `/signup` is customer-only; `/signup/store`, `/signup/driver` and
+  `/signup/taxi` reuse `SignupShell`. `/login` remains the single login for
+  every role. Driver applications capture `requestedKind` and
+  `requestedPlate`; the taxi page preselects kind `taxi` and a car.
 - `src/lib/analytics.ts` computes delivery (5 MAD), taxi (2 MAD) and grocery
   (5%) margin, 14-day bars, top stores and signup counts. Admin state now
   includes taxi rides.
