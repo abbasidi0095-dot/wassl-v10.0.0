@@ -153,8 +153,9 @@ const jsonBackend: DatabaseBackend = {
             fs.readFileSync(/*turbopackIgnore: true*/ dbFile, "utf8"),
           ) as Database,
         );
-        globalForDb.__wasslJsonDb = existing;
-        globalForDb.__wasslJsonDir = dataDir;
+        // Persist migrations (handover codes, grocery fields) immediately so a
+        // restart cannot change a customer's code mid-delivery.
+        saveJson(existing);
         return existing;
       } catch {
         // fall through to a clean seed if the local demo file is corrupt
