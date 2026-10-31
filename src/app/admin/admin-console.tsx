@@ -21,6 +21,7 @@ import {
   RotateCcw,
   Database,
   History,
+  Image as ImageIcon,
   KeyRound,
   Loader2,
   Lock,
@@ -41,6 +42,7 @@ import {
 import { AccountProvisionModal, resizePhoto } from "./account-provision-modal";
 import { AdminMenuModal } from "./admin-menu-modal";
 import { THEME_PRESETS } from "@/lib/theme";
+import { resizeImage } from "@/lib/image-client";
 import { computeAnalytics } from "@/lib/analytics";
 import type { AdminUserView, OrderView } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
@@ -101,6 +103,7 @@ type StoreDraft = {
   phone: string;
   ownerName: string;
   isOpen: boolean;
+  image?: string;
 };
 
 const TABS: { id: Tab; label: string; icon: typeof MapPin }[] = [
@@ -1878,6 +1881,7 @@ function StoreFormModal({
     phone: store?.phone ?? "",
     ownerName: store?.ownerName ?? "",
     isOpen: store?.isOpen ?? false,
+    image: store?.image,
   }));
   const [error, setError] = useState("");
 
@@ -1949,6 +1953,43 @@ function StoreFormModal({
               placeholder="مثال: مطعم الداخلة"
             />
           </label>
+          <div className="flex items-center gap-3 rounded-[8px] border border-line p-3 sm:col-span-2">
+            {draft.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={draft.image} alt="Store cover preview" className="h-16 w-24 rounded-[6px] object-cover" />
+            ) : (
+              <span className="grid h-16 w-24 place-items-center rounded-[6px] bg-surface-2 text-muted">
+                <ImageIcon size={20} />
+              </span>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="text-[12px] font-semibold">Store cover</div>
+              <div className="text-[11px] text-muted">Shown on the storefront and search cards.</div>
+            </div>
+            <label className="btn btn-ghost btn-sm cursor-pointer">
+              Upload
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  const image = await resizeImage(file, {
+                    width: 1200,
+                    height: 800,
+                    fit: "cover",
+                  });
+                  set("image", image);
+                }}
+              />
+            </label>
+            {draft.image ? (
+              <button type="button" onClick={() => set("image", undefined)} className="btn btn-ghost btn-sm text-danger">
+                Remove
+              </button>
+            ) : null}
+          </div>
           <label className="block">
             <span className="label">City</span>
             <select

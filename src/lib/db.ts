@@ -1354,6 +1354,7 @@ export async function createOrder(
             productId: product.id,
             name: product.name,
             emoji: product.emoji,
+            image: product.image,
             price: unitPrice,
             qty,
             options: selected.length ? selected : undefined,
@@ -1912,6 +1913,7 @@ export type CreateStoreInput = {
   ownerName?: string;
   isOpen?: boolean;
   accent?: string;
+  image?: string;
   tags?: string[];
 };
 
@@ -1956,6 +1958,7 @@ export async function createStore(
       lng:
         typeof input.lng === "number" && Number.isFinite(input.lng) ? input.lng : city.lng,
       accent: input.accent || "#0f6e6e",
+      image: input.image?.trim() || undefined,
       rating: 0,
       reviews: 0,
       prepTime: Math.max(5, Math.min(180, Math.round(input.prepTime ?? 30))),
@@ -2010,6 +2013,7 @@ export async function updateStoreAdmin(
       | "phone"
       | "ownerName"
       | "isOpen"
+      | "image"
     >
   >,
   actor: OrderActor,
@@ -2278,13 +2282,13 @@ export async function updateDriverAdmin(
 
 export async function updateStore(
   storeId: string,
-  patch: Partial<Pick<Store, "isOpen">>,
+  patch: Partial<Pick<Store, "isOpen" | "image">>,
   actor: OrderActor,
 ): Promise<Store> {
   return mutate((db) => {
     const store = db.stores.find((item) => item.id === storeId);
     if (!store) throw new Error("Store not found");
-    const before = store.isOpen;
+    const before = `${store.isOpen ? "open" : "closed"} · ${store.image ? "photo" : "default photo"}`;
     Object.assign(store, patch);
     recordAudit(db, {
       actorRole: actor.role,
@@ -2293,9 +2297,9 @@ export async function updateStore(
       action: "store.update",
       entity: "store",
       entityId: storeId,
-      summary: `${store.name} is now ${store.isOpen ? "open" : "closed"}`,
-      before: String(before),
-      after: String(store.isOpen),
+      summary: `${store.name} updated${patch.image ? " · cover photo" : ""}`,
+      before,
+      after: `${store.isOpen ? "open" : "closed"} · ${store.image ? "custom photo" : "default photo"}`,
     });
     publish({ type: "store", storeId, citySlug: store.citySlug });
     return store;
@@ -2334,6 +2338,7 @@ export type CreateProductInput = {
   category: string;
   description?: string;
   price: number;
+  image?: string;
   available?: boolean;
   popular?: boolean;
   tags?: string[];
@@ -2384,6 +2389,7 @@ export async function createProduct(
       name,
       description: input.description?.trim() || "Freshly prepared by the store.",
       price: Math.max(1, Math.round(input.price)),
+      image: input.image?.trim() || undefined,
       emoji: "",
       available: input.available ?? true,
       popular: Boolean(input.popular),
@@ -2996,6 +3002,7 @@ export type UpdateProductInput = Partial<
     | "category"
     | "description"
     | "price"
+    | "image"
     | "available"
     | "popular"
     | "tags"
@@ -3045,6 +3052,7 @@ export async function updateProductDetails(
       "category",
       "description",
       "price",
+      "image",
       "available",
       "popular",
       "tags",

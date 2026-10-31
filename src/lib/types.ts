@@ -112,6 +112,8 @@ export interface Store {
   verifiedAt?: string;
   /** Public source page for an imported establishment. */
   sourceUrl?: string | null;
+  /** Merchant-supplied cover image, stored as a data URL or absolute URL. */
+  image?: string;
   /** Grocery/supermarket settings. Absent on restaurants and older records. */
   grocery?: GrocerySettings;
 }
@@ -182,6 +184,8 @@ export interface Product {
   description: string;
   price: number;
   emoji: string;
+  /** Merchant-supplied product image, stored as a data URL or absolute URL. */
+  image?: string;
   available: boolean;
   popular?: boolean;
   /** Part of a locked, read-only menu snapshot. */
@@ -253,6 +257,7 @@ export interface OrderItem {
   productId: string;
   name: string;
   emoji: string;
+  image?: string;
   price: number;
   qty: number;
   options?: SelectedModifier[];

@@ -8,6 +8,7 @@ import {
   CarTaxiFront,
   CircleDot,
   Loader2,
+  LocateFixed,
   MapPin,
   Navigation,
 } from "lucide-react";
@@ -48,6 +49,7 @@ export function TaxiRequest({
   const [dropoffLabel, setDropoffLabel] = useState("");
   const [target, setTarget] = useState<Target>("dropoff");
   const [submitting, setSubmitting] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
 
   const distance = useMemo(
@@ -72,6 +74,30 @@ export function TaxiRequest({
       setDropoff({ lat, lng });
       setTarget("pickup");
     }
+  }
+
+  function useMyLocation() {
+    if (!navigator.geolocation) {
+      setError(t("Location is not available in this browser."));
+      return;
+    }
+    setLocating(true);
+    setError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setPickup({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setPickupLabel(t("Current location"));
+        setLocating(false);
+      },
+      () => {
+        setError(t("Location permission was denied. Move the pin manually."));
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 },
+    );
   }
 
   async function submit() {
@@ -234,9 +260,24 @@ export function TaxiRequest({
             ))}
           </div>
 
-          <p className="mt-2 text-[11px] text-muted">
-            {t("Tap the map to move the")} {target === "pickup" ? t("Pickup point") : t("Destination")}.
-          </p>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[11px] text-muted">
+              {t("Tap the map to move the")} {target === "pickup" ? t("Pickup point") : t("Destination")}.
+            </p>
+            <button
+              type="button"
+              onClick={useMyLocation}
+              disabled={locating}
+              className="btn btn-ghost btn-sm"
+            >
+              {locating ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <LocateFixed size={12} />
+              )}
+              {t("Use my location")}
+            </button>
+          </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <label className="block">

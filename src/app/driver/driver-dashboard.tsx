@@ -149,6 +149,9 @@ export function DriverDashboard({
       }
       setDriver(data.driver);
       setToast(next === "available" ? "You are online" : "You are offline");
+      if (next === "available" && !sharing) {
+        toggleShare();
+      }
       if (next === "offline" && watchRef.current !== null) {
         navigator.geolocation.clearWatch(watchRef.current);
         watchRef.current = null;

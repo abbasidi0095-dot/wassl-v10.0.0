@@ -111,6 +111,7 @@ export function ProductSheet({
         minOrder: store.minOrder,
         name: product.name,
         emoji: product.emoji,
+        image: product.image,
         basePrice: product.price,
         price: unitPrice,
         options: chosen,
@@ -135,19 +136,26 @@ export function ProductSheet({
       >
         <div className="relative shrink-0">
           <div className={`relative grid h-32 place-items-center overflow-hidden ${visual.tile} sm:h-36`}>
-            <div
-              aria-hidden
-              className="absolute inset-0 opacity-60"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 50% 120%, rgba(15,110,110,.16), transparent 62%)",
-              }}
-            />
-            <ProductGlyph
-              size={52}
-              strokeWidth={1.45}
-              className={`relative ${visual.ink}`}
-            />
+            {product.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={product.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <>
+                <div
+                  aria-hidden
+                  className="absolute inset-0 opacity-60"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle at 50% 120%, rgba(15,110,110,.16), transparent 62%)",
+                  }}
+                />
+                <ProductGlyph
+                  size={52}
+                  strokeWidth={1.45}
+                  className={`relative ${visual.ink}`}
+                />
+              </>
+            )}
           </div>
           <button
             type="button"

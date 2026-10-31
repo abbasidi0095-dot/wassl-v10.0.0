@@ -35,6 +35,7 @@ function orderSummary(order: OrderView) {
       productId: item.productId,
       name: item.name,
       emoji: item.emoji,
+      image: item.image,
       price: item.price,
       qty: item.qty,
       options: item.options ?? [],

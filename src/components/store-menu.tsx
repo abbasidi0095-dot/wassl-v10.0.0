@@ -84,6 +84,7 @@ export function StoreMenu({
       minOrder: store.minOrder,
       name: product.name,
       emoji: product.emoji,
+      image: product.image,
       basePrice: product.price,
       price: product.price,
       options: [],
@@ -208,6 +209,7 @@ export function StoreMenu({
                     <ProductTile
                       name={product.name}
                       category={product.category}
+                      image={product.image}
                       className="h-full w-full"
                       iconSize={30}
                     />

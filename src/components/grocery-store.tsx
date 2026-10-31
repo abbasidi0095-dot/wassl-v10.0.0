@@ -453,6 +453,7 @@ export function GroceryStore({
                       <ProductTile
                         name={product.name}
                         category={product.category}
+                        image={product.image}
                         className="h-full w-full"
                         iconSize={24}
                       />
@@ -594,6 +595,7 @@ function GrocerySheet({
           <ProductTile
             name={product.name}
             category={product.category}
+            image={product.image}
             className="h-14 w-14 rounded-[6px]"
             iconSize={24}
           />

@@ -60,6 +60,7 @@ export async function POST(request: Request) {
         name: body.name,
         category: body.category,
         description: body.description,
+        image: body.image,
         price,
         available: body.available ?? true,
         popular: Boolean(body.popular),

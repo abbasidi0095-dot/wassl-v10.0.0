@@ -346,7 +346,12 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             <div className="mt-3 space-y-2">
               {order.items.map((item, index) => (
                 <div key={`${item.productId}-${index}`} className="flex items-center gap-2 text-[11px]">
-                  <ProductTile name={item.name} className="h-7 w-7 rounded-[6px]" iconSize={14} />
+                  <ProductTile
+                    name={item.name}
+                    image={item.image}
+                    className="h-7 w-7 rounded-[6px]"
+                    iconSize={14}
+                  />
                   <span className="min-w-0 flex-1 font-medium">
                     <span className="block truncate">{item.qty}× {item.name}</span>
                     {item.options?.length ? (

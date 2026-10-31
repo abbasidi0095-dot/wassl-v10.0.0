@@ -26,6 +26,7 @@ type SummaryLine = {
   productId: string;
   name: string;
   emoji: string;
+  image?: string;
   price: number;
   qty: number;
   options: SelectedModifier[];
@@ -132,6 +133,7 @@ export function OrdersList() {
           minOrder: order.minOrder,
           name: line.name,
           emoji: line.emoji,
+          image: line.image,
           basePrice: line.price - modifierTotal,
           price: line.price,
           options: line.options,

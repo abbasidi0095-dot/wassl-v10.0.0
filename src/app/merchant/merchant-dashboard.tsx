@@ -17,6 +17,8 @@ import {
   ReceiptText,
   RefreshCw,
   ShoppingBag,
+  ImagePlus,
+  Loader2,
   Star,
   TrendingUp,
   Truck,
@@ -29,6 +31,8 @@ import type { Product, Store } from "@/lib/types";
 import { STATUS_META } from "@/lib/types";
 import { money, timeAgo } from "@/lib/utils";
 import { useLiveEvents } from "@/lib/use-live-events";
+import { resizeImage } from "@/lib/image-client";
+import { storePhoto } from "@/lib/store-images";
 
 type Tab = "orders" | "menu" | "store";
 
@@ -51,6 +55,7 @@ export function MerchantDashboard({
   const [soundOn, setSoundOn] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
   const placedCount = useRef(
     initialOrders.filter((order) => order.status === "placed").length,
   );
@@ -133,6 +138,33 @@ export function MerchantDashboard({
     }
   }
 
+  async function updateCover(file?: File) {
+    if (!file) return;
+    setCoverUploading(true);
+    try {
+      const image = await resizeImage(file, {
+        width: 1200,
+        height: 800,
+        fit: "cover",
+        quality: 0.8,
+      });
+      const response = await fetch("/api/merchant/store", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image }),
+      });
+      const data = (await response.json()) as { store?: Store; error?: string };
+      if (!response.ok || !data.store) {
+        setToast(data.error || "Could not save the cover photo");
+        return;
+      }
+      setStore(data.store);
+      setToast("Cover photo updated");
+    } finally {
+      setCoverUploading(false);
+    }
+  }
+
   async function toggleStore() {
     setBusy("store");
     try {
@@ -145,6 +177,34 @@ export function MerchantDashboard({
         setStore((current) => ({ ...current, isOpen: !current.isOpen }));
         setToast(store.isOpen ? "Store paused" : "Store opened");
       }
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function updateProductImage(product: Product, file?: File) {
+    if (!file) return;
+    setBusy(product.id);
+    try {
+      const image = await resizeImage(file, {
+        width: 640,
+        height: 640,
+        fit: "cover",
+      });
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image }),
+      });
+      const data = (await response.json()) as { product?: Product; error?: string };
+      if (!response.ok || !data.product) {
+        setToast(data.error || "Could not save the item photo");
+        return;
+      }
+      setProducts((current) =>
+        current.map((item) => (item.id === product.id ? data.product! : item)),
+      );
+      setToast("Item photo updated");
     } finally {
       setBusy("");
     }
@@ -175,6 +235,7 @@ export function MerchantDashboard({
     category: string;
     price: number;
     description: string;
+    image?: string;
     popular: boolean;
     available: boolean;
   }) {
@@ -384,6 +445,7 @@ export function MerchantDashboard({
                     <ProductTile
                       name={product.name}
                       category={product.category}
+                      image={product.image}
                       className="h-11 w-11 shrink-0 rounded-[6px]"
                       iconSize={20}
                     />
@@ -414,6 +476,17 @@ export function MerchantDashboard({
                             {product.available ? "Available" : "Sold out"}
                           </span>
                         </div>
+                        <label className="btn btn-ghost btn-sm shrink-0 cursor-pointer">
+                          <ImagePlus size={12} /> Photo
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={(event) =>
+                              void updateProductImage(product, event.target.files?.[0])
+                            }
+                          />
+                        </label>
                         <button
                           type="button"
                           onClick={() => toggleProduct(product)}
@@ -448,6 +521,7 @@ export function MerchantDashboard({
                             <ProductTile
                               name={product.name}
                               category={product.category}
+                              image={product.image}
                               className="h-8 w-8 rounded-[4px]"
                               iconSize={15}
                             />
@@ -473,14 +547,27 @@ export function MerchantDashboard({
                           </span>
                         </td>
                         <td className="text-end">
-                          <button
-                            type="button"
-                            onClick={() => toggleProduct(product)}
-                            disabled={busy === product.id}
-                            className="btn btn-ghost btn-sm"
-                          >
-                            {product.available ? "Mark sold out" : "Restore"}
-                          </button>
+                          <div className="flex justify-end gap-1">
+                            <label className="btn btn-ghost btn-sm cursor-pointer">
+                              <ImagePlus size={12} /> Photo
+                              <input
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp"
+                                className="hidden"
+                                onChange={(event) =>
+                                  void updateProductImage(product, event.target.files?.[0])
+                                }
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => toggleProduct(product)}
+                              disabled={busy === product.id}
+                              className="btn btn-ghost btn-sm"
+                            >
+                              {product.available ? "Mark sold out" : "Restore"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -516,6 +603,32 @@ export function MerchantDashboard({
             <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">
               Store profile
             </h2>
+            <div className="mt-4 overflow-hidden rounded-[8px] border border-line">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={storePhoto(store)}
+                alt={`${store.name} cover`}
+                className="aspect-[16/9] w-full object-cover"
+              />
+              <div className="flex flex-wrap items-center gap-2 border-t border-line p-2.5">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] font-semibold">Restaurant cover</div>
+                  <div className="text-[10px] text-muted">
+                    Shown at the top of your storefront.
+                  </div>
+                </div>
+                <label className="btn btn-ghost btn-sm cursor-pointer">
+                  {coverUploading ? <Loader2 size={12} className="animate-spin" /> : null}
+                  {coverUploading ? "Saving…" : "Change photo"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={(event) => void updateCover(event.target.files?.[0])}
+                  />
+                </label>
+              </div>
+            </div>
             <div className="mt-4 space-y-3 text-[13px]">
               {[
                 ["Store name", store.name],
@@ -627,6 +740,7 @@ function AddItemModal({
     category: string;
     price: number;
     description: string;
+    image?: string;
     popular: boolean;
     available: boolean;
   }) => void | Promise<void>;
@@ -635,6 +749,8 @@ function AddItemModal({
   const [category, setCategory] = useState(categories[0] || "Mains");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [popular, setPopular] = useState(false);
 
   useEffect(() => {
@@ -663,6 +779,7 @@ function AddItemModal({
             category: category.trim(),
             price: Number(price),
             description: description.trim(),
+            image: image || undefined,
             popular,
             available: true,
           });
@@ -735,6 +852,52 @@ function AddItemModal({
                 required
               />
             </label>
+          </div>
+          <div className="rounded-[8px] border border-line p-3">
+            <div className="flex items-center gap-3">
+              {image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={image} alt="Item preview" className="h-14 w-14 rounded-[6px] object-cover" />
+              ) : (
+                <span className="grid h-14 w-14 place-items-center rounded-[6px] bg-surface-2 text-muted">
+                  <ImagePlus size={20} />
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="text-[12px] font-semibold">Item photo</div>
+                <div className="text-[11px] text-muted">Shown on the menu and in the cart.</div>
+              </div>
+              <label className="btn btn-ghost btn-sm cursor-pointer">
+                {uploading ? <Loader2 size={12} className="animate-spin" /> : null}
+                {image ? "Replace" : "Upload"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    setUploading(true);
+                    try {
+                      setImage(
+                        await resizeImage(file, {
+                          width: 640,
+                          height: 640,
+                          fit: "cover",
+                        }),
+                      );
+                    } finally {
+                      setUploading(false);
+                    }
+                  }}
+                />
+              </label>
+              {image ? (
+                <button type="button" onClick={() => setImage("")} className="btn btn-ghost btn-sm text-danger">
+                  Remove
+                </button>
+              ) : null}
+            </div>
           </div>
           <label className="block">
             <span className="label">Description</span>
@@ -839,7 +1002,12 @@ function MerchantOrderCard({
       <div className="mt-3 space-y-1.5 rounded-[6px] bg-surface-2/70 p-3">
         {order.items.map((item, index) => (
           <div key={`${item.productId}-${index}`} className="flex items-center gap-2 text-[11px]">
-            <ProductTile name={item.name} className="h-5 w-5 rounded-[3px]" iconSize={11} />
+            <ProductTile
+              name={item.name}
+              image={item.image}
+              className="h-5 w-5 rounded-[3px]"
+              iconSize={11}
+            />
             <span className="min-w-0 flex-1 font-medium">
               <span className="block truncate">{item.qty}× {item.name}</span>
               {item.options?.length ? (

@@ -56,6 +56,7 @@ export async function POST(request: Request) {
         commissionRate: numberOrUndefined(body.commissionRate),
         phone: body.phone,
         ownerName: body.ownerName,
+        image: typeof body.image === "string" ? body.image : undefined,
         isOpen: Boolean(body.isOpen),
         tags: Array.isArray(body.tags) ? body.tags : undefined,
       },
@@ -99,6 +100,7 @@ export async function PATCH(request: Request) {
     "phone",
     "ownerName",
     "isOpen",
+    "image",
   ]);
   const patch: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(body.patch)) {

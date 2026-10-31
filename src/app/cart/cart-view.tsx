@@ -88,6 +88,7 @@ export function CartView() {
             <div key={item.lineId} className="flex items-center gap-3 px-4 py-3.5">
               <ProductTile
                 name={item.name}
+                image={item.image}
                 className="h-[52px] w-[52px] rounded-[6px]"
                 iconSize={20}
               />

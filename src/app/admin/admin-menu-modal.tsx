@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
+  ImagePlus,
   Loader2,
   Package,
   Plus,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import type { Product, Store } from "@/lib/types";
 import { money } from "@/lib/utils";
+import { resizeImage } from "@/lib/image-client";
 
 export function AdminMenuModal({
   store,
@@ -30,6 +32,7 @@ export function AdminMenuModal({
     unit: store.category === "grocery" ? "each" : "",
     stock: store.category === "grocery" ? "20" : "",
     description: "",
+    image: "",
   });
 
   const load = useCallback(async () => {
@@ -63,6 +66,7 @@ export function AdminMenuModal({
           unit: draft.unit || undefined,
           stock: draft.stock ? Number(draft.stock) : undefined,
           description: draft.description,
+          image: draft.image || undefined,
           available: true,
         }),
       });
@@ -225,6 +229,38 @@ export function AdminMenuModal({
                 placeholder="Optional"
               />
             </label>
+            <div className="flex items-center gap-3 rounded-[6px] border border-line p-2 sm:col-span-2">
+              {draft.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={draft.image} alt="Item preview" className="h-12 w-12 rounded-[4px] object-cover" />
+              ) : (
+                <span className="grid h-12 w-12 place-items-center rounded-[4px] bg-surface-2 text-muted">
+                  <ImagePlus size={17} />
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] font-semibold">Item photo</div>
+                <div className="text-[10px] text-muted">Optional menu image.</div>
+              </div>
+              <label className="btn btn-ghost btn-sm cursor-pointer">
+                Upload
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    const image = await resizeImage(file, {
+                      width: 640,
+                      height: 640,
+                      fit: "cover",
+                    });
+                    setDraft((current) => ({ ...current, image }));
+                  }}
+                />
+              </label>
+            </div>
             <label className="block sm:col-span-2">
               <span className="label">Description</span>
               <textarea
@@ -262,8 +298,13 @@ export function AdminMenuModal({
           ) : products.length ? (
             products.map((product) => (
               <div key={product.id} className="flex items-center gap-3 px-3 py-2.5">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[4px] bg-surface-2 text-muted">
-                  <Package size={14} />
+                <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-[4px] bg-surface-2 text-muted">
+                  {product.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={product.image} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <Package size={14} />
+                  )}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[12px] font-semibold">{product.name}</div>

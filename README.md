@@ -29,6 +29,20 @@ and dark themes.
 
 ## Release history
 
+### 10.7.0 — 31 October 2026 — photos and GPS
+- Store owners can upload a restaurant/store cover from the merchant profile;
+  admins can upload the same cover from the store editor.
+- Products now support photos. Merchants can upload an item image when adding
+  it or from each menu row; admins can do the same from the store menu editor.
+  Images appear on the storefront, product sheet, cart, checkout and receipts.
+- Customer checkout and taxi booking have a “Use my location” action that moves
+  the pin to the device GPS position.
+- Drivers start live GPS sharing automatically when they go online; the taxi
+  queue has its own Share GPS control. iOS/Android location permission strings
+  were already present.
+- Uploaded images are resized and stored in the JSON document, so no new storage
+  service is required.
+
 ### 10.6.0 — 31 October 2026 — fleet, analytics and access
 - Admin Fleet now shows **Delivery boys** and **Taxi drivers** side by side,
   each with its own “Generate credentials” action and driver profile list.

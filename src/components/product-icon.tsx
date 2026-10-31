@@ -98,11 +98,13 @@ export function ProductIcon({
 export function ProductTile({
   name,
   category,
+  image,
   className = "h-10 w-10 rounded-[6px]",
   iconSize = 18,
 }: {
   name: string;
   category?: string;
+  image?: string;
   className?: string;
   iconSize?: number;
 }) {
@@ -112,7 +114,12 @@ export function ProductTile({
       className={`grid shrink-0 place-items-center overflow-hidden ${tile} ${className}`}
       aria-hidden
     >
-      <Icon size={iconSize} strokeWidth={1.7} className={ink} />
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={image} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <Icon size={iconSize} strokeWidth={1.7} className={ink} />
+      )}
     </span>
   );
 }

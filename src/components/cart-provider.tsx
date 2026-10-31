@@ -25,6 +25,7 @@ export type CartItem = {
   minOrder: number;
   name: string;
   emoji: string;
+  image?: string;
   basePrice: number;
   storeCategory?: "restaurant" | "grocery" | "pharmacy" | "cafe" | "gifts";
   variantId?: string;

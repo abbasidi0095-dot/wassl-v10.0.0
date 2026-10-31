@@ -97,8 +97,11 @@ function fingerprint(value: string): number {
   return Math.abs(hash);
 }
 
-/** Resolve a storefront cover photo. Always returns a local image path. */
-export function storePhoto(store: Pick<Store, "slug" | "category">): string {
+/** Resolve a storefront cover photo. Merchant uploads win over curated art. */
+export function storePhoto(
+  store: Pick<Store, "slug" | "category" | "image">,
+): string {
+  if (store.image) return store.image;
   const curated = STORE_PHOTOS[store.slug];
   if (curated) return `${BASE}/${curated}`;
   const pool = CATEGORY_POOL[store.category] ?? CATEGORY_POOL.restaurant;

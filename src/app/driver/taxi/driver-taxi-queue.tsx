@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   CarTaxiFront,
   CircleDot,
   Loader2,
+  LocateFixed,
   MapPin,
   Phone,
 } from "lucide-react";
@@ -30,6 +31,8 @@ export function DriverTaxiQueue({
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [codeFor, setCodeFor] = useState<TaxiRide | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const watchRef = useRef<number | null>(null);
 
   const refresh = useCallback(async () => {
     const response = await fetch("/api/taxi/queue", { cache: "no-store" });
@@ -46,6 +49,44 @@ export function DriverTaxiQueue({
     const timer = window.setInterval(() => void refresh(), 5000);
     return () => window.clearInterval(timer);
   }, [refresh]);
+
+  useEffect(
+    () => () => {
+      if (watchRef.current !== null) navigator.geolocation.clearWatch(watchRef.current);
+    },
+    [],
+  );
+
+  function toggleGps() {
+    if (sharing) {
+      if (watchRef.current !== null) navigator.geolocation.clearWatch(watchRef.current);
+      watchRef.current = null;
+      setSharing(false);
+      return;
+    }
+    if (!navigator.geolocation) {
+      setError(t("This browser does not support GPS"));
+      return;
+    }
+    watchRef.current = navigator.geolocation.watchPosition(
+      (position) => {
+        void fetch("/api/driver/location", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          }),
+        }).catch(() => null);
+      },
+      () => {
+        setError(t("GPS permission denied. Allow location access to receive rides."));
+        setSharing(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 12000 },
+    );
+    setSharing(true);
+  }
 
   async function move(ride: TaxiRide, status: TaxiStatus, proofCode?: string) {
     if (status === "completed" && ride.handoverRequired && !proofCode) {
@@ -82,7 +123,17 @@ export function DriverTaxiQueue({
             {t("Accept a nearby request and collect the fare in cash.")}
           </p>
         </div>
-        <span className="pill pill-warm">{money(driver.cashOnHand)}</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleGps}
+            className={sharing ? "btn btn-primary btn-sm" : "btn btn-ghost btn-sm"}
+          >
+            <LocateFixed size={12} />
+            {sharing ? t("GPS on") : t("Share GPS")}
+          </button>
+          <span className="pill pill-warm">{money(driver.cashOnHand)}</span>
+        </div>
       </div>
 
       {error ? (

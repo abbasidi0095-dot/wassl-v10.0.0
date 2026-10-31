@@ -9,6 +9,8 @@ import {
   Banknote,
   CheckCircle2,
   Clock3,
+  Loader2,
+  LocateFixed,
   Mail,
   MapPin,
   Phone,
@@ -63,6 +65,8 @@ export function CheckoutForm({
     lng: store?.storeLng ?? -15.958,
   });
   const [error, setError] = useState("");
+  const [locating, setLocating] = useState(false);
+  const [pinError, setPinError] = useState("");
   const [loading, setLoading] = useState(false);
   const [promoInput, setPromoInput] = useState("");
   const [promo, setPromo] = useState<PromoQuote | null>(null);
@@ -137,6 +141,29 @@ export function CheckoutForm({
       active = false;
     };
   }, []);
+
+  function useMyLocation() {
+    if (!navigator.geolocation) {
+      setPinError(t("Location is not available in this browser."));
+      return;
+    }
+    setLocating(true);
+    setPinError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setPin({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setLocating(false);
+      },
+      () => {
+        setPinError(t("Location permission was denied. Move the pin manually."));
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 },
+    );
+  }
 
   function applySavedAddress(entry: SavedAddress) {
     setName(entry.name);
@@ -472,7 +499,12 @@ export function CheckoutForm({
         <div className="mt-4 max-h-56 space-y-2 overflow-y-auto pe-1">
           {items.map((item) => (
             <div key={item.lineId} className="flex items-center gap-2 text-[11px]">
-              <ProductTile name={item.name} className="h-7 w-7 rounded-[6px]" iconSize={14} />
+              <ProductTile
+                name={item.name}
+                image={item.image}
+                className="h-7 w-7 rounded-[6px]"
+                iconSize={14}
+              />
               <span className="min-w-0 flex-1 truncate font-medium">
                 {item.qty}× {item.name}
                 {item.options.length ? (

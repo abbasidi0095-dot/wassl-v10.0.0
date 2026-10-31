@@ -47,6 +47,7 @@ export function FavoritesView({
           <ProductTile
             name={product.name}
             category={product.category}
+            image={product.image}
             className="h-16 w-16 rounded-[10px]"
             iconSize={26}
           />

@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.6.0** (31 October 2026; fleet panels, signup split, analytics and access)
+- Release: **10.7.0** (31 October 2026; product/store photos and GPS)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,17 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.7.0 — photos and GPS
+- `Store.image` and `Product.image` fields; `storePhoto()` prefers merchant
+  uploads. Product tiles and sheets render images with icon fallbacks.
+- Merchant dashboard: cover-photo upload on Store profile, item image in Add
+  item and per-row Photo action. Admin store form and menu modal have uploads.
+- `src/lib/image-client.ts` resizes uploads to bounded JPEG/PNG data URLs.
+- Checkout and taxi booking use `navigator.geolocation` with explicit errors.
+  Driver dashboard auto-starts sharing when coming online; taxi queue has GPS.
+- iOS `NSLocationWhenInUseUsageDescription` and Android fine/coarse location
+  permissions were already in the native projects.
 
 ### 10.6.0 — fleet, signup separation, analytics and access
 - Admin Fleet is two side-by-side panels, `DriverPanel` for delivery and taxi,
