@@ -15,8 +15,10 @@ import {
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
+import { StoreCard } from "@/components/store-card";
 import { MapView } from "@/components/map-view";
 import { dashboardStats, getCities, getPriorityCities, getStores } from "@/lib/db";
+import { getOpenState } from "@/lib/hours";
 import { getTranslator } from "@/lib/i18n-server";
 import { storePhoto } from "@/lib/store-images";
 import { money } from "@/lib/utils";
@@ -44,6 +46,20 @@ export default async function HomePage() {
   for (const store of stores) {
     storeCount.set(store.citySlug, (storeCount.get(store.citySlug) ?? 0) + 1);
   }
+  const restaurants = stores.filter((store) => store.category === "restaurant");
+  const localRestaurants = restaurants.filter(
+    (store) => store.citySlug === dakhla.slug,
+  );
+  const topRestaurants = [
+    ...(localRestaurants.length >= 3 ? localRestaurants : restaurants),
+  ]
+    .sort(
+      (a, b) =>
+        Number(getOpenState(b).open) - Number(getOpenState(a).open) ||
+        b.rating - a.rating ||
+        b.reviews - a.reviews,
+    )
+    .slice(0, 3);
 
   const doors = [
     {
@@ -80,182 +96,36 @@ export default async function HomePage() {
     <>
       <SiteHeader cities={cities} currentCity={dakhla} />
       <main>
-        {/* Hero: type left, one real live panel right. */}
-        <section className="container-wassl grid gap-10 pb-12 pt-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:gap-14 lg:pb-16 lg:pt-16">
-          <div>
-            <div className="flex items-center gap-2 text-[13px] font-medium text-muted">
-              <span className="status-dot live-dot text-success" />
-              {t("Now delivering in {city}", { city: cityLabel })}
-              <span className="text-line-strong">/</span>
-              <span className="tnum">06:00–02:00</span>
-            </div>
-
-            <h1 className="display mt-6">
-              {t("The South,")}
-              <br />
-              {t("delivered.").replace(".", "")}
-              <span className="text-signal">.</span>
-            </h1>
-
-            <p className="lede mt-7 max-w-[46ch]" dir="auto">
-              {t(
-                "Restaurants, a full supermarket, pharmacy essentials and taxi rides — from Dakhla to Tarfaya. Cash on arrival, tracked live.",
-              )}
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link href={`/city/${dakhla.slug}`} className="btn btn-primary btn-lg">
-                {t("Order from {city}", { city: cityLabel })}
-                <ArrowRight size={17} className="rtl:-scale-x-100" />
-              </Link>
-              <Link
-                href="/grocery"
-                className="inline-flex min-h-11 items-center gap-1.5 text-[14px] font-medium text-ink underline decoration-line-strong decoration-1 underline-offset-4 transition-colors hover:decoration-ink"
-              >
-                {t("Shop 24/7 groceries")}
-                <ArrowUpRight size={15} className="rtl:-scale-x-100" />
-              </Link>
-            </div>
-
-            <dl className="mt-10 grid max-w-xl grid-cols-2 gap-y-5 border-t border-line pt-6 sm:grid-cols-4 sm:gap-x-5">
-              {[
-                { value: String(priority.length), label: t("cities live") },
-                { value: String(stores.length), label: t("local stores") },
-                { value: "24/7", label: t("grocery where staffed") },
-                { value: "COD", label: t("cash on delivery") },
-              ].map((item, index) => (
-                <div
-                  key={item.label}
-                  className={index > 0 ? "sm:border-s sm:border-line sm:ps-5" : ""}
-                >
-                  <dt className="tnum font-display text-[26px] font-semibold leading-none tracking-[-0.03em]">
-                    {item.value}
-                  </dt>
-                  <dd className="mt-2 text-[11px] leading-4 text-muted">
-                    {item.label}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          {featuredStore ? (
-            <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
-              <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
-                <div className="flex min-w-0 items-center gap-2 text-[13px] font-medium">
-                  <span className="status-dot live-dot text-success" />
-                  <span className="truncate">
-                    {t("Live in {city}", { city: cityLabel })}
-                  </span>
-                </div>
-                <span className="shrink-0 text-[11px] text-muted tnum">
-                  {featuredStore.prepTime}–{featuredStore.prepTime + 10} min
-                </span>
+        {/* Restaurants first: three real listings before anything else. */}
+        <section className="container-wassl pt-8 lg:pt-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-[13px] font-medium text-muted">
+                <span className="status-dot live-dot text-success" />
+                {t("Now delivering in {city}", { city: cityLabel })}
+                <span className="text-line-strong">/</span>
+                <span className="tnum">06:00–02:00</span>
               </div>
-              <MapView
-                points={[
-                  {
-                    id: "store",
-                    lat: featuredStore.lat,
-                    lng: featuredStore.lng,
-                    kind: "store",
-                    label: featuredStore.name,
-                  },
-                  {
-                    id: "driver",
-                    lat: featuredStore.lat - 0.003,
-                    lng: featuredStore.lng - 0.004,
-                    kind: "driver",
-                    label: "Youssef · driver",
-                  },
-                  {
-                    id: "customer",
-                    lat: featuredStore.lat - 0.006,
-                    lng: featuredStore.lng - 0.008,
-                    kind: "customer",
-                    label: t("Drop-off"),
-                  },
-                ]}
-                center={{
-                  lat: featuredStore.lat - 0.003,
-                  lng: featuredStore.lng - 0.004,
-                }}
-                zoom={14}
-                height={330}
-                route={[
-                  [featuredStore.lat, featuredStore.lng],
-                  [featuredStore.lat - 0.003, featuredStore.lng - 0.004],
-                  [featuredStore.lat - 0.006, featuredStore.lng - 0.008],
-                ]}
-                followDriverId="driver"
-                interactive={false}
-                className="rounded-none"
-              />
-              <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-3.5">
-                <div className="min-w-0">
-                  <div className="truncate text-[13px] font-semibold">
-                    {featuredStore.name}
-                  </div>
-                  <div className="mt-0.5 truncate text-[11px] text-muted">
-                    {featuredStore.landmark} · {t("Cash on delivery")}
-                  </div>
-                </div>
-                <Link
-                  href={`/store/${featuredStore.slug}`}
-                  className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-brand"
-                >
-                  {t("Open store")}
-                  <ArrowRight size={13} className="rtl:-scale-x-100" />
-                </Link>
-              </div>
+              <h1 className="display mt-4 text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)]">
+                {t("Restaurants in {city}", { city: cityLabel })}
+              </h1>
+              <p className="mt-4 max-w-[52ch] text-[14px] leading-6 text-muted">
+                {t(
+                  "Local kitchens, cafés and late-night grills — delivered hot, paid in cash on arrival.",
+                )}
+              </p>
             </div>
-          ) : null}
-        </section>
-
-        {/* Four doors, one per service. */}
-        <section className="container-wassl">
-          <div className="flex items-end justify-between gap-4 border-t border-line pt-6">
-            <h2 className="text-[13px] font-semibold text-muted">
-              {t("What do you need?")}
-            </h2>
-            <Link href="/cities" className="text-[13px] font-medium text-brand">
-              {t("All Moroccan cities")}
+            <Link
+              href={`/city/${dakhla.slug}`}
+              className="btn btn-ghost btn-sm"
+            >
+              {t("All restaurants")}
+              <ArrowRight size={13} className="rtl:-scale-x-100" />
             </Link>
           </div>
-          <div className="mt-4 grid grid-cols-2 border-s border-t border-line lg:grid-cols-4">
-            {doors.map((door) => (
-              <Link
-                key={door.label}
-                href={door.href}
-                className="group relative flex min-h-[148px] flex-col border-e border-b border-line bg-surface p-4 transition-colors after:absolute after:bottom-0 after:start-0 after:h-[2px] after:w-0 after:bg-brand after:transition-[width] after:duration-300 hover:bg-surface-2 hover:after:w-full sm:min-h-[160px] sm:p-5"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <door.icon
-                    size={20}
-                    strokeWidth={1.6}
-                    className="text-muted"
-                  />
-                  {door.count !== null ? (
-                    <span className="text-[11px] text-muted tnum">{door.count}</span>
-                  ) : (
-                    <span className="text-[11px] text-muted">—</span>
-                  )}
-                </div>
-                <div className="mt-auto pt-6">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-display text-[20px] font-semibold tracking-[-0.03em] sm:text-[24px]">
-                      {door.label}
-                    </span>
-                    <ArrowUpRight
-                      size={15}
-                      className="shrink-0 text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100"
-                    />
-                  </div>
-                  <p className="mt-0.5 text-[12px] leading-4 text-muted sm:mt-1 sm:text-[13px]">
-                    {door.note}
-                  </p>
-                </div>
-              </Link>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {topRestaurants.map((store) => (
+              <StoreCard key={store.id} store={store} />
             ))}
           </div>
         </section>
@@ -386,6 +256,54 @@ export default async function HomePage() {
           </section>
         ) : null}
 
+        {/* All services, after the two lead offerings. */}
+        <section className="container-wassl mt-12 lg:mt-16">
+          <div className="flex items-end justify-between gap-4 border-t border-line pt-6">
+            <h2 className="text-[13px] font-semibold text-muted">
+              {t("All services")}
+            </h2>
+            <Link href="/cities" className="text-[13px] font-medium text-brand">
+              {t("All Moroccan cities")}
+            </Link>
+          </div>
+          <div className="mt-4 grid grid-cols-2 border-s border-t border-line lg:grid-cols-4">
+            {doors.map((door) => (
+              <Link
+                key={door.label}
+                href={door.href}
+                className="group relative flex min-h-[148px] flex-col border-e border-b border-line bg-surface p-4 transition-colors after:absolute after:bottom-0 after:start-0 after:h-[2px] after:w-0 after:bg-brand after:transition-[width] after:duration-300 hover:bg-surface-2 hover:after:w-full sm:min-h-[160px] sm:p-5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <door.icon
+                    size={20}
+                    strokeWidth={1.6}
+                    className="text-muted"
+                  />
+                  {door.count !== null ? (
+                    <span className="text-[11px] text-muted tnum">{door.count}</span>
+                  ) : (
+                    <span className="text-[11px] text-muted">—</span>
+                  )}
+                </div>
+                <div className="mt-auto pt-6">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-display text-[20px] font-semibold tracking-[-0.03em] sm:text-[24px]">
+                      {door.label}
+                    </span>
+                    <ArrowUpRight
+                      size={15}
+                      className="shrink-0 text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100"
+                    />
+                  </div>
+                  <p className="mt-0.5 text-[12px] leading-4 text-muted sm:mt-1 sm:text-[13px]">
+                    {door.note}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         <section className="container-wassl pt-14 lg:pt-20" id="stores">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -401,7 +319,7 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="mt-6">
-            <StoreBrowser stores={stores} initialLimit={9} />
+            <StoreBrowser stores={stores} initialLimit={6} />
           </div>
         </section>
 
@@ -533,6 +451,138 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        {/* Brand close: the old intro now sits after every service. */}
+        <section className="mt-16 border-t border-line lg:mt-24">
+        <div className="container-wassl grid gap-10 pb-12 pt-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:gap-14 lg:pb-16 lg:pt-16">
+          <div>
+            <div className="flex items-center gap-2 text-[13px] font-medium text-muted">
+              <span className="status-dot live-dot text-success" />
+              {t("One platform for the South.")}
+            </div>
+
+            <h2 className="display mt-4 text-[clamp(2.6rem,1.7rem+3.2vw,4.6rem)]">
+              {t("The South,")}
+              <br />
+              {t("delivered.").replace(".", "")}
+              <span className="text-signal">.</span>
+            </h2>
+
+            <p className="lede mt-7 max-w-[46ch]" dir="auto">
+              {t(
+                "Restaurants, a full supermarket, pharmacy essentials and taxi rides — from Dakhla to Tarfaya. Cash on arrival, tracked live.",
+              )}
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link href={`/city/${dakhla.slug}`} className="btn btn-primary btn-lg">
+                {t("Order from {city}", { city: cityLabel })}
+                <ArrowRight size={17} className="rtl:-scale-x-100" />
+              </Link>
+              <Link
+                href="/grocery"
+                className="inline-flex min-h-11 items-center gap-1.5 text-[14px] font-medium text-ink underline decoration-line-strong decoration-1 underline-offset-4 transition-colors hover:decoration-ink"
+              >
+                {t("Shop 24/7 groceries")}
+                <ArrowUpRight size={15} className="rtl:-scale-x-100" />
+              </Link>
+            </div>
+
+            <dl className="mt-10 grid max-w-xl grid-cols-2 gap-y-5 border-t border-line pt-6 sm:grid-cols-4 sm:gap-x-5">
+              {[
+                { value: String(priority.length), label: t("cities live") },
+                { value: String(stores.length), label: t("local stores") },
+                { value: "24/7", label: t("grocery where staffed") },
+                { value: "COD", label: t("cash on delivery") },
+              ].map((item, index) => (
+                <div
+                  key={item.label}
+                  className={index > 0 ? "sm:border-s sm:border-line sm:ps-5" : ""}
+                >
+                  <dt className="tnum font-display text-[26px] font-semibold leading-none tracking-[-0.03em]">
+                    {item.value}
+                  </dt>
+                  <dd className="mt-2 text-[11px] leading-4 text-muted">
+                    {item.label}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {featuredStore ? (
+            <div className="overflow-hidden rounded-[10px] border border-line bg-surface">
+              <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2 text-[13px] font-medium">
+                  <span className="status-dot live-dot text-success" />
+                  <span className="truncate">
+                    {t("Live in {city}", { city: cityLabel })}
+                  </span>
+                </div>
+                <span className="shrink-0 text-[11px] text-muted tnum">
+                  {featuredStore.prepTime}–{featuredStore.prepTime + 10} min
+                </span>
+              </div>
+              <MapView
+                points={[
+                  {
+                    id: "store",
+                    lat: featuredStore.lat,
+                    lng: featuredStore.lng,
+                    kind: "store",
+                    label: featuredStore.name,
+                  },
+                  {
+                    id: "driver",
+                    lat: featuredStore.lat - 0.003,
+                    lng: featuredStore.lng - 0.004,
+                    kind: "driver",
+                    label: "Youssef · driver",
+                  },
+                  {
+                    id: "customer",
+                    lat: featuredStore.lat - 0.006,
+                    lng: featuredStore.lng - 0.008,
+                    kind: "customer",
+                    label: t("Drop-off"),
+                  },
+                ]}
+                center={{
+                  lat: featuredStore.lat - 0.003,
+                  lng: featuredStore.lng - 0.004,
+                }}
+                zoom={14}
+                height={300}
+                route={[
+                  [featuredStore.lat, featuredStore.lng],
+                  [featuredStore.lat - 0.003, featuredStore.lng - 0.004],
+                  [featuredStore.lat - 0.006, featuredStore.lng - 0.008],
+                ]}
+                followDriverId="driver"
+                interactive={false}
+                className="rounded-none"
+              />
+              <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-3.5">
+                <div className="min-w-0">
+                  <div className="truncate text-[13px] font-semibold">
+                    {featuredStore.name}
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] text-muted">
+                    {featuredStore.landmark} · {t("Cash on delivery")}
+                  </div>
+                </div>
+                <Link
+                  href={`/store/${featuredStore.slug}`}
+                  className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-brand"
+                >
+                  {t("Open store")}
+                  <ArrowRight size={13} className="rtl:-scale-x-100" />
+                </Link>
+              </div>
+            </div>
+          ) : null}
+        </div>
+        </section>
+
       </main>
       <SiteFooter />
     </>

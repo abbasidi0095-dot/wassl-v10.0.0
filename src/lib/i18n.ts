@@ -634,6 +634,12 @@ const fr: Record<string, string> = {
   Reorder: "Commander à nouveau",
   "Your local orders will appear here. Try Dakhla Grill or Sahara Market to see the full flow.":
     "Vos commandes locales apparaîtront ici. Essayez Dakhla Grill ou Sahara Market pour voir le parcours complet.",
+  "Restaurants in {city}": "Restaurants à {city}",
+  "Local kitchens, cafés and late-night grills — delivered hot, paid in cash on arrival.":
+    "Cuisines locales, cafés et grillades de nuit — livrés chauds, payés en espèces à la réception.",
+  "All restaurants": "Tous les restaurants",
+  "All services": "Tous les services",
+  "One platform for the South.": "Une seule plateforme pour le Sud.",
 };
 
 const es: Record<string, string> = {
@@ -1244,6 +1250,12 @@ const es: Record<string, string> = {
   Reorder: "Volver a pedir",
   "Your local orders will appear here. Try Dakhla Grill or Sahara Market to see the full flow.":
     "Tus pedidos locales aparecerán aquí. Prueba Dakhla Grill o Sahara Market para ver el flujo completo.",
+  "Restaurants in {city}": "Restaurantes en {city}",
+  "Local kitchens, cafés and late-night grills — delivered hot, paid in cash on arrival.":
+    "Cocinas locales, cafeterías y parrillas nocturnas — entregados calientes y pagados en efectivo al recibir.",
+  "All restaurants": "Todos los restaurantes",
+  "All services": "Todos los servicios",
+  "One platform for the South.": "Una plataforma para el Sur.",
 };
 
 const ar: Record<string, string> = {
@@ -1851,6 +1863,12 @@ const ar: Record<string, string> = {
   Reorder: "إعادة الطلب",
   "Your local orders will appear here. Try Dakhla Grill or Sahara Market to see the full flow.":
     "ستظهر طلباتك المحلية هنا. جرّب Dakhla Grill أو Sahara Market لرؤية المسار الكامل.",
+  "Restaurants in {city}": "مطاعم {city}",
+  "Local kitchens, cafés and late-night grills — delivered hot, paid in cash on arrival.":
+    "مطابخ محلية ومقاهٍ ومشاوٍ حتى وقت متأخر — تُوصّل ساخنة ويُدفع نقداً عند الاستلام.",
+  "All restaurants": "كل المطاعم",
+  "All services": "كل الخدمات",
+  "One platform for the South.": "منصة واحدة للجنوب.",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

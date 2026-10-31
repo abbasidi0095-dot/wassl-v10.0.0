@@ -29,6 +29,16 @@ and dark themes.
 
 ## Release history
 
+### 10.3.2 — 31 October 2026 — restaurant-first home
+- Home now opens with three open, top-rated Dakhla restaurants and an “All
+  restaurants” action. The grocery feature follows, then the all-services index,
+  the full store directory, cities, business tools and finally the brand/map
+  section that used to sit at the top.
+- The closing brand section keeps the live map and operating stats but no longer
+  acts as a gate before the first order.
+- Restaurant picks prefer stores that are open right now, then rating/reviews.
+- Home’s full directory starts at six cards to keep the longer page manageable.
+
 ### 10.3.1 — 31 October 2026 — navigation fixes
 - Removed the public admin entry from the mobile menu and footer; operations
   accounts now sign in only through the normal `/login` form and are routed to

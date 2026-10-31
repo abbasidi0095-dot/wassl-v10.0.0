@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.3.1** (31 October 2026; navigation and mobile chrome fixes)
+- Release: **10.3.2** (31 October 2026; restaurant-first home)
 - Live: <https://wassl-34-preview.fly.dev>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,15 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.3.2 — restaurant-first home
+- `src/app/page.tsx` reordered: three open, top-rated Dakhla restaurant cards
+  (with “All restaurants”), then the grocery feature, all-services index, full
+  store directory, cities, business tools, and finally the former hero as a
+  closing brand/map section with an `<h2>`.
+- `topRestaurants` prefers `getOpenState(store).open`, then rating and review
+  count, so the first viewport does not lead with a closed kitchen.
+- Directory `initialLimit` reduced to 6; new copy keys added in FR/ES/AR.
 
 ### 10.3.1 — navigation and mobile chrome
 - Public admin links removed from the mobile menu and footer. Admins use the
