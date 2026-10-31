@@ -56,6 +56,26 @@ function hydrate(db: Database): Database {
   db.pushSubscriptions ??= [];
   db.taxiRides ??= [];
 
+  // Give existing records a handover code once. The code is persisted on the
+  // next mutation; until then the in-memory view is still consistent.
+  const code = () => String(1000 + Math.floor(Math.random() * 9000));
+  for (const order of db.orders) {
+    if (!order.deliveryPin) {
+      const pin = code();
+      order.deliveryPin = pin;
+      if (order.fulfillment === "pickup" && !order.pickupCode) {
+        order.pickupCode = `P${pin}`;
+      }
+      order.handoverRequired = true;
+    }
+  }
+  for (const ride of db.taxiRides) {
+    if (!ride.verificationCode) {
+      ride.verificationCode = code();
+      ride.handoverRequired = true;
+    }
+  }
+
   // Backfill older documents with grocery settings and SKU/stock fields. This
   // is intentionally additive and never touches locked snapshot products.
   for (const store of db.stores) {
