@@ -90,8 +90,15 @@ export async function GET(request: Request) {
   if (session.role === "driver") {
     driverId = session.driverId;
   }
+  const orders = await getOrderViews({ storeId, citySlug, driverId });
   return NextResponse.json({
-    orders: await getOrderViews({ storeId, citySlug, driverId }),
+    orders:
+      session.role === "driver" || session.role === "merchant"
+        ? orders.map(({ deliveryPin, pickupCode, ...order }) => ({
+            ...order,
+            handoverRequired: Boolean(deliveryPin),
+          }))
+        : orders,
   });
 }
 

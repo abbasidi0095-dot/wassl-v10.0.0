@@ -1066,8 +1066,17 @@ export type DriverBoard = {
  * deliberately stripped of customer PII: a driver only receives the address
  * and phone after the order is assigned (or claimed) to them.
  */
+export function handoverSafeOrderView(view: OrderView): OrderView {
+  return {
+    ...view,
+    deliveryPin: undefined,
+    pickupCode: undefined,
+    handoverRequired: Boolean(view.deliveryPin),
+  };
+}
+
 function driverQueueViewFromDb(db: Database, order: Order): OrderView {
-  const view = orderViewFromDb(db, order);
+  const view = handoverSafeOrderView(orderViewFromDb(db, order));
   return {
     ...view,
     customerName: "Customer",
@@ -1091,7 +1100,7 @@ export async function getDriverBoard(
   return {
     driver,
     orders: ordersFromDb(db, { driverId }).map((order) =>
-      orderViewFromDb(db, order),
+      handoverSafeOrderView(orderViewFromDb(db, order)),
     ),
     cityOrders: ordersFromDb(db, { citySlug: driver.citySlug })
       .filter(
@@ -1442,8 +1451,9 @@ export async function createOrder(
       fulfillment: isGrocery ? fulfillment : undefined,
       express: isGrocery ? Boolean(input.express) : undefined,
       deliveryWindow: isGrocery ? input.deliveryWindow : undefined,
-      deliveryPin: isGrocery ? pin : undefined,
+      deliveryPin: pin,
       pickupCode: isGrocery && fulfillment === "pickup" ? `P${pin}` : undefined,
+      handoverRequired: true,
       substitutionPreference: isGrocery
         ? input.substitutionPreference ?? settings?.substitutionDefault
         : undefined,
@@ -1525,10 +1535,13 @@ export async function updateOrderStatus(
     const isGrocery = store?.category === "grocery";
     const isPickup = order.fulfillment === "pickup";
 
-    if (isGrocery && next === "delivered" && actor.role !== "admin") {
-      const supplied = (options.proofPin ?? "").trim().toUpperCase();
-      const expected = (order.deliveryPin ?? "").trim().toUpperCase();
-      const pickupExpected = (order.pickupCode ?? "").trim().toUpperCase();
+    const check = checkTransition(order, next, actor, options);
+    if (!check.ok) throw new OrderRuleError(check.code, check.error);
+
+    if (next === "delivered" && actor.role !== "admin" && order.deliveryPin) {
+      const supplied = (options.proofPin ?? "").replace(/\D/g, "");
+      const expected = (order.deliveryPin ?? "").replace(/\D/g, "");
+      const pickupExpected = (order.pickupCode ?? "").replace(/\D/g, "");
       if (!supplied || (supplied !== expected && supplied !== pickupExpected)) {
         throw new OrderRuleError(
           "proof_required",
@@ -1538,9 +1551,6 @@ export async function updateOrderStatus(
         );
       }
     }
-
-    const check = checkTransition(order, next, actor, options);
-    if (!check.ok) throw new OrderRuleError(check.code, check.error);
 
     const now = new Date().toISOString();
     const from = order.status;
@@ -1697,6 +1707,12 @@ function assignDriverInDb(
     );
   }
   if (!driver.active) throw new OrderRuleError("driver_inactive", "Driver is not active");
+  if (driver.kind === "taxi") {
+    throw new OrderRuleError(
+      "wrong_driver_type",
+      "This driver is registered for taxi rides, not deliveries",
+    );
+  }
   if (driver.citySlug !== order.citySlug) {
     throw new OrderRuleError("wrong_city", "Driver is in another city");
   }
@@ -1782,6 +1798,7 @@ export async function autoAssignOrder(
         (driver) =>
           driver.citySlug === order.citySlug &&
           driver.active &&
+          driver.kind !== "taxi" &&
           driver.status === "available" &&
           driver.cashOnHand < driver.cashLimit,
       )
@@ -2022,6 +2039,161 @@ export async function updateStoreAdmin(
   });
 }
 
+function provisionPassword(): string {
+  const token = randomId("p", 4).slice(2, 10).toUpperCase();
+  return `Wsl-${token.slice(0, 4)}-${token.slice(4, 8)}!`;
+}
+
+function provisionEmail(prefix: string, name: string): string {
+  const handle = slugify(name).replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "");
+  return `${prefix}.${handle || "account"}.${randomId("x", 2).slice(2)}@wassl.ma`;
+}
+
+export type ProvisionedDriver = {
+  user: User;
+  driver: Driver;
+  password: string;
+  email: string;
+};
+
+export async function createDriverAccount(
+  input: {
+    name: string;
+    phone: string;
+    citySlug: string;
+    kind?: Driver["kind"];
+    vehicle: string;
+    plate?: string;
+    photo?: string;
+    email?: string;
+    password?: string;
+    cashLimit?: number;
+  },
+  actor: OrderActor,
+): Promise<ProvisionedDriver> {
+  const name = input.name.trim();
+  if (name.length < 2) throw new Error("Driver name is required");
+  if (!input.phone.trim()) throw new Error("Phone number is required");
+  if (!input.vehicle.trim()) throw new Error("Choose the vehicle");
+  const kind = input.kind === "taxi" || input.kind === "both" ? input.kind : "delivery";
+  if (kind !== "delivery" && !input.plate?.trim()) {
+    throw new Error("A plate number is required for taxi drivers");
+  }
+
+  return mutate((db) => {
+    const city = db.cities.find((candidate) => candidate.slug === input.citySlug);
+    if (!city) throw new Error("City not found");
+    const email = (input.email?.trim().toLowerCase() || provisionEmail("driver", name));
+    if (db.users.some((user) => user.email.toLowerCase() === email)) {
+      throw new Error("An account with this email already exists");
+    }
+    const password = input.password?.trim() || provisionPassword();
+    if (password.length < 8) throw new Error("Use a password with at least 8 characters");
+
+    const now = new Date().toISOString();
+    const driver: Driver = {
+      id: `driver_${randomId("x", 4).slice(2)}`,
+      name,
+      phone: input.phone.trim(),
+      email,
+      citySlug: city.slug,
+      vehicle: input.vehicle.trim(),
+      plate: input.plate?.trim() || "",
+      kind,
+      photo: input.photo?.trim() || undefined,
+      status: "offline",
+      lat: city.lat,
+      lng: city.lng,
+      rating: 5,
+      deliveries: 0,
+      cashOnHand: 0,
+      cashLimit: Math.max(0, Math.round(input.cashLimit ?? 1000)),
+      active: true,
+    };
+    db.drivers.push(driver);
+
+    const user: User = {
+      id: randomId("user", 8),
+      email,
+      passwordHash: hashPassword(password),
+      name,
+      role: "driver",
+      driverId: driver.id,
+      phone: driver.phone,
+      citySlug: city.slug,
+      accountStatus: "active",
+      emailVerified: true,
+      createdAt: now,
+    };
+    db.users.push(user);
+
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "driver.create",
+      entity: "driver",
+      entityId: driver.id,
+      summary: `Created ${kind} driver ${driver.name} in ${city.name}`,
+      after: `${driver.vehicle} · ${driver.plate || "no plate"}`,
+      metadata: { email, citySlug: city.slug, kind },
+    });
+    return { user, driver, password, email };
+  });
+}
+
+export async function createMerchantAccount(
+  input: {
+    storeId: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    password?: string;
+  },
+  actor: OrderActor,
+): Promise<{ user: User; store: Store; password: string; email: string }> {
+  return mutate((db) => {
+    const store = db.stores.find((candidate) => candidate.id === input.storeId);
+    if (!store) throw new Error("Store not found");
+    const name = input.name?.trim() || store.ownerName || store.name;
+    const email = (input.email?.trim().toLowerCase() || provisionEmail("store", store.slug));
+    if (db.users.some((user) => user.email.toLowerCase() === email)) {
+      throw new Error("An account with this email already exists");
+    }
+    const password = input.password?.trim() || provisionPassword();
+    if (password.length < 8) throw new Error("Use a password with at least 8 characters");
+
+    const user: User = {
+      id: randomId("user", 8),
+      email,
+      passwordHash: hashPassword(password),
+      name,
+      role: "merchant",
+      storeId: store.id,
+      phone: input.phone?.trim() || store.phone,
+      citySlug: store.citySlug,
+      accountStatus: "active",
+      emailVerified: true,
+      createdAt: new Date().toISOString(),
+    };
+    db.users.push(user);
+    store.ownerName = name;
+
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "auth.provision",
+      entity: "auth",
+      entityId: user.id,
+      summary: `Created store login for ${store.name}`,
+      after: email,
+      metadata: { storeId: store.id },
+    });
+    return { user, store, password, email };
+  });
+}
+
 export async function updateDriverAdmin(
   driverId: string,
   patch: {
@@ -2029,6 +2201,8 @@ export async function updateDriverAdmin(
     vehicle?: string;
     plate?: string;
     phone?: string;
+    kind?: Driver["kind"];
+    photo?: string;
     cashLimit?: number;
     resetCash?: boolean;
     status?: Driver["status"];
@@ -2063,6 +2237,8 @@ export async function updateDriverAdmin(
     if (patch.vehicle !== undefined) driver.vehicle = patch.vehicle.trim() || driver.vehicle;
     if (patch.plate !== undefined) driver.plate = patch.plate.trim();
     if (patch.phone !== undefined) driver.phone = patch.phone.trim();
+    if (patch.kind !== undefined) driver.kind = patch.kind;
+    if (patch.photo !== undefined) driver.photo = patch.photo.trim() || undefined;
     if (patch.active !== undefined) {
       driver.active = patch.active;
       if (!patch.active) driver.status = "offline";
@@ -2674,6 +2850,8 @@ export async function createTaxiRide(
       distanceKm: Math.round(distanceKm * 100) / 100,
       fare: estimateTaxiFare(distanceKm),
       status: "requested",
+      verificationCode: String(1000 + Math.floor(Math.random() * 9000)),
+      handoverRequired: true,
       createdAt: now,
       updatedAt: now,
     };
@@ -2722,6 +2900,7 @@ export async function updateTaxiRideStatus(
   rideId: string,
   next: TaxiStatus,
   actor: OrderActor,
+  options: { proofCode?: string } = {},
 ): Promise<TaxiRide> {
   return mutate((db) => {
     db.taxiRides ??= [];
@@ -2731,13 +2910,25 @@ export async function updateTaxiRideStatus(
       throw new Error(`A ${ride.status} ride cannot move to ${next}`);
     }
 
+    if (next === "completed" && actor.role !== "admin" && ride.verificationCode) {
+      const supplied = (options.proofCode ?? "").replace(/\D/g, "");
+      const expected = (ride.verificationCode ?? "").replace(/\D/g, "");
+      if (!supplied || supplied !== expected) {
+        throw new Error("Enter the customer's 4-digit ride code to complete this trip");
+      }
+    }
+
     if (actor.role === "driver") {
       const driver = db.drivers.find((candidate) => candidate.id === actor.driverId);
       if (!driver || !driver.active) throw new Error("Driver profile is not active");
       if (ride.status === "requested" && next === "accepted") {
+        if (driver.kind === "delivery") {
+          throw new Error("This driver is registered for delivery, not taxi rides");
+        }
         ride.driverId = driver.id;
         ride.driverName = driver.name;
         ride.driverPhone = driver.phone;
+        ride.driverPhoto = driver.photo;
         ride.vehicle = driver.vehicle;
         ride.plate = driver.plate;
         driver.status = "busy";
@@ -2756,6 +2947,7 @@ export async function updateTaxiRideStatus(
     ride.updatedAt = new Date().toISOString();
     if (next === "completed") {
       ride.completedAt = ride.updatedAt;
+      ride.codeVerifiedAt = ride.updatedAt;
       if (ride.driverId) {
         const driver = db.drivers.find((candidate) => candidate.id === ride.driverId);
         if (driver) {

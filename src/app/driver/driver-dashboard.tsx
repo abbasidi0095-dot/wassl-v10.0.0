@@ -25,6 +25,7 @@ import type { Driver } from "@/lib/types";
 import { STATUS_META } from "@/lib/types";
 import { clock, distanceKm, money, timeAgo } from "@/lib/utils";
 import { MapView, type MapPoint } from "@/components/map-view";
+import { HandoverPrompt } from "@/components/handover-code";
 import { useLiveEvents } from "@/lib/use-live-events";
 
 type Action = { label: string; status: string; icon: typeof Bike };
@@ -49,6 +50,8 @@ export function DriverDashboard({
   const [cityOrders, setCityOrders] = useState(initialCityOrders);
   const [busy, setBusy] = useState("");
   const [toast, setToast] = useState("");
+  const [codeFor, setCodeFor] = useState<OrderView | null>(null);
+  const [codeError, setCodeError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [simulating, setSimulating] = useState(false);
@@ -217,18 +220,13 @@ export function DriverDashboard({
     }, 1200);
   }
 
-  async function advance(order: OrderView) {
+  async function advance(order: OrderView, proofPin?: string) {
     const action = NEXT_ACTION[order.status];
     if (!action) return;
-    let proofPin: string | undefined;
-    if (action.status === "delivered" && order.deliveryPin) {
-      const entered = window.prompt(
-        order.fulfillment === "pickup"
-          ? "Ask the customer for their pickup code"
-          : "Ask the customer for their 4-digit delivery PIN",
-      );
-      if (!entered?.trim()) return;
-      proofPin = entered.trim();
+    if (action.status === "delivered" && order.handoverRequired && !proofPin) {
+      setCodeError("");
+      setCodeFor(order);
+      return;
     }
     setBusy(order.id);
     try {
@@ -239,9 +237,11 @@ export function DriverDashboard({
       });
       const data = (await response.json()) as { error?: string; order?: OrderView };
       if (!response.ok) {
+        setCodeError(data.error || "Could not update the order");
         setToast(data.error || "Could not update the order");
         return;
       }
+      setCodeFor(null);
       await refresh(true);
       if (action.status === "delivered") {
         setToast(`Delivered · ${money(order.total)} cash collected`);
@@ -698,6 +698,20 @@ export function DriverDashboard({
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-[6px] bg-ink px-4 py-2.5 text-[12px] font-medium text-on-dark shadow-[var(--shadow-float)]">
           {toast}
         </div>
+      ) : null}
+
+      {codeFor ? (
+        <HandoverPrompt
+          title="Complete this delivery"
+          description="Ask the customer for the four digits on their order screen. Enter them to hand over the order and collect the cash."
+          busy={busy === codeFor.id}
+          error={codeError}
+          onClose={() => {
+            setCodeFor(null);
+            setCodeError("");
+          }}
+          onSubmit={(code) => advance(codeFor, code)}
+        />
       ) : null}
     </div>
   );

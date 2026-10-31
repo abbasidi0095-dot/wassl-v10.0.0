@@ -3,12 +3,16 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
+  Banknote,
   Check,
   Bike,
   CarTaxiFront,
   Clock3,
+  KeyRound,
   MapPin,
   Pill,
+  Route,
+  ShieldCheck,
   ShoppingBasket,
   UtensilsCrossed,
 } from "lucide-react";
@@ -255,6 +259,93 @@ export default async function HomePage() {
             </div>
           </section>
         ) : null}
+
+        {/* Taxi: real photography plus a moving route, before the service index. */}
+        <section className="container-wassl mt-16 lg:mt-24">
+          <div className="overflow-hidden rounded-[16px] border border-line bg-surface">
+            <div className="grid lg:grid-cols-[1.02fr_0.98fr]">
+              <div className="p-6 sm:p-10 lg:p-12">
+                <div className="eyebrow">
+                  <CarTaxiFront size={14} /> {t("Wassl Taxi")}
+                </div>
+                <h2 className="headline mt-3 max-w-[20ch]">
+                  {t("A car at the curb. The fare agreed.")}
+                </h2>
+                <p className="mt-4 max-w-[48ch] text-[14px] leading-6 text-muted">
+                  {t(
+                    "Book a local taxi and pay the driver in cash. The route is tracked and the fare is confirmed before you ride.",
+                  )}
+                </p>
+
+                <ul className="mt-6 grid gap-3 text-[12px] sm:grid-cols-3">
+                  {[
+                    { icon: Banknote, label: t("Cash fare") },
+                    { icon: Route, label: t("Live route") },
+                    { icon: KeyRound, label: t("4-digit handover") },
+                  ].map((item) => (
+                    <li key={item.label} className="flex items-center gap-2 text-muted">
+                      <item.icon size={15} className="shrink-0 text-brand" />
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-7 flex flex-wrap items-center gap-3">
+                  <Link href="/taxi" className="btn btn-primary">
+                    {t("Book a taxi")}
+                    <ArrowRight size={15} className="rtl:-scale-x-100" />
+                  </Link>
+                  <Link href="/login?next=driver" className="btn btn-ghost">
+                    {t("Drive with Wassl")}
+                  </Link>
+                </div>
+
+                <div
+                  className="relative mt-8 h-20 overflow-hidden rounded-[8px] border border-line bg-surface-2/70"
+                  aria-hidden="true"
+                >
+                  <div className="absolute inset-x-6 top-1/2 border-t border-dashed border-line-strong" />
+                  <span className="absolute start-5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-brand">
+                    <span className="taxi-ping absolute inset-0 rounded-full bg-brand/40" />
+                  </span>
+                  <span className="absolute end-5 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-signal">
+                    <span className="taxi-ping absolute inset-0 rounded-full bg-signal/40" />
+                  </span>
+                  <span className="taxi-route-run absolute top-1/2 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface text-brand shadow-[var(--shadow)]">
+                    <CarTaxiFront size={17} />
+                  </span>
+                  <span className="absolute inset-x-0 bottom-1.5 flex justify-between px-5 text-[10px] font-medium text-muted">
+                    <span>{t("Pickup")}</span>
+                    <span>{t("Destination")}</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative order-first min-h-[320px] overflow-hidden bg-ink lg:order-none lg:min-h-full">
+                <Image
+                  src="/images/taxi/taxi-night.jpg"
+                  alt={t("A Wassl taxi moving through the city at night")}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 48vw"
+                  className="object-cover opacity-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#07120f]/75 via-transparent to-[#07120f]/10" />
+                <div className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-[8px] border border-white/20 bg-[#07120f]/75 p-3 text-on-dark backdrop-blur-[2px] sm:inset-x-6 sm:bottom-6">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-[#f7f4ec] text-[#0c1a17]">
+                    <ShieldCheck size={18} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-semibold">{t("Fare agreed before you move")}</div>
+                    <div className="text-[11px] text-on-dark/65">
+                      {t("Cash to the driver · tracked live · code on arrival")}
+                    </div>
+                  </div>
+                  <ArrowUpRight size={16} className="shrink-0 text-on-dark/70" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* All services, after the two lead offerings. */}
         <section className="container-wassl mt-12 lg:mt-16">

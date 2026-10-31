@@ -24,5 +24,11 @@ export async function GET(
     return NextResponse.json({ error: "You cannot view this ride" }, { status: 403 });
   }
 
+  if (session.role === "driver") {
+    const { verificationCode, ...rest } = ride;
+    return NextResponse.json({
+      ride: { ...rest, handoverRequired: Boolean(verificationCode) },
+    });
+  }
   return NextResponse.json({ ride });
 }

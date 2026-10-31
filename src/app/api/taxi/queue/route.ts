@@ -27,8 +27,15 @@ export async function GET(request: Request) {
       ? await getTaxiRides({ driverId: session.driverId, limit: 20 })
       : [];
 
+  const safe = (ride: (typeof open)[number]) => {
+    const { verificationCode, ...rest } = ride;
+    return { ...rest, handoverRequired: Boolean(verificationCode) };
+  };
+
   return NextResponse.json({
-    open,
-    assigned: assigned.filter((ride) => TAXI_ACTIVE_STATUSES.includes(ride.status)),
+    open: session.role === "driver" ? open.map(safe) : open,
+    assigned: assigned
+      .filter((ride) => TAXI_ACTIVE_STATUSES.includes(ride.status))
+      .map(safe),
   });
 }

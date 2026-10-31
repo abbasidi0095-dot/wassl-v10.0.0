@@ -13,6 +13,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { MapView } from "@/components/map-view";
+import { HandoverCode } from "@/components/handover-code";
 import { useI18n } from "@/components/locale-provider";
 import type { TaxiRide } from "@/lib/types";
 import { TAXI_STATUS_ORDER, TAXI_STATUS_TEXT } from "@/lib/taxi-status";
@@ -153,13 +154,31 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
       </div>
 
       <div className="space-y-4">
+        {active && role !== "driver" && ride.verificationCode ? (
+          <HandoverCode
+            code={ride.verificationCode}
+            label={t("Ride handover code")}
+            note={t(
+              "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.",
+            )}
+          />
+        ) : null}
         <div className="card p-5">
           <div className="text-sm font-semibold">{t("Your driver")}</div>
           {ride.driverName ? (
             <div className="mt-3 flex items-center gap-3">
-              <span className="grid h-12 w-12 place-items-center rounded-[10px] bg-brand-soft text-brand">
-                <CarTaxiFront size={22} />
-              </span>
+              {ride.driverPhoto ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={ride.driverPhoto}
+                  alt={ride.driverName ?? "Driver"}
+                  className="h-12 w-12 rounded-[10px] object-cover"
+                />
+              ) : (
+                <span className="grid h-12 w-12 place-items-center rounded-[10px] bg-brand-soft text-brand">
+                  <CarTaxiFront size={22} />
+                </span>
+              )}
               <div className="min-w-0">
                 <div className="font-semibold">{ride.driverName}</div>
                 <div className="text-xs text-muted">

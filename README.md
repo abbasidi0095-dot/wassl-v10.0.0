@@ -29,6 +29,22 @@ and dark themes.
 
 ## Release history
 
+### 10.4.0 — 31 October 2026 — handover codes and fleet provisioning
+- Every delivery and taxi ride now gets a four-digit handover code. The customer
+  sees four large digits; the driver or store must enter them to close the
+  delivery/ride. Admins can see the code; driver and merchant views are stripped
+  of it server-side.
+- Taxi tracking shows the driver’s photo, vehicle and plate after acceptance.
+  Driver profiles now support a photo, vehicle type and delivery/taxi/both role.
+- Admin can provision driver logins (unique generated email + password), choose
+  the vehicle, plate and photo, and create store logins for existing stores.
+- Admin store menu editor can add items and toggle availability on the
+  merchant’s behalf.
+- Home gains a taxi feature with local photography, a moving route animation,
+  fare/route/handover proof points and direct booking/driver actions.
+- Driver taxi completion uses a focused four-digit entry dialog; order
+  completion uses the same handover language and server-side validation.
+
 ### 10.3.3 — 31 October 2026 — self-hosted on OCI
 - Fly is retired; Wassl runs on the OCI VPS at
   <https://141.145.192.23.nip.io>.
@@ -645,7 +661,7 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 69 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 71 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three

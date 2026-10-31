@@ -9,6 +9,7 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import { HandoverPrompt } from "@/components/handover-code";
 import { useI18n } from "@/components/locale-provider";
 import type { Driver, TaxiRide, TaxiStatus } from "@/lib/types";
 import { TAXI_STATUS_TEXT } from "@/lib/taxi-status";
@@ -28,6 +29,7 @@ export function DriverTaxiQueue({
   const [assigned, setAssigned] = useState(initialAssigned);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
+  const [codeFor, setCodeFor] = useState<TaxiRide | null>(null);
 
   const refresh = useCallback(async () => {
     const response = await fetch("/api/taxi/queue", { cache: "no-store" });
@@ -45,20 +47,25 @@ export function DriverTaxiQueue({
     return () => window.clearInterval(timer);
   }, [refresh]);
 
-  async function move(ride: TaxiRide, status: TaxiStatus) {
+  async function move(ride: TaxiRide, status: TaxiStatus, proofCode?: string) {
+    if (status === "completed" && ride.handoverRequired && !proofCode) {
+      setCodeFor(ride);
+      return;
+    }
     setBusy(ride.id);
     setError("");
     try {
       const response = await fetch(`/api/taxi/rides/${ride.id}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, proofCode }),
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) {
         setError(data.error || t("Could not update the ride"));
         return;
       }
+      setCodeFor(null);
       await refresh();
     } finally {
       setBusy("");
@@ -201,6 +208,22 @@ export function DriverTaxiQueue({
           </div>
         )}
       </section>
+
+      {codeFor ? (
+        <HandoverPrompt
+          title={t("Close this trip")}
+          description={t(
+            "Ask the customer for the four-digit ride code on their screen. Enter it to complete the trip and record the cash fare.",
+          )}
+          busy={busy === codeFor.id}
+          error={error}
+          onClose={() => {
+            setCodeFor(null);
+            setError("");
+          }}
+          onSubmit={(code) => move(codeFor, "completed", code)}
+        />
+      ) : null}
     </div>
   );
 }

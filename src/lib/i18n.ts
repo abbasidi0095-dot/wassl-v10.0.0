@@ -640,6 +640,23 @@ const fr: Record<string, string> = {
   "All restaurants": "Tous les restaurants",
   "All services": "Tous les services",
   "One platform for the South.": "Une seule plateforme pour le Sud.",
+  "A car at the curb. The fare agreed.": "Une voiture à votre porte. Le tarif convenu.",
+  "Book a local taxi and pay the driver in cash. The route is tracked and the fare is confirmed before you ride.":
+    "Réservez un taxi local et payez le chauffeur en espèces. Le trajet est suivi et le tarif est confirmé avant de partir.",
+  "Live route": "Trajet en direct",
+  "4-digit handover": "Remise à 4 chiffres",
+  "Book a taxi": "Réserver un taxi",
+  "Drive with Wassl": "Conduire avec Wassl",
+  "Ride handover code": "Code de remise du trajet",
+  "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.":
+    "Ne partagez ces quatre chiffres avec le chauffeur qu'à votre arrivée. La course ne peut pas être clôturée sans eux.",
+  "Close this trip": "Clôturer ce trajet",
+  "Ask the customer for the four-digit ride code on their screen. Enter it to complete the trip and record the cash fare.":
+    "Demandez au client les quatre chiffres affichés sur son écran. Saisissez-les pour clôturer le trajet et enregistrer la course en espèces.",
+  "Fare agreed before you move": "Tarif convenu avant le départ",
+  "Cash to the driver · tracked live · code on arrival":
+    "Paiement au chauffeur · suivi en direct · code à l'arrivée",
+  "A Wassl taxi moving through the city at night": "Un taxi Wassl dans la ville, la nuit",
 };
 
 const es: Record<string, string> = {
@@ -794,7 +811,6 @@ const es: Record<string, string> = {
   "Search cities…": "Buscar ciudades…",
   stores: "tiendas",
   "Request a ride": "Pedir un taxi",
-  Pickup: "Recogida",
   "Drop-off": "Destino",
   "Where from?": "¿Desde dónde?",
   "Where to?": "¿A dónde?",
@@ -1256,6 +1272,24 @@ const es: Record<string, string> = {
   "All restaurants": "Todos los restaurantes",
   "All services": "Todos los servicios",
   "One platform for the South.": "Una plataforma para el Sur.",
+  "A car at the curb. The fare agreed.": "Un coche en la puerta. La tarifa acordada.",
+  "Book a local taxi and pay the driver in cash. The route is tracked and the fare is confirmed before you ride.":
+    "Pide un taxi local y paga al conductor en efectivo. El trayecto se sigue en directo y la tarifa se confirma antes de salir.",
+  "Live route": "Ruta en directo",
+  "4-digit handover": "Entrega con código de 4 dígitos",
+  "Book a taxi": "Pedir un taxi",
+  "Drive with Wassl": "Conduce con Wassl",
+  "Ride handover code": "Código de entrega del viaje",
+  "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.":
+    "Comparte estos cuatro dígitos con el conductor solo al llegar. El viaje no se puede cerrar sin ellos.",
+  "Close this trip": "Cerrar este viaje",
+  "Ask the customer for the four-digit ride code on their screen. Enter it to complete the trip and record the cash fare.":
+    "Pide al cliente los cuatro dígitos de su pantalla. Introdúcelos para cerrar el viaje y registrar la tarifa en efectivo.",
+  Pickup: "Recogida",
+  "Fare agreed before you move": "Tarifa acordada antes de salir",
+  "Cash to the driver · tracked live · code on arrival":
+    "Pago al conductor · seguimiento en directo · código al llegar",
+  "A Wassl taxi moving through the city at night": "Un taxi de Wassl por la ciudad de noche",
 };
 
 const ar: Record<string, string> = {
@@ -1869,6 +1903,23 @@ const ar: Record<string, string> = {
   "All restaurants": "كل المطاعم",
   "All services": "كل الخدمات",
   "One platform for the South.": "منصة واحدة للجنوب.",
+  "A car at the curb. The fare agreed.": "سيارة عند بابك. والأجرة متفق عليها.",
+  "Book a local taxi and pay the driver in cash. The route is tracked and the fare is confirmed before you ride.":
+    "اطلب تاكسي محلياً وادفع للسائق نقداً. تُتابع الرحلة مباشرة وتُؤكد الأجرة قبل الانطلاق.",
+  "Live route": "المسار مباشر",
+  "4-digit handover": "تسليم برمز من 4 أرقام",
+  "Book a taxi": "اطلب تاكسي",
+  "Drive with Wassl": "قد مع وصل",
+  "Ride handover code": "رمز تسليم الرحلة",
+  "Share these four digits with the driver only when you reach your destination. The trip cannot be closed without them.":
+    "شارك هذه الأرقام الأربعة مع السائق عند وصولك فقط. لا يمكن إغلاق الرحلة دونها.",
+  "Close this trip": "إغلاق الرحلة",
+  "Ask the customer for the four-digit ride code on their screen. Enter it to complete the trip and record the cash fare.":
+    "اطلب من العميل الرمز المكوّن من أربعة أرقام على شاشته. أدخله لإغلاق الرحلة وتسجيل الأجرة نقداً.",
+  "Fare agreed before you move": "الأجرة متفق عليها قبل الانطلاق",
+  "Cash to the driver · tracked live · code on arrival":
+    "الدفع للسائق · تتبع مباشر · رمز عند الوصول",
+  "A Wassl taxi moving through the city at night": "تاكسي وصل في المدينة ليلاً",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

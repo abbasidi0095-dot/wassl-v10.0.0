@@ -23,7 +23,9 @@ export async function POST(
   if (isResponse(session)) return session;
 
   const { id } = await params;
-  const body = (await request.json().catch(() => null)) as { status?: string } | null;
+  const body = (await request.json().catch(() => null)) as
+    | { status?: string; proofCode?: string }
+    | null;
   if (!body?.status || !STATUSES.includes(body.status as TaxiStatus)) {
     return NextResponse.json({ error: "A valid status is required" }, { status: 400 });
   }
@@ -33,6 +35,7 @@ export async function POST(
       id,
       body.status as TaxiStatus,
       actorFromSession(session),
+      { proofCode: body.proofCode },
     );
     void notifyTaxiPush(ride);
     return NextResponse.json({ ok: true, ride });

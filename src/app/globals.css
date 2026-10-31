@@ -1006,3 +1006,51 @@ html.dark .maplibregl-ctrl-group button span {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------- */
+/* Taxi feature                                                      */
+/* ---------------------------------------------------------------- */
+
+@keyframes taxi-route-run {
+  0% {
+    left: 8%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  86% {
+    opacity: 1;
+  }
+  100% {
+    left: 90%;
+    opacity: 0;
+  }
+}
+
+.taxi-route-run {
+  animation: taxi-route-run 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes taxi-ping {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.65;
+  }
+  70%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.taxi-ping {
+  animation: taxi-ping 2.4s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .taxi-route-run,
+  .taxi-ping {
+    animation: none;
+  }
+}

@@ -19,6 +19,8 @@ export async function PATCH(request: Request) {
         vehicle?: string;
         plate?: string;
         phone?: string;
+        kind?: Driver["kind"];
+        photo?: string;
         cashLimit?: number;
         resetCash?: boolean;
         status?: string;
@@ -39,6 +41,8 @@ export async function PATCH(request: Request) {
         vehicle: body.vehicle,
         plate: body.plate,
         phone: body.phone,
+        kind: body.kind,
+        photo: body.photo,
         cashLimit:
           body.cashLimit === undefined || body.cashLimit === null
             ? undefined

@@ -76,5 +76,5 @@ test("grocery pickup reserves stock and returns a pickup code", async ({
 
   await expect(page).toHaveURL(/\/orders\/order_/);
   await expect(page.getByText("Pickup code")).toBeVisible();
-  await expect(page.getByText(/^P\d{4}$/)).toBeVisible();
+  await expect(page.getByLabel(/Pickup code: \d{4}/)).toBeVisible();
 });

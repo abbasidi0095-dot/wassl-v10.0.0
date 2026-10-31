@@ -864,7 +864,7 @@ function MerchantOrderCard({
       {order.fulfillment || order.deliveryWindow || order.express || order.substitutionPreference ? (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {order.fulfillment === "pickup" ? (
-            <span className="pill">{order.pickupCode} · pickup</span>
+            <span className="pill">Pickup · code required</span>
           ) : order.express ? (
             <span className="pill pill-warm">Express</span>
           ) : order.deliveryWindow ? (
@@ -973,7 +973,7 @@ function MerchantOrderCard({
               type="button"
               disabled={busy}
               onClick={() => {
-                const code = window.prompt("Enter the customer pickup code (e.g. P4821)");
+                const code = window.prompt("Enter the customer 4-digit pickup code");
                 if (code?.trim()) onStatus("delivered", undefined, code.trim());
               }}
               className="btn btn-primary btn-sm shrink-0"

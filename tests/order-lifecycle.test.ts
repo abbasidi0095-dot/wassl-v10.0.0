@@ -86,7 +86,13 @@ describe("order lifecycle", () => {
     await db.assignDriver(order.id, "driver_youssef", admin);
     await db.updateOrderStatus(order.id, "picked_up", driver);
     await db.updateOrderStatus(order.id, "en_route", driver);
-    const delivered = await db.updateOrderStatus(order.id, "delivered", driver);
+    expect(order.deliveryPin).toMatch(/^\d{4}$/);
+    await expect(
+      db.updateOrderStatus(order.id, "delivered", driver, { proofPin: "0000" }),
+    ).rejects.toThrow(/PIN|code/i);
+    const delivered = await db.updateOrderStatus(order.id, "delivered", driver, {
+      proofPin: order.deliveryPin,
+    });
 
     expect(delivered.status).toBe("delivered");
     expect(delivered.cashCollected).toBe(true);

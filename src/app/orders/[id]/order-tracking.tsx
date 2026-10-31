@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import type { OrderView } from "@/lib/db";
 import { ProductTile } from "@/components/product-icon";
+import { HandoverCode } from "@/components/handover-code";
 import { STATUS_META } from "@/lib/types";
 import { clock, money, timeAgo } from "@/lib/utils";
 import { MapView } from "@/components/map-view";
@@ -167,22 +168,20 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
         </div>
       </div>
 
-      {order.deliveryPin && !delivered && !cancelled ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[6px] border border-line bg-surface px-4 py-3">
-          <div>
-            <div className="text-[11px] text-muted">
-              {order.fulfillment === "pickup" ? "Pickup code" : "Delivery PIN"}
-            </div>
-            <div className="mt-1 font-display text-[22px] font-semibold tracking-[0.14em] tnum">
-              {order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin}
-            </div>
-            <div className="text-[11px] text-muted">
-              {order.fulfillment === "pickup"
-                ? "Show this code to the store when you collect."
-                : "Share this PIN with the driver at handover."}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold">
+      {!delivered && !cancelled ? (
+        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+          <HandoverCode
+            code={
+              order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin
+            }
+            label={order.fulfillment === "pickup" ? "Pickup code" : "Handover code"}
+            note={
+              order.fulfillment === "pickup"
+                ? "Show these four digits at the counter when you collect. The store cannot close the order without them."
+                : "Give these four digits to the driver only when the order is in your hands. The delivery cannot be completed without them."
+            }
+          />
+          <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold lg:max-w-[180px] lg:justify-end">
             {order.fulfillment === "pickup" ? <span className="pill">Pickup</span> : null}
             {order.express ? <span className="pill pill-warm">Express</span> : null}
             {order.deliveryWindow ? <span className="pill">{order.deliveryWindow}</span> : null}
@@ -231,9 +230,18 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
 
           {order.driver ? (
             <div className="card flex flex-wrap items-center gap-3 p-4">
-              <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-ink">
-                <Bike size={20} />
-              </span>
+              {order.driver.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={order.driver.photo}
+                  alt={order.driver.name}
+                  className="h-11 w-11 rounded-[6px] object-cover"
+                />
+              ) : (
+                <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-ink">
+                  <Bike size={20} />
+                </span>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold">{order.driver.name}</div>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-bold text-muted">

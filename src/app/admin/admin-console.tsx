@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -8,6 +8,7 @@ import {
   Banknote,
   Bike,
   Building2,
+  CarTaxiFront,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
@@ -19,6 +20,7 @@ import {
   RotateCcw,
   Database,
   History,
+  KeyRound,
   Loader2,
   Lock,
   Save,
@@ -34,6 +36,8 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import { AccountProvisionModal, resizePhoto } from "./account-provision-modal";
+import { AdminMenuModal } from "./admin-menu-modal";
 import type { AdminUserView, OrderView } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
 import type {
@@ -147,10 +151,25 @@ export function AdminConsole({
   const [storeFormOpen, setStoreFormOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
+  const [provision, setProvision] = useState<{
+    role: "driver" | "merchant";
+    storeId?: string;
+  } | null>(null);
+  const [menuStore, setMenuStore] = useState<Store | null>(null);
+  const [driverFilter, setDriverFilter] = useState<"all" | "delivery" | "taxi">("all");
 
   const pendingUsers = useMemo(
     () => users.filter((user) => (user.accountStatus ?? "active") === "pending"),
     [users],
+  );
+  const visibleDrivers = useMemo(
+    () =>
+      drivers.filter((driver) => {
+        if (driverFilter === "all") return true;
+        if (driverFilter === "taxi") return driver.kind === "taxi" || driver.kind === "both";
+        return driver.kind !== "taxi";
+      }),
+    [driverFilter, drivers],
   );
 
   const refresh = useCallback(async (silent = false) => {
@@ -370,6 +389,8 @@ export function AdminConsole({
       vehicle: string;
       plate: string;
       phone: string;
+      kind: Driver["kind"];
+      photo?: string;
       cashLimit: number;
       active: boolean;
       resetCash: boolean;
@@ -687,6 +708,23 @@ export function AdminConsole({
         />
       ) : null}
 
+      {provision ? (
+        <AccountProvisionModal
+          cities={cities}
+          stores={stores}
+          defaultRole={provision.role}
+          defaultStoreId={provision.storeId}
+          onClose={() => setProvision(null)}
+          onCreated={async () => {
+            await refresh(true);
+          }}
+        />
+      ) : null}
+
+      {menuStore ? (
+        <AdminMenuModal store={menuStore} onClose={() => setMenuStore(null)} />
+      ) : null}
+
       {editingDriver ? (
         <DriverEditModal
           driver={editingDriver}
@@ -795,6 +833,13 @@ export function AdminConsole({
               >
                 <Plus size={13} /> Add store
               </button>
+              <button
+                type="button"
+                onClick={() => setProvision({ role: "merchant" })}
+                className="btn btn-ghost btn-sm"
+              >
+                <KeyRound size={13} /> Store login
+              </button>
             </div>
           </div>
           <div className="card mt-3 overflow-hidden">
@@ -853,6 +898,22 @@ export function AdminConsole({
                         <div className="flex justify-end gap-1">
                           <button
                             type="button"
+                            onClick={() => setMenuStore(store)}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            <Plus size={11} /> Menu
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProvision({ role: "merchant", storeId: store.id });
+                            }}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            <KeyRound size={11} /> Login
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => {
                               setEditingStore(store);
                               setStoreFormOpen(true);
@@ -891,22 +952,69 @@ export function AdminConsole({
                 Cash on hand is COD liability. Drivers at their limit cannot be assigned.
               </p>
             </div>
-            <span className="pill">{stats.onlineDrivers} online</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="pill">{stats.onlineDrivers} online</span>
+              <div className="flex rounded-[6px] border border-line p-0.5">
+                {[
+                  { id: "all" as const, label: "All" },
+                  { id: "delivery" as const, label: "Delivery" },
+                  { id: "taxi" as const, label: "Taxi" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setDriverFilter(item.id)}
+                    className={`rounded-[4px] px-2 py-1 text-[10px] font-semibold ${
+                      driverFilter === item.id
+                        ? "bg-ink text-on-dark"
+                        : "text-muted hover:text-ink"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setProvision({ role: "driver" })}
+                className="btn btn-primary btn-sm"
+              >
+                <Plus size={13} /> Add driver
+              </button>
+            </div>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {drivers.map((driver) => {
+            {visibleDrivers.map((driver) => {
               const ratio = Math.min(100, Math.round((driver.cashOnHand / driver.cashLimit) * 100));
               return (
                 <article key={driver.id} className="card p-4">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-brand-soft text-brand">
-                        <Bike size={17} />
-                      </span>
-                      <div>
-                        <div className="text-[13px] font-semibold">{driver.name}</div>
-                        <div className="text-[11px] font-bold text-muted">
-                          {driver.citySlug} · {driver.vehicle}
+                    <div className="flex min-w-0 items-center gap-2">
+                      {driver.photo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={driver.photo}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-[6px] object-cover"
+                        />
+                      ) : (
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-brand-soft text-brand">
+                          {driver.kind === "taxi" ? (
+                            <CarTaxiFront size={17} />
+                          ) : (
+                            <Bike size={17} />
+                          )}
+                        </span>
+                      )}
+                      <div className="min-w-0">
+                        <div className="truncate text-[13px] font-semibold">{driver.name}</div>
+                        <div className="truncate text-[11px] font-bold text-muted">
+                          {driver.citySlug} · {driver.vehicle} ·{" "}
+                          {driver.kind === "taxi"
+                            ? "taxi"
+                            : driver.kind === "both"
+                              ? "delivery + taxi"
+                              : "delivery"}
                         </div>
                       </div>
                     </div>
@@ -1745,11 +1853,17 @@ function DriverEditModal({
     active: boolean;
     resetCash: boolean;
     status: Driver["status"];
+    kind: Driver["kind"];
+    photo?: string;
   }) => Promise<void>;
 }) {
   const [vehicle, setVehicle] = useState(driver.vehicle);
   const [plate, setPlate] = useState(driver.plate);
   const [phone, setPhone] = useState(driver.phone);
+  const [kind, setKind] = useState<Driver["kind"]>(driver.kind ?? "delivery");
+  const [photo, setPhoto] = useState(driver.photo ?? "");
+  const [uploading, setUploading] = useState(false);
+  const photoRef = useRef<HTMLInputElement | null>(null);
   const [cashLimit, setCashLimit] = useState(String(driver.cashLimit));
   const [active, setActive] = useState(driver.active);
   const [resetCash, setResetCash] = useState(false);
@@ -1777,6 +1891,8 @@ function DriverEditModal({
             active,
             resetCash,
             status,
+            kind,
+            photo: photo || undefined,
           });
         }}
       >
@@ -1817,6 +1933,72 @@ function DriverEditModal({
                 className="input"
               />
             </label>
+          </div>
+          <label className="block">
+            <span className="label">Works as</span>
+            <select
+              value={kind ?? "delivery"}
+              onChange={(event) => setKind(event.target.value as Driver["kind"])}
+              className="input"
+            >
+              <option value="delivery">Delivery courier</option>
+              <option value="taxi">Taxi driver</option>
+              <option value="both">Delivery + taxi</option>
+            </select>
+          </label>
+          <div className="flex flex-wrap items-center gap-3 rounded-[8px] border border-line p-3">
+            {photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={photo}
+                alt={`${driver.name} preview`}
+                className="h-14 w-14 rounded-[8px] object-cover"
+              />
+            ) : (
+              <span className="grid h-14 w-14 place-items-center rounded-[8px] bg-surface-2 text-muted">
+                <Bike size={19} />
+              </span>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="text-[12px] font-semibold">Driver photo</div>
+              <div className="text-[11px] text-muted">
+                Shown to dispatch and riders when accepted.
+              </div>
+            </div>
+            <input
+              ref={photoRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                setUploading(true);
+                try {
+                  setPhoto(await resizePhoto(file));
+                } finally {
+                  setUploading(false);
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => photoRef.current?.click()}
+              disabled={uploading}
+              className="btn btn-ghost btn-sm"
+            >
+              {uploading ? <Loader2 size={12} className="animate-spin" /> : null}
+              {photo ? "Replace" : "Upload"}
+            </button>
+            {photo ? (
+              <button
+                type="button"
+                onClick={() => setPhoto("")}
+                className="btn btn-ghost btn-sm text-danger"
+              >
+                Remove
+              </button>
+            ) : null}
           </div>
           <label className="block">
             <span className="label">Phone</span>
@@ -1917,7 +2099,9 @@ function AdminOrderCard({
   const transitions = availableTransitions(order, { role: "admin" }).filter(
     (rule) => rule.to !== "assigned",
   );
-  const available = drivers.filter((driver) => driver.status !== "offline");
+  const available = drivers.filter(
+    (driver) => driver.status !== "offline" && driver.kind !== "taxi",
+  );
 
   return (
     <article className="card p-4">
@@ -1960,10 +2144,38 @@ function AdminOrderCard({
         </div>
       ) : null}
 
+      {!terminal && (order.deliveryPin || order.pickupCode) ? (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-[6px] border border-line bg-surface-2/60 px-3 py-2">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">
+              Handover code
+            </div>
+            <div className="text-[11px] text-muted">
+              Customer shares this at the door
+            </div>
+          </div>
+          <div className="font-display text-[22px] font-semibold tracking-[0.12em] text-ink tnum">
+            {(order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin)
+              ?.replace(/\D/g, "")
+              .slice(-4)}
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
         {order.driver ? (
           <span className="inline-flex items-center gap-1 rounded-[6px] bg-brand-soft px-2 py-1 text-[11px] font-semibold text-brand">
-            <Bike size={11} /> {order.driver.name}
+            {order.driver.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={order.driver.photo}
+                alt=""
+                className="h-5 w-5 rounded-full object-cover"
+              />
+            ) : (
+              <Bike size={11} />
+            )}{" "}
+            {order.driver.name}
           </span>
         ) : (
           <span className="inline-flex items-center gap-1 rounded-[6px] bg-surface-2 px-2 py-1 text-[11px] font-bold text-muted">

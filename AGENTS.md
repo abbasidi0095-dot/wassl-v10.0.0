@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.3.3** (31 October 2026; self-hosted on OCI)
+- Release: **10.4.0** (31 October 2026; handover codes and fleet provisioning)
 - Live: <https://141.145.192.23.nip.io>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -30,7 +30,7 @@ the architecture, hard constraints and the full change history.
 npm install
 npm run dev              # local dev
 npm run typecheck        # tsc --noEmit
-npm test                 # 69 Vitest tests
+npm test                 # 71 Vitest tests
 npm run test:pg          # Postgres integration tests
 npm run build            # production build
 PLAYWRIGHT_PORT=3510 npx playwright test   # 10 e2e tests
@@ -90,6 +90,29 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.4.0 — handover codes and fleet provisioning
+- `Order.deliveryPin` is now generated for every order, not only grocery.
+  `updateOrderStatus` requires a matching four-digit proof for non-admin
+  completion; transition checks run first so illegal jumps keep their 409.
+- `TaxiRide.verificationCode` is generated per ride. `updateTaxiRideStatus`
+  takes `proofCode`, rejects completion without it, and stamps `codeVerifiedAt`.
+- Driver/merchant order views use `handoverSafeOrderView` or an equivalent API
+  projection: they keep `handoverRequired` but never receive the code.
+- New `HandoverCode` / `HandoverPrompt` components render four large digit
+  tiles and a segmented entry dialog. Used in order tracking, taxi tracking,
+  driver dashboard and driver taxi queue.
+- `Driver` gains `kind` (`delivery`/`taxi`/`both`) and `photo`; taxi acceptance
+  stores `driverPhoto`, vehicle and plate on the ride. Delivery assignment
+  excludes taxi-only drivers and vice versa.
+- Admin can provision driver accounts (`/api/admin/accounts`): generated
+  `@wassl.ma` email + password, active/verified user, linked driver profile,
+  vehicle, plate, kind and photo. Store logins are provisioned against existing
+  stores; `AccountProvisionModal` shows credentials once.
+- Admin menu modal uses the existing admin product APIs to add items and toggle
+  availability for any store.
+- Home taxi section uses `public/images/taxi/*` and CSS route/ping animations;
+  `prefers-reduced-motion` disables them.
 
 ### 10.3.3 — self-hosted on OCI
 - Fly app and volume retired after the service became unreachable.

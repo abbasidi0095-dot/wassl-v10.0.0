@@ -20,8 +20,8 @@ export default async function AccountsPage() {
         links={[
           { href: "/admin", label: "Overview" },
           { href: "/admin/accounts", label: "Accounts" },
-          { href: "/admin#drivers", label: "Drivers" },
-          { href: "/admin#stores", label: "Stores" },
+          { href: "/admin/grocery", label: "Grocery" },
+          { href: "/admin/taxi", label: "Taxi" },
         ]}
         accent="ink"
       />

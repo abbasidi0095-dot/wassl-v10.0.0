@@ -28,7 +28,6 @@ export default async function AdminGroceryPage() {
           { href: "/admin/accounts", label: "Accounts" },
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
-          { href: "/admin#orders", label: "Orders" },
         ]}
         accent="ink"
       />

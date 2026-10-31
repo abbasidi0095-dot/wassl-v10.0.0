@@ -212,6 +212,8 @@ export interface ProductVariant {
 
 export type DriverStatus = "offline" | "available" | "busy";
 
+export type DriverKind = "delivery" | "taxi" | "both";
+
 export interface Driver {
   id: string;
   name: string;
@@ -220,6 +222,10 @@ export interface Driver {
   citySlug: string;
   vehicle: string;
   plate: string;
+  /** Delivery courier, taxi driver, or both. Defaults to delivery for legacy rows. */
+  kind?: DriverKind;
+  /** Data-URL or absolute image URL. Shown in dispatch, taxi and customer views. */
+  photo?: string;
   status: DriverStatus;
   lat: number;
   lng: number;
@@ -300,6 +306,8 @@ export interface Order {
   deliveryWindow?: string;
   deliveryPin?: string;
   pickupCode?: string;
+  /** True when a four-digit handover is required; safe to expose to drivers. */
+  handoverRequired?: boolean;
   substitutionPreference?: "allow" | "refund" | "contact";
   loyaltyPointsUsed?: number;
   loyaltyDiscount?: number;
@@ -390,8 +398,14 @@ export interface TaxiRide {
   driverId?: string;
   driverName?: string;
   driverPhone?: string;
+  driverPhoto?: string;
   vehicle?: string;
   plate?: string;
+  /** Four-digit handover code the customer shares before the trip is closed. */
+  verificationCode?: string;
+  /** Safe driver-facing flag; the code itself is never sent to drivers. */
+  handoverRequired?: boolean;
+  codeVerifiedAt?: string;
   createdAt: string;
   updatedAt: string;
   completedAt?: string;

@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
-import { getOrderViews, getProducts, getStore } from "@/lib/db";
+import {
+  getOrderViews,
+  getProducts,
+  getStore,
+  handoverSafeOrderView,
+} from "@/lib/db";
 import { StaffHeader } from "@/components/staff-header";
 import { MerchantDashboard } from "./merchant-dashboard";
 
@@ -13,7 +18,9 @@ export default async function MerchantPage() {
   const store = await getStore(session.storeId);
   if (!store) redirect("/login?next=merchant");
   const products = await getProducts(store.id);
-  const orders = await getOrderViews({ storeId: store.id });
+  const orders = (await getOrderViews({ storeId: store.id })).map(
+    handoverSafeOrderView,
+  );
 
   return (
     <div className="staff-shell">

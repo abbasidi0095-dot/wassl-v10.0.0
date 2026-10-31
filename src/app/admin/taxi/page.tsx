@@ -26,9 +26,8 @@ export default async function AdminTaxiPage() {
         links={[
           { href: "/admin", label: "Overview" },
           { href: "/admin/accounts", label: "Accounts" },
+          { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
-          { href: "/admin#orders", label: "Orders" },
-          { href: "/admin#stores", label: "Stores" },
         ]}
         accent="ink"
       />
@@ -38,7 +37,11 @@ export default async function AdminTaxiPage() {
             <div className="eyebrow">Wassl Taxi</div>
             <h1 className="display mt-2 text-4xl">{t("Taxi rides")}</h1>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/admin#drivers" className="btn btn-ghost btn-sm">
+              Driver fleet
+            </Link>
+            <div className="grid grid-cols-3 gap-2 text-center">
             <div className="card-flat px-4 py-2">
               <div className="text-lg font-semibold">{active.length}</div>
               <div className="text-[11px] uppercase tracking-wider text-muted">Active</div>
@@ -50,6 +53,7 @@ export default async function AdminTaxiPage() {
             <div className="card-flat px-4 py-2">
               <div className="text-lg font-semibold">{money(cash)}</div>
               <div className="text-[11px] uppercase tracking-wider text-muted">Cash</div>
+            </div>
             </div>
           </div>
         </div>
@@ -65,6 +69,7 @@ export default async function AdminTaxiPage() {
                     <th>{t("Route")}</th>
                     <th>{t("Fare")}</th>
                     <th>{t("Status")}</th>
+                    <th>Handover</th>
                     <th>{t("Driver")}</th>
                     <th />
                   </tr>
@@ -92,8 +97,36 @@ export default async function AdminTaxiPage() {
                       <td>
                         <span className="pill">{t(TAXI_STATUS_TEXT[ride.status])}</span>
                       </td>
+                      <td>
+                        {ride.verificationCode ? (
+                          <span className="font-display text-[18px] font-semibold tracking-[0.12em] tnum">
+                            {ride.verificationCode}
+                          </span>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
                       <td className="text-[13px]">
-                        {ride.driverName || <span className="text-muted">—</span>}
+                        {ride.driverName ? (
+                          <span className="inline-flex items-center gap-2">
+                            {ride.driverPhoto ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={ride.driverPhoto}
+                                alt=""
+                                className="h-7 w-7 rounded-full object-cover"
+                              />
+                            ) : null}
+                            <span>
+                              <span className="block font-semibold">{ride.driverName}</span>
+                              <span className="block text-[11px] text-muted">
+                                {ride.vehicle} · {ride.plate}
+                              </span>
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
                       </td>
                       <td className="text-end">
                         <Link href={`/taxi/${ride.id}`} className="btn btn-ghost btn-sm">
