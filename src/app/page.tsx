@@ -7,6 +7,7 @@ import {
   MapPin,
   Phone,
   ShieldCheck,
+  ShoppingBasket,
   Sparkles,
   Star,
   Store as StoreIcon,
@@ -61,6 +62,10 @@ export default async function HomePage() {
               <Link href="/cities" className="btn btn-ghost h-12 px-5">
                 <MapPin size={16} />
                 {t("All Moroccan cities")}
+              </Link>
+              <Link href="/grocery" className="btn btn-ghost h-12 px-5">
+                <ShoppingBasket size={16} />
+                {t("Shop groceries")}
               </Link>
             </div>
             <div className="mt-8 grid max-w-lg grid-cols-3 gap-3">

@@ -57,7 +57,7 @@ export function FavoritesView({
             </div>
             <div className="mt-1 text-sm font-extrabold">{money(product.price)}</div>
             <div className="mt-1 flex items-center gap-2">
-              <Link href={`/grocery/${storeSlug}`} className="text-[10px] font-extrabold text-teal">
+              <Link href={`/store/${storeSlug}`} className="text-[10px] font-extrabold text-teal">
                 {t("Open store")} <ArrowRight size={10} className="inline rtl:-scale-x-100" />
               </Link>
               <button

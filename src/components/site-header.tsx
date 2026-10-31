@@ -270,6 +270,7 @@ export function SiteHeader({
           {[
             { href: "/", label: t("Home"), icon: MapPin },
             { href: currentCity ? `/city/${currentCity.slug}` : "/", label: t("Stores"), icon: Store },
+            { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
             { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
             { href: "/orders", label: t("Orders"), icon: ReceiptText },
             {
@@ -286,11 +287,11 @@ export function SiteHeader({
               key={item.label}
               href={item.href}
               className={cn(
-                "relative flex min-w-[58px] flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[9px] font-extrabold text-ink/55",
+                "relative flex min-w-[48px] flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[8px] font-extrabold text-ink/55",
                 pathname === item.href && "bg-white text-teal shadow-sm",
               )}
             >
-              <item.icon size={18} />
+              <item.icon size={17} />
               {item.label}
             </Link>
           ))}

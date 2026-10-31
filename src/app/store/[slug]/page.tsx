@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -16,7 +16,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { StoreMenu } from "@/components/store-menu";
 import { CartMini } from "@/components/cart-mini";
 import { MapView } from "@/components/map-view";
-import { getCities, getCity, getProducts, getStore } from "@/lib/db";
+import { getCities, getCity, getDrivers, getProducts, getStore, getUserById } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { groceryAvailability, grocerySettings } from "@/lib/grocery";
+import { GroceryStore } from "@/components/grocery-store";
 import { getOpenState } from "@/lib/hours";
 import { storePhoto } from "@/lib/store-images";
 import { categoryLabel, money } from "@/lib/utils";
@@ -46,11 +49,42 @@ export default async function StorePage({
   const { slug } = await params;
   const store = await getStore(slug);
   if (!store) notFound();
-  if (store.category === "grocery") redirect(`/grocery/${store.slug}`);
   const city = await getCity(store.citySlug);
   if (!city) notFound();
   const products = await getProducts(store.id);
   const cities = await getCities();
+
+  if (store.category === "grocery") {
+    const [drivers, session] = await Promise.all([
+      getDrivers(store.citySlug),
+      getSession(),
+    ]);
+    const user = session ? await getUserById(session.userId) : undefined;
+    const settings = grocerySettings(store);
+    const availability = groceryAvailability(
+      store,
+      drivers.filter((driver) => driver.active).length,
+    );
+    return (
+      <>
+        <SiteHeader cities={cities} currentCity={city} />
+        <main className="container-wassl py-6">
+          <GroceryStore
+            store={store}
+            photo={storePhoto(store)}
+            products={products}
+            settings={settings}
+            availability={availability}
+            loyaltyPoints={user?.loyaltyPoints ?? 0}
+            favorites={user?.favorites ?? []}
+            signedIn={Boolean(session)}
+          />
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
+
   const openState = getOpenState(store);
   const hasRating = store.rating > 0 && store.reviews > 0;
 

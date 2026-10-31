@@ -3,7 +3,7 @@ import { getCities, getUserById } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CheckoutForm } from "./checkout-form";
+import { CheckoutSwitch } from "./checkout-switch";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Delivery details" };
@@ -19,10 +19,10 @@ export default async function CheckoutPage() {
       <main className="container-wassl pt-8 lg:pt-12">
         <div className="max-w-2xl">
           <div className="eyebrow">Almost there</div>
-          <h1 className="display mt-2 text-5xl">Delivery details</h1>
+          <h1 className="display mt-2 text-5xl">Checkout</h1>
           <p className="mt-3 text-sm leading-6 text-ink/50">
-            A phone number and a landmark are enough. Drop the pin on the map so the
-            driver can find you.
+            Delivery or pickup, cash on arrival. Your cart chooses the right flow
+            automatically.
           </p>
           {!session ? (
             <p className="mt-3 text-xs text-ink/45">
@@ -43,7 +43,7 @@ export default async function CheckoutPage() {
             </p>
           ) : null}
         </div>
-        <CheckoutForm
+        <CheckoutSwitch
           initialName={customer?.name || (session?.role === "customer" ? session.name : "")}
           initialPhone={customer?.phone || ""}
           initialEmail={customer?.email || (session?.role === "customer" ? session.email : "")}

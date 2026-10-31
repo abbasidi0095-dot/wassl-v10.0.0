@@ -154,7 +154,7 @@ export function GroceryStore({
 
   async function saveToList(product: Product) {
     if (!signedIn) {
-      router.push(`/login?next=grocery/${store.slug}`);
+      router.push(`/login?next=store/${store.slug}`);
       return;
     }
     const response = await fetch("/api/grocery/lists", {
@@ -170,7 +170,7 @@ export function GroceryStore({
 
   async function toggleFavorite(productId: string) {
     if (!signedIn) {
-      router.push(`/login?next=grocery/${store.slug}`);
+      router.push(`/login?next=store/${store.slug}`);
       return;
     }
     const next = favorites.includes(productId)

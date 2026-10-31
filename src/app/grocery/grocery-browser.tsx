@@ -110,7 +110,7 @@ export function GroceryBrowser({ items }: { items: Item[] }) {
           {visible.map(({ store, photo, availability, settings }) => (
             <Link
               key={store.id}
-              href={`/grocery/${store.slug}`}
+              href={`/store/${store.slug}`}
               className="card group overflow-hidden transition hover:-translate-y-1 hover:border-teal/25"
             >
               <div className="relative h-40 overflow-hidden">

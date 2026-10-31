@@ -156,7 +156,7 @@ export function CartView() {
         ) : null}
 
         <Link
-          href={storeCategory === "grocery" ? "/grocery/checkout" : "/checkout"}
+          href="/checkout"
           className={`btn mt-4 w-full ${belowMinimum ? "pointer-events-none opacity-40" : "btn-primary"}`}
           aria-disabled={belowMinimum}
         >

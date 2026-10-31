@@ -89,8 +89,11 @@ persists; every mutation should add an audit entry via `recordAudit`.
 - Grocery data model: `Store.grocery` settings, product SKU/barcode/unit/stock/
   variants, order fulfilment/PIN/loyalty, stock reservations and refund requests;
   lazy backfill in `db-backend.ts` for older documents.
-- Customer `/grocery`, `/grocery/[slug]`, `/grocery/checkout`, favourites and
-  shopping lists.
+- Customer `/grocery` discovery; grocery storefronts render on the main
+  `/store/[slug]` route; checkout is unified at `/checkout`; favourites and
+  shopping lists live under `/grocery`.
+- Grocery is a bottom-tab feature (Home, Stores, Grocery, Taxi, Orders, Account)
+  and shares cart, auth, orders, tracking and notifications with delivery/taxi.
 - Vendor `/merchant/grocery` catalog, variants, stock, zones and 24/7 settings.
 - Admin `/admin/grocery` inventory/refunds.
 - Transactional stock reserve/release/commit; pickup code and delivery PIN proof;

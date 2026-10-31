@@ -368,8 +368,10 @@ The grocery module lives alongside restaurants and taxi without replacing them.
 See [docs/GROCERY.md](docs/GROCERY.md) for the architecture audit, migration
 plan, risk assessment and phase breakdown.
 
-- Customer: `/grocery` discovery, `/grocery/[slug]` storefront, `/grocery/checkout`,
-  `/grocery/favorites`, `/grocery/lists`.
+- Customer: `/grocery` discovery, **main `/store/[slug]` storefront** for grocery
+  stores, unified `/checkout`, `/grocery/favorites` and `/grocery/lists`.
+- Grocery is a first-class bottom-tab feature alongside delivery and taxi; store
+  cards, cart, checkout, orders, tracking and notifications are shared.
 - Vendor: `/merchant/grocery` catalog, stock, variants and fulfilment settings.
 - Admin: `/admin/grocery` inventory health and refunds.
 - Data: optional `Store.grocery`, `Product` SKU/barcode/unit/stock/variants,

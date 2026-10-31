@@ -114,7 +114,7 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
                 >
                   <Trash2 size={13} />
                 </button>
-                <Link href={`/grocery/${item.storeSlug}`} className="text-[10px] font-extrabold text-teal">
+                <Link href={`/store/${item.storeSlug}`} className="text-[10px] font-extrabold text-teal">
                   {t("Shop")}
                 </Link>
               </div>
