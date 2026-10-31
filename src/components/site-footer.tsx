@@ -11,7 +11,7 @@ const CITIES = ["Dakhla", "Laayoune", "Boujdour", "Esmara", "Tarfaya"];
 export function SiteFooter() {
   const { t } = useI18n();
   return (
-    <footer className="field-ink mt-20 border-t border-line">
+    <footer className="field-ink mt-20 border-t border-line pb-[calc(58px+env(safe-area-inset-bottom))] md:pb-0">
       <div className="container-wassl">
         <div className="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
@@ -65,9 +65,6 @@ export function SiteFooter() {
               </Link>
               <Link href="/login?next=driver" className="hover:opacity-100">
                 {t("Driver app")}
-              </Link>
-              <Link href="/login?next=admin" className="hover:opacity-100">
-                {t("Admin console")}
               </Link>
             </div>
           </div>

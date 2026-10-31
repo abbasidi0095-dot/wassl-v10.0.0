@@ -29,6 +29,15 @@ and dark themes.
 
 ## Release history
 
+### 10.3.1 — 31 October 2026 — navigation fixes
+- Removed the public admin entry from the mobile menu and footer; operations
+  accounts now sign in only through the normal `/login` form and are routed to
+  `/admin` by role (verified end to end).
+- Language and theme controls now sit in the mobile top bar instead of being
+  hidden behind the menu. The compact mark keeps the bar within 320px.
+- The bottom tab bar no longer hides on scroll; it stays fixed and the footer
+  reserves its height so the last line is never covered.
+
 ### 10.3.0 — 31 October 2026 — editorial pass
 - Home shows a curated nine-store directory with a counted category rail and a
   “Show all” expansion instead of dumping all 43 stores at once.

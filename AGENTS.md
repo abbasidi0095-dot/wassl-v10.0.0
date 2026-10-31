@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.3.0** (31 October 2026; editorial design pass)
+- Release: **10.3.1** (31 October 2026; navigation and mobile chrome fixes)
 - Live: <https://wassl-34-preview.fly.dev>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,16 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 10.3.1 — navigation and mobile chrome
+- Public admin links removed from the mobile menu and footer. Admins use the
+  normal `/login` form; `/api/auth/login` already returns `/admin` for the role.
+- Mobile top bar now exposes the language switcher (compact `EN` control) and
+  theme toggle; the wordmark collapses to the route mark below `sm` so five
+  header tools fit at 320px without horizontal overflow.
+- Removed the scroll listener that slid the six-tab bottom bar off-screen.
+  Body padding was replaced by footer bottom padding so the fixed bar never
+  covers the last footer line and no pale strip appears beneath the footer.
 
 ### 10.3.0 — editorial design pass
 - Home: `StoreBrowser` accepts `initialLimit`; the landing page shows nine

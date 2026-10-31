@@ -994,9 +994,6 @@ html.dark .maplibregl-ctrl-group button span {
   .container-wassl {
     width: calc(100% - 32px);
   }
-  body {
-    padding-bottom: 70px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

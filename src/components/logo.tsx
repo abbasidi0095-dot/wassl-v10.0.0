@@ -27,9 +27,12 @@ export function LogoMark({ className = "" }: { className?: string }) {
 export function Logo({
   compact = false,
   light = false,
+  responsive = false,
 }: {
   compact?: boolean;
   light?: boolean;
+  /** Hide the wordmark below the `sm` breakpoint to leave room for header tools. */
+  responsive?: boolean;
 }) {
   return (
     <Link
@@ -38,14 +41,18 @@ export function Logo({
       aria-label="Wassl home"
     >
       <span
-        className={`grid h-9 w-9 place-items-center rounded-[5px] ${
+        className={`grid h-9 w-9 shrink-0 place-items-center rounded-[5px] ${
           light ? "bg-white/10 text-on-dark" : "bg-teal text-on-dark"
         }`}
       >
         <LogoMark className="h-[21px] w-[21px]" />
       </span>
       {!compact ? (
-        <span className="flex items-baseline gap-2">
+        <span
+          className={`items-baseline gap-2 ${
+            responsive ? "hidden sm:flex" : "flex"
+          }`}
+        >
           <span
             className={`font-display text-[22px] font-semibold leading-none tracking-[-0.04em] ${
               light ? "text-on-dark" : "text-ink"

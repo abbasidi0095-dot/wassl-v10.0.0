@@ -56,7 +56,6 @@ export function SiteHeader({
   const { count } = useCart();
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const [hideTabs, setHideTabs] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null | undefined>(undefined);
 
   useEffect(() => {
@@ -77,17 +76,6 @@ export function SiteHeader({
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-
-  useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setHideTabs(y > 160 && y > last + 6);
-      last = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const southern = cities.filter((city) => city.priority);
   const others = cities.filter((city) => !city.priority);
@@ -158,7 +146,7 @@ export function SiteHeader({
       <header className="relative z-40 border-b border-line bg-paper/95 pt-[env(safe-area-inset-top)] lg:sticky lg:top-0">
         <div className="container-wassl flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-7">
-            <Logo />
+            <Logo responsive />
             <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
               {nav.map((item) => (
                 <Link
@@ -197,12 +185,11 @@ export function SiteHeader({
               />
             </label>
 
+            <LanguageSwitcher compact className="md:hidden" />
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
+            <ThemeToggle />
 
             <NotificationBell />
 
@@ -269,7 +256,7 @@ export function SiteHeader({
                 </select>
               </label>
               {[
-                { href: "/", label: t("Home"), icon: MapPin },
+                { href: "/", label: t("Home"), icon: House },
                 {
                   href: currentCity ? `/city/${currentCity.slug}` : "/",
                   label: t("Stores"),
@@ -304,11 +291,6 @@ export function SiteHeader({
                   label: t("Sell on Wassl"),
                   icon: Store,
                 },
-                {
-                  href: "/login?next=admin",
-                  label: t("Admin"),
-                  icon: LayoutDashboard,
-                },
               ].map((item) => (
                 <Link
                   key={`${item.href}-${item.label}`}
@@ -320,19 +302,13 @@ export function SiteHeader({
                   {item.label}
                 </Link>
               ))}
-              <div className="mt-2 flex items-center gap-2 border-t border-line pt-3">
-                <LanguageSwitcher />
-                <ThemeToggle />
-              </div>
             </div>
           </div>
         ) : null}
       </header>
 
       <nav
-        className={`tabbar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line bg-surface transition-transform duration-200 md:hidden ${
-          hideTabs ? "translate-y-full" : "translate-y-0"
-        }`}
+        className="tabbar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line bg-surface md:hidden"
         aria-label="Sections"
       >
         {mobileNav.map((item) => (
