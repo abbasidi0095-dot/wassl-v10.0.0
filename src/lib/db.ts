@@ -20,6 +20,7 @@ import {
 } from "./email-verification";
 import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
 import { maskPhone, normalizeMoroccanPhone } from "./phone";
+import type { PhoneOtpChannel } from "./types";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
 import { casablancaNow } from "./hours";
 import { sanitizeCityServices } from "./city-services";
@@ -436,6 +437,7 @@ export type IssuePhoneVerificationResult =
 /** Creates a six-digit SMS challenge for the account's Moroccan mobile. */
 export async function issuePhoneVerification(
   email: string,
+  channel: PhoneOtpChannel = "sms",
 ): Promise<IssuePhoneVerificationResult> {
   const normalizedEmail = email.trim().toLowerCase();
   return mutate((db) => {
@@ -497,13 +499,16 @@ export async function issuePhoneVerification(
         ? previous!.windowStartedAt
         : new Date(now).toISOString(),
       lastSentAt: new Date(now).toISOString(),
+      channel,
     };
 
     recordAudit(db, {
       action: "auth.phone_verification_sent",
       entity: "auth",
       entityId: user.id,
-      summary: `Mobile verification code sent to ${maskPhone(phone)}`,
+      summary: `Mobile verification code sent to ${maskPhone(phone)} by ${
+        channel === "whatsapp" ? "WhatsApp" : "SMS"
+      }`,
       actorRole: "system",
       actorName: user.name,
     });

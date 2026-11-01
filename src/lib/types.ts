@@ -87,7 +87,12 @@ export interface EmailVerificationChallenge {
   lastSentAt: string;
 }
 
-export type PhoneVerificationChallenge = EmailVerificationChallenge;
+export type PhoneOtpChannel = "sms" | "whatsapp";
+
+export type PhoneVerificationChallenge = EmailVerificationChallenge & {
+  /** Channel used for the newest code. Older challenges have no channel. */
+  channel?: PhoneOtpChannel;
+};
 
 export type StoreCategory =
   | "restaurant"

@@ -4,6 +4,11 @@ import { getUserByEmail } from "@/lib/db";
 import { isEmailVerified } from "@/lib/email-verification";
 import { homeForRole } from "@/lib/auth-config";
 import {
+  availablePhoneChannels,
+  defaultPhoneChannel,
+  phoneVerificationRequired,
+} from "@/lib/otp-config";
+import {
   isPhoneVerified,
   maskPhone,
   normalizeMoroccanPhone,
@@ -20,13 +25,10 @@ export default async function VerifyPhonePage({
   searchParams: Promise<{
     email?: string;
     next?: string;
-    sent?: string;
-    warning?: string;
-    cooldown?: string;
     ticket?: string;
   }>;
 }) {
-  const { email, next, sent, warning, cooldown, ticket } = await searchParams;
+  const { email, next, ticket } = await searchParams;
   const normalized = email?.trim().toLowerCase() || "";
   if (!normalized) redirect("/login");
 
@@ -41,7 +43,7 @@ export default async function VerifyPhonePage({
     );
   }
 
-  if (isPhoneVerified(user)) {
+  if (!phoneVerificationRequired() || isPhoneVerified(user)) {
     const session = await getSession();
     redirect(session ? homeForRole(session.role) : "/login");
   }
@@ -56,9 +58,8 @@ export default async function VerifyPhonePage({
       ticket={ticket!}
       maskedPhone={maskPhone(phone)}
       context={next === "login" ? "login" : "signup"}
-      sent={sent === "1"}
-      startWarning={warning === "1"}
-      initialCooldown={Math.max(0, Math.min(600, Number(cooldown) || 0))}
+      channels={availablePhoneChannels()}
+      defaultChannel={defaultPhoneChannel()}
     />
   );
 }

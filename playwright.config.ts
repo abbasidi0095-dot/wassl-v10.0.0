@@ -36,6 +36,15 @@ export default defineConfig({
       // Playwright cannot read real inboxes, so the OTP send route returns the
       // code in its response when this flag is set.
       WASSL_OTP_TEST_MODE: "1",
+      PHONE_VERIFICATION_REQUIRED: "1",
+      OTP_SMS_ENABLED: "1",
+      OTP_WHATSAPP_ENABLED: "1",
+      OTP_DEFAULT_CHANNEL: "whatsapp",
+      AION_API_KEY: "e2e-aion-key",
+      AION_SENDER_ID: "WASSL",
+      OPENWA_API_KEY: "e2e-openwa-key",
+      OPENWA_SESSION_ID: "wassl-otp",
+      OPENWA_BASE_URL: "http://127.0.0.1:2785/api",
       ...(process.env.DATABASE_URL
         ? { DATABASE_URL: process.env.DATABASE_URL }
         : {}),

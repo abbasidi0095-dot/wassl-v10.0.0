@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { issuePhoneVerification } from "@/lib/db";
-import { isSmsConfigured, otpSmsBody, sendSms } from "@/lib/sms";
+import {
+  availablePhoneChannels,
+  isPhoneChannelEnabled,
+  phoneVerificationRequired,
+} from "@/lib/otp-config";
+import { deliverPhoneOtp } from "@/lib/otp-delivery";
 import {
   failureMessage,
   isTestMode,
@@ -8,19 +13,23 @@ import {
   OTP_TTL_MS,
 } from "@/lib/email-verification";
 import { maskPhone, verifyPhoneTicket } from "@/lib/phone";
+import type { PhoneOtpChannel } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Requests a new SMS code for a verified email address. */
+/** Requests a new code on the channel chosen by the customer. */
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as
-    | { email?: string; ticket?: string }
+    | { email?: string; ticket?: string; channel?: string }
     | null;
   const email = body?.email?.trim().toLowerCase() || "";
   const ticket = body?.ticket || "";
+  const requested = body?.channel || "";
+  const channel: PhoneOtpChannel | null =
+    requested === "sms" || requested === "whatsapp" ? requested : null;
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json(
@@ -34,8 +43,23 @@ export async function POST(request: Request) {
       { status: 403 },
     );
   }
+  if (!phoneVerificationRequired()) {
+    return NextResponse.json(
+      { error: "Phone verification is not enabled yet." },
+      { status: 409 },
+    );
+  }
+  if (!channel || !isPhoneChannelEnabled(channel)) {
+    return NextResponse.json(
+      {
+        error: "That verification channel is not available. Choose SMS or WhatsApp.",
+        channels: availablePhoneChannels(),
+      },
+      { status: 400 },
+    );
+  }
 
-  const result = await issuePhoneVerification(email);
+  const result = await issuePhoneVerification(email, channel);
   if (!result.ok) {
     if (
       result.failure === "not_found" ||
@@ -52,7 +76,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Add a Moroccan mobile number to your account before requesting an SMS code.",
+            "Add a Moroccan mobile number to your account before requesting a code.",
         },
         { status: 400 },
       );
@@ -72,24 +96,22 @@ export async function POST(request: Request) {
   }
 
   if (!isTestMode()) {
-    if (!isSmsConfigured()) {
-      console.error("[auth] SMS verification is not configured");
-      return NextResponse.json(
-        {
-          error:
-            "SMS verification is not available right now. Contact Wassl support.",
-        },
-        { status: 503 },
-      );
-    }
-    const delivery = await sendSms(result.phone, otpSmsBody(result.code));
+    const delivery = await deliverPhoneOtp(result.phone, result.code, channel);
     if (!delivery.ok) {
-      console.error("[auth] verification SMS failed:", delivery.error);
+      console.error(
+        `[auth] ${channel} verification delivery failed:`,
+        delivery.error,
+      );
+      const message =
+        delivery.code === "not_on_whatsapp"
+          ? "This number is not registered on WhatsApp. Try SMS instead."
+          : delivery.code === "not_ready"
+            ? "WhatsApp is temporarily disconnected. Try SMS instead or contact support."
+            : channel === "whatsapp"
+              ? "We could not send the WhatsApp code. Try SMS instead or contact support."
+              : "We could not send the SMS. Try WhatsApp instead or contact support.";
       return NextResponse.json(
-        {
-          error:
-            "We could not send the SMS right now. Check the number or contact support if it keeps failing.",
-        },
+        { error: message, code: delivery.code, channel },
         { status: 502 },
       );
     }
@@ -98,6 +120,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     sent: true,
+    channel,
     email: result.email,
     maskedPhone: maskPhone(result.phone),
     expiresInSeconds: Math.floor(OTP_TTL_MS / 1000),

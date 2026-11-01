@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.5.0** (1 November 2026; email and SMS verification)
+- Release: **11.6.0** (1 November 2026; SMS or WhatsApp verification)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -91,6 +91,18 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.6.0 — SMS or WhatsApp verification
+- `PhoneVerificationChallenge.channel` records the newest delivery channel.
+- `otp-config.ts`: master phone gate + per-channel flags, default all off.
+- `otp-delivery.ts` dispatches Aion SMS or OpenWA WhatsApp.
+- `whatsapp.ts`: OpenWA contacts check, send-text with idempotency key, session probe.
+- `/verify-phone` offers SMS/WhatsApp; switching channels replaces the challenge.
+- Email confirmation and login no longer auto-send; the customer picks a channel.
+- Flags off: email-only signup, no phone gate.
+- Env: `PHONE_VERIFICATION_REQUIRED`, `OTP_SMS_ENABLED`, `OTP_WHATSAPP_ENABLED`,
+  `OTP_DEFAULT_CHANNEL`, `OPENWA_*`.
+- Full runbook: `docs/AUTH-OTP.md`.
 
 ### 11.5.0 — email and SMS verification
 - New accounts require email + Moroccan mobile verification before a session.

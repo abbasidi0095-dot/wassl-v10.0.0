@@ -4,7 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, Loader2, RotateCcw, Smartphone } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Loader2,
+  MessageCircle,
+  MessageSquareText,
+  Send,
+  Smartphone,
+} from "lucide-react";
 import { Logo } from "@/components/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -17,44 +25,38 @@ export function VerifyPhoneForm({
   ticket,
   maskedPhone,
   context,
-  startWarning,
-  initialCooldown,
-  sent,
+  channels,
+  defaultChannel,
 }: {
   email: string;
   ticket: string;
   maskedPhone: string;
   context: "signup" | "login";
-  startWarning: boolean;
-  initialCooldown: number;
-  sent: boolean;
+  channels: ("sms" | "whatsapp")[];
+  defaultChannel: "sms" | "whatsapp" | null;
 }) {
   const router = useRouter();
   const { t } = useI18n();
   const [digits, setDigits] = useState<string[]>(Array(LENGTH).fill(""));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [channel, setChannel] = useState<"sms" | "whatsapp" | null>(
+    defaultChannel ?? channels[0] ?? null,
+  );
+  const [sent, setSent] = useState(false);
   const [notice, setNotice] = useState(
-    startWarning
-      ? t("We could not send the SMS. Use resend below or contact support.")
-      : sent && initialCooldown > 0
-        ? t("We sent an SMS to {phone}. Enter the newest code you received.", {
-            phone: maskedPhone,
-          })
-        : initialCooldown > 0
-          ? t("A code was sent recently. Enter the newest code you received.")
-          : t("Tap resend to receive your SMS code."),
+    channels.length
+      ? t("Choose how to receive your code, then tap send.")
+      : t("Phone verification is temporarily unavailable. Contact support."),
   );
-  const [seconds, setSeconds] = useState(
-    startWarning ? 0 : Math.max(initialCooldown, 0),
-  );
+  const [seconds, setSeconds] = useState(0);
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const submitting = useRef(false);
   const code = digits.join("");
 
   useEffect(() => {
-    inputs.current[0]?.focus();
-  }, []);
+    if (sent) inputs.current[0]?.focus();
+  }, [sent]);
 
   useEffect(() => {
     if (seconds <= 0) return;
@@ -173,31 +175,48 @@ export function VerifyPhoneForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
-  async function resend() {
-    if (busy || seconds > 0) return;
+  function chooseChannel(next: "sms" | "whatsapp") {
+    if (busy || next === channel) return;
+    setChannel(next);
+    setSent(false);
+    setSeconds(0);
+    setDigits(Array(LENGTH).fill(""));
+    setError("");
+    setNotice(t("Choose how to receive your code, then tap send."));
+  }
+
+  async function sendCode() {
+    if (!channel || busy || (sent && seconds > 0)) return;
     setBusy(true);
     setError("");
     try {
       const response = await fetch("/api/auth/verify/phone/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, ticket }),
+        body: JSON.stringify({ email, ticket, channel }),
       });
       const data = (await response.json()) as {
         error?: string;
         retryAfterSeconds?: number;
+        resendAfterSeconds?: number;
+        devCode?: string;
       };
       if (!response.ok) {
         setError(
           data.error ||
-            t("We could not send the SMS. Try resending in a moment."),
+            t("We could not send the code. Try the other channel or contact support."),
         );
         setSeconds(data.retryAfterSeconds ?? 30);
         return;
       }
-      setNotice(t("A new SMS code is on its way."));
+      setSent(true);
       setDigits(Array(LENGTH).fill(""));
-      setSeconds(60);
+      setSeconds(data.resendAfterSeconds ?? 60);
+      setNotice(
+        channel === "whatsapp"
+          ? t("Code sent to {phone} on WhatsApp.", { phone: maskedPhone })
+          : t("Code sent to {phone} by SMS.", { phone: maskedPhone }),
+      );
       focus(0);
     } catch {
       setError(t("Could not reach Wassl. Check your connection and try again."));
@@ -279,24 +298,94 @@ export function VerifyPhoneForm({
           </h2>
           <p className="mt-3 text-[13px] leading-6 text-muted">
             {context === "login"
-              ? t("Enter the SMS code sent to {phone} to finish signing in.", {
+              ? t("Enter the code sent to {phone} to finish signing in.", {
                   phone: maskedPhone,
                 })
-              : t("Enter the SMS code sent to {phone} to finish creating your account.", {
-                  phone: maskedPhone,
-                })}
+              : t(
+                  "Choose SMS or WhatsApp, then enter the code sent to {phone} to finish creating your account.",
+                  { phone: maskedPhone },
+                )}
           </p>
           <p className="mt-1.5 text-[11px] text-muted">
             {t("The code expires in 10 minutes.")}
           </p>
+
+          <div className="mt-6">
+            <span className="label">{t("Send my code by")}</span>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {channels.map((id) => {
+                const active = channel === id;
+                const Icon = id === "whatsapp" ? MessageCircle : MessageSquareText;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => chooseChannel(id)}
+                    disabled={busy}
+                    className={`flex items-center gap-2 rounded-[8px] border p-3 text-start transition-colors ${
+                      active
+                        ? "border-brand bg-brand-soft/60 ring-1 ring-brand/20"
+                        : "border-line bg-surface hover:border-line-strong"
+                    }`}
+                  >
+                    <span
+                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-[6px] ${
+                        active ? "bg-brand text-on-dark" : "bg-surface-2 text-brand"
+                      }`}
+                    >
+                      <Icon size={15} />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[12px] font-semibold">
+                        {id === "whatsapp" ? t("WhatsApp") : t("SMS")}
+                      </span>
+                      <span className="block text-[10px] text-muted">
+                        {id === "whatsapp" ? t("Chat message") : t("Text message")}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {channels.length ? (
+              <p className="mt-2 text-[10px] leading-4 text-muted">
+                {t(
+                  "Switching channels sends a new code and cancels the previous one.",
+                )}
+              </p>
+            ) : (
+              <p className="mt-2 text-[12px] leading-5 text-danger">
+                {t(
+                  "No verification channel is active yet. Contact Wassl support.",
+                )}
+              </p>
+            )}
+          </div>
 
           <form
             onSubmit={(event) => {
               event.preventDefault();
               void verify(code);
             }}
-            className="mt-7"
+            className="mt-5"
           >
+            <button
+              type="button"
+              onClick={sendCode}
+              disabled={!channel || busy || (sent && seconds > 0)}
+              className="btn btn-primary mb-5 w-full disabled:opacity-50"
+            >
+              {busy ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Send size={15} />
+              )}
+              {sent
+                ? seconds > 0
+                  ? t("Resend in {seconds}s", { seconds })
+                  : t("Resend code")
+                : t("Send code")}
+            </button>
             <fieldset>
               <legend className="label">{t("Verification code")}</legend>
               <div
@@ -321,7 +410,8 @@ export function VerifyPhoneForm({
                     autoComplete={index === 0 ? "one-time-code" : "off"}
                     aria-label={t("Digit {n}", { n: index + 1 })}
                     aria-invalid={Boolean(error)}
-                    className={`h-12 w-10 rounded-[6px] border bg-surface text-center text-[20px] font-semibold tnum outline-none transition-colors sm:h-[52px] sm:w-11 ${
+                    disabled={!sent || busy}
+                    className={`h-12 w-10 rounded-[6px] border bg-surface text-center text-[20px] font-semibold tnum outline-none transition-colors disabled:opacity-40 sm:h-[52px] sm:w-11 ${
                       error
                         ? "border-danger text-danger"
                         : "border-line text-ink focus:border-brand"
@@ -331,9 +421,11 @@ export function VerifyPhoneForm({
               </div>
             </fieldset>
 
-            <p className="mt-3 text-[11px] text-muted">
-              {t("Didn't get it? Check your signal, then resend.")}
-            </p>
+            {sent ? (
+              <p className="mt-3 text-[11px] text-muted">
+                {t("Didn't get it? Check your connection, then resend.")}
+              </p>
+            ) : null}
 
             {error ? (
               <p
@@ -362,18 +454,7 @@ export function VerifyPhoneForm({
             </button>
           </form>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
-            <button
-              type="button"
-              onClick={resend}
-              disabled={busy || seconds > 0}
-              className="inline-flex items-center gap-1.5 text-[12px] font-medium text-brand disabled:text-muted"
-            >
-              <RotateCcw size={12} />
-              {seconds > 0
-                ? t("Resend in {seconds}s", { seconds })
-                : t("Resend SMS")}
-            </button>
+          <div className="mt-5 border-t border-line pt-5">
             <Link href="/login" className="text-[12px] text-muted hover:text-ink">
               {t("Back to sign in")}
             </Link>
@@ -381,7 +462,7 @@ export function VerifyPhoneForm({
 
           <p className="mt-8 text-[11px] leading-5 text-muted">
             {t(
-              "If you did not request this code, ignore the SMS. Nobody can open your account without it.",
+              "If you did not request this code, ignore the message. Nobody can open your account without it.",
             )}
           </p>
         </div>

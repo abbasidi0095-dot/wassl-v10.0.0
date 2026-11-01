@@ -29,6 +29,19 @@ and dark themes.
 
 ## Release history
 
+### 11.6.0 — 1 November 2026 — SMS or WhatsApp verification
+- Phone verification now offers **SMS or WhatsApp**, chosen by the customer.
+- SMS uses Aion; WhatsApp uses a self-hosted **OpenWA** session.
+- Both channels share the same challenge, HMAC, 10-minute expiry, 5 attempts,
+  resend cooldown and rate limit. Switching channels invalidates the old code.
+- Added `PHONE_VERIFICATION_REQUIRED`, `OTP_SMS_ENABLED` and
+  `OTP_WHATSAPP_ENABLED`; all default **off**.
+- With phone verification off, signup completes after email verification.
+- Added OpenWA registration check, idempotent sends, session probes and an
+  admin QR page at `/admin/whatsapp`.
+- Added `OPENWA_*` settings and a staged master/channel flag set.
+- Full runbook: `docs/AUTH-OTP.md`.
+
 ### 11.5.0 — 1 November 2026 — email and SMS verification
 - New accounts must verify both their **email** and their **Moroccan mobile**
   before a session opens.
@@ -515,6 +528,13 @@ Copy `.env.example` to `.env.local` for a documented template.
 | `AION_API_KEY` | unset | Server-only Aion Messaging key for SMS verification |
 | `AION_SENDER_ID` | `WASSL` | Approved Aion sender ID for Morocco SMS |
 | `AION_BASE_URL` | `https://aionmessaging.com/api/v1` | Optional Aion API base override |
+| `OPENWA_BASE_URL` | `http://127.0.0.1:2785/api` | Local OpenWA API |
+| `OPENWA_API_KEY` | unset | Server-only OpenWA API key |
+| `OPENWA_SESSION_ID` | `wassl-otp` | Dedicated WhatsApp session |
+| `PHONE_VERIFICATION_REQUIRED` | `0` | Master phone gate |
+| `OTP_SMS_ENABLED` | `0` | Show SMS option |
+| `OTP_WHATSAPP_ENABLED` | `0` | Show WhatsApp option |
+| `OTP_DEFAULT_CHANNEL` | `whatsapp` | Preselected channel |
 | `BREVO_SENDER_EMAIL` | `abbasidi0095@gmail.com` | Verified Brevo sender address |
 | `BREVO_SENDER_NAME` | `Wassl` | Sender display name |
 | `BREVO_REPLY_TO` | unset | Optional reply-to address |
