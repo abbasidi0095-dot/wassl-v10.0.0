@@ -288,6 +288,26 @@ test("admin enables a service per city without disabling the others", async ({
   await dialog.getByRole("button", { name: "Cancel" }).click();
 });
 
+test("admin adjusts each service commission with details", async ({ page }) => {
+  await loginViaUi(page, ADMIN_EMAIL, ADMIN_PASSWORD, "/admin");
+  await page.goto("/admin#settings");
+
+  await expect(page.getByText("Service commissions")).toBeVisible();
+  const grocery = page.locator('[data-commission="grocery"]');
+  await expect(grocery.getByText("Grocery goods")).toBeVisible();
+  await grocery.getByLabel("Fixed (MAD)").fill("3");
+  await grocery.getByLabel("Rate (%)").fill("7");
+  await page.getByRole("button", { name: "Save settings" }).click();
+  await expect(page.getByText("Platform settings saved")).toBeVisible();
+
+  await page.goto("/admin#analytics");
+  await expect(page.getByText("Commission detail")).toBeVisible();
+  await expect(page.getByText("0 MAD goods · 7%")).toBeVisible();
+  await expect(
+    page.locator('[data-commission="grocery"]'),
+  ).toHaveCount(0);
+});
+
 test("admin grocery shows inventory intelligence", async ({ page }) => {
   await loginViaUi(page, ADMIN_EMAIL, ADMIN_PASSWORD, "/admin");
   await page.goto("/admin/grocery");

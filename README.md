@@ -29,6 +29,17 @@ and dark themes.
 
 ## Release history
 
+### 11.4.0 — 1 November 2026 — per-service commissions
+- Added **Service commissions** in Admin → Settings for Food to go, Grocery,
+  Pharmacy and Taxi.
+- Each service has an editable **fixed fee (MAD)** and **percentage rate** with
+  a plain-language explanation and a live example.
+- Profit cards and a new **Commission detail** table show jobs, base, fixed,
+  percentage, rate and earned amount per service.
+- Defaults preserve the launch model: 5 MAD + 0% food, 5 MAD + 5% grocery,
+  5 MAD + 5% pharmacy, 2 MAD + 0% taxi. Pickup skips the fixed fee.
+- Store-level merchant commission remains separate.
+
 ### 11.3.2 — 1 November 2026 — taxi in the dock
 - Added **Taxi** to the bottom tab bar: Home, Food, Grocery, Pharmacy, Taxi,
   Account.

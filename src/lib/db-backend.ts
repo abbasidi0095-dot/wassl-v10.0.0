@@ -6,6 +6,7 @@ import { GROCERY_PRESETS } from "./grocery-presets";
 import { defaultGrocerySettings } from "./grocery";
 import { defaultCityServices } from "./city-services";
 import { DEFAULT_GROCERY_PROMOTIONS } from "./grocery-promotions";
+import { normalizeServiceCommissions } from "./commissions";
 import {
   DEFAULT_LOYALTY_REWARDS,
   makeReferralCode,
@@ -76,6 +77,7 @@ function hydrate(db: Database): Database {
     db.settings.accentColor = "#ff8a3d";
   }
   db.settings.accentColor ??= "#ff8a3d";
+  db.settings.commissions = normalizeServiceCommissions(db.settings.commissions);
   db.settings.themePreset ??= "coastal";
   db.settings.defaultTheme ??= "system";
   db.promotions ??= DEFAULT_GROCERY_PROMOTIONS.map((promotion) => ({ ...promotion }));

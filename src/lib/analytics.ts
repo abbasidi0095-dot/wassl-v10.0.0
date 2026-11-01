@@ -1,15 +1,15 @@
 import type {
   Order,
   Role,
+  ServiceCommissionId,
+  ServiceCommissions,
   Store,
   TaxiRide,
 } from "./types";
-
-export const PROFIT_RULES = {
-  delivery: 5,
-  taxi: 2,
-  groceryRate: 0.05,
-} as const;
+import {
+  normalizeServiceCommissions,
+  serviceCommissionParts,
+} from "./commissions";
 
 export type AnalyticsDay = {
   key: string;
@@ -19,9 +19,10 @@ export type AnalyticsDay = {
   groceryOrders: number;
   gmv: number;
   profit: number;
-  deliveryProfit: number;
+  foodProfit: number;
   taxiProfit: number;
   groceryProfit: number;
+  pharmacyProfit: number;
 };
 
 export type ProfitEvent = {
@@ -30,7 +31,16 @@ export type ProfitEvent = {
   note: string;
   at: string;
   profit: number;
-  kind: "delivery" | "taxi" | "grocery";
+  kind: ServiceCommissionId;
+};
+
+export type ServiceProfit = {
+  id: ServiceCommissionId;
+  jobs: number;
+  base: number;
+  fixed: number;
+  percent: number;
+  earned: number;
 };
 
 export type AdminAnalytics = {
@@ -41,11 +51,16 @@ export type AdminAnalytics = {
   averageOrder: number;
   profit: {
     total: number;
-    delivery: number;
+    food: number;
     taxi: number;
     grocery: number;
+    pharmacy: number;
+    foodSales: number;
     grocerySales: number;
+    pharmacySales: number;
+    taxiFares: number;
   };
+  services: Record<ServiceCommissionId, ServiceProfit>;
   days: AnalyticsDay[];
   topStores: { id: string; name: string; citySlug: string; orders: number; gmv: number }[];
   signups: { customers: number; merchants: number; drivers: number; admins: number };
@@ -65,40 +80,65 @@ function shortDay(key: string) {
   }).format(date);
 }
 
+function emptyService(id: ServiceCommissionId): ServiceProfit {
+  return { id, jobs: 0, base: 0, fixed: 0, percent: 0, earned: 0 };
+}
+
 export function computeAnalytics(
   orders: Order[],
   rides: TaxiRide[],
   stores: Store[],
   users: { role: Role; createdAt?: string }[],
+  commissions?: ServiceCommissions,
   days = 14,
 ): AdminAnalytics {
   const storeMap = new Map(stores.map((store) => [store.id, store]));
+  const rules = normalizeServiceCommissions(commissions);
   const delivered = orders.filter((order) => order.status === "delivered");
   const completed = rides.filter((ride) => ride.status === "completed");
 
-  let deliveryProfit = 0;
-  let taxiProfit = 0;
-  let grocerySales = 0;
+  const services: Record<ServiceCommissionId, ServiceProfit> = {
+    food: emptyService("food"),
+    grocery: emptyService("grocery"),
+    pharmacy: emptyService("pharmacy"),
+    taxi: emptyService("taxi"),
+  };
+
+  function addService(
+    service: ServiceCommissionId,
+    base: number,
+    includeFixed: boolean,
+  ) {
+    const parts = serviceCommissionParts(rules, service, base, includeFixed);
+    const row = services[service];
+    row.jobs += 1;
+    row.base += base;
+    row.fixed += parts.fixed;
+    row.percent += parts.percent;
+    row.earned += parts.total;
+    return parts;
+  }
+
+  function serviceForOrder(order: Order): ServiceCommissionId {
+    const store = storeMap.get(order.storeId);
+    if (store?.category === "grocery") return "grocery";
+    if (store?.category === "pharmacy") return "pharmacy";
+    return "food";
+  }
+
   let gmv = 0;
   let groceryOrders = 0;
 
   for (const order of delivered) {
     gmv += order.total;
-    const store = storeMap.get(order.storeId);
-    const isGrocery = store?.category === "grocery";
-    if (order.fulfillment !== "pickup") {
-      deliveryProfit += PROFIT_RULES.delivery;
-    }
-    if (isGrocery) {
-      groceryOrders += 1;
-      grocerySales += order.subtotal;
-    }
+    const service = serviceForOrder(order);
+    addService(service, order.subtotal, order.fulfillment !== "pickup");
+    if (service === "grocery") groceryOrders += 1;
   }
   for (const ride of completed) {
     gmv += ride.fare;
-    taxiProfit += PROFIT_RULES.taxi;
+    addService("taxi", ride.fare, true);
   }
-  const groceryProfit = grocerySales * PROFIT_RULES.groceryRate;
 
   const today = new Date();
   const dayMap = new Map<string, AnalyticsDay>();
@@ -114,9 +154,10 @@ export function computeAnalytics(
       groceryOrders: 0,
       gmv: 0,
       profit: 0,
-      deliveryProfit: 0,
+      foodProfit: 0,
       taxiProfit: 0,
       groceryProfit: 0,
+      pharmacyProfit: 0,
     });
   }
 
@@ -125,47 +166,62 @@ export function computeAnalytics(
     const at = order.deliveredAt ?? order.updatedAt ?? order.createdAt;
     const key = dayKey(at);
     const store = storeMap.get(order.storeId);
-    const isGrocery = store?.category === "grocery";
-    const delivery = order.fulfillment !== "pickup" ? PROFIT_RULES.delivery : 0;
-    const grocery = isGrocery ? order.subtotal * PROFIT_RULES.groceryRate : 0;
-    const profit = delivery + grocery;
+    const service = serviceForOrder(order);
+    const rule = rules[service];
+    const parts = serviceCommissionParts(
+      rules,
+      service,
+      order.subtotal,
+      order.fulfillment !== "pickup",
+    );
     const day = dayMap.get(key);
     if (day) {
       day.orders += 1;
       day.gmv += order.total;
-      day.profit += profit;
-      day.deliveryProfit += delivery;
-      day.groceryProfit += grocery;
-      if (isGrocery) day.groceryOrders += 1;
+      day.profit += parts.total;
+      if (service === "food") day.foodProfit += parts.total;
+      if (service === "grocery") {
+        day.groceryProfit += parts.total;
+        day.groceryOrders += 1;
+      }
+      if (service === "pharmacy") day.pharmacyProfit += parts.total;
     }
-    if (profit > 0) {
+    if (parts.total > 0) {
       recent.push({
         id: order.id,
         label: store?.name ?? order.code,
-        note: isGrocery ? "Grocery · 5% + delivery" : `Delivery · ${order.code}`,
+        note:
+          service === "food"
+            ? `Food · ${parts.fixed} MAD + ${rule.rate}%`
+            : service === "grocery"
+              ? `Grocery · ${rule.rate}%`
+              : `Pharmacy · ${rule.rate}%`,
         at,
-        profit,
-        kind: isGrocery ? "grocery" : "delivery",
+        profit: parts.total,
+        kind: service,
       });
     }
   }
   for (const ride of completed) {
     const at = ride.completedAt ?? ride.updatedAt ?? ride.createdAt;
     const day = dayMap.get(dayKey(at));
+    const parts = serviceCommissionParts(rules, "taxi", ride.fare, true);
     if (day) {
       day.rides += 1;
       day.gmv += ride.fare;
-      day.profit += PROFIT_RULES.taxi;
-      day.taxiProfit += PROFIT_RULES.taxi;
+      day.profit += parts.total;
+      day.taxiProfit += parts.total;
     }
-    recent.push({
-      id: ride.id,
-      label: `${ride.pickupLabel} → ${ride.dropoffLabel}`,
-      note: `Taxi · ${ride.citySlug}`,
-      at,
-      profit: PROFIT_RULES.taxi,
-      kind: "taxi",
-    });
+    if (parts.total > 0) {
+      recent.push({
+        id: ride.id,
+        label: `${ride.pickupLabel} → ${ride.dropoffLabel}`,
+        note: `Taxi · ${parts.fixed} MAD + ${rules.taxi.rate}%`,
+        at,
+        profit: parts.total,
+        kind: "taxi",
+      });
+    }
   }
   recent.sort((a, b) => b.at.localeCompare(a.at));
 
@@ -188,6 +244,11 @@ export function computeAnalytics(
     topMap.set(store.id, row);
   }
 
+  const foodProfit = services.food.earned;
+  const groceryProfit = services.grocery.earned;
+  const pharmacyProfit = services.pharmacy.earned;
+  const taxiProfit = services.taxi.earned;
+
   return {
     deliveredOrders: delivered.length,
     completedRides: completed.length,
@@ -195,12 +256,17 @@ export function computeAnalytics(
     gmv,
     averageOrder: delivered.length ? gmv / delivered.length : 0,
     profit: {
-      total: deliveryProfit + taxiProfit + groceryProfit,
-      delivery: deliveryProfit,
+      total: foodProfit + groceryProfit + pharmacyProfit + taxiProfit,
+      food: foodProfit,
       taxi: taxiProfit,
       grocery: groceryProfit,
-      grocerySales,
+      pharmacy: pharmacyProfit,
+      foodSales: services.food.base,
+      grocerySales: services.grocery.base,
+      pharmacySales: services.pharmacy.base,
+      taxiFares: services.taxi.base,
     },
+    services,
     days: [...dayMap.values()],
     topStores: [...topMap.values()].sort((a, b) => b.gmv - a.gmv).slice(0, 6),
     signups: {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { updateSettings } from "@/lib/db";
 import { actorFromSession, isResponse, requireApiRole } from "@/lib/api-auth";
 import type { PlatformSettings } from "@/lib/types";
+import { normalizeServiceCommissions } from "@/lib/commissions";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,6 +48,9 @@ export async function PATCH(request: Request) {
   if (typeof body.supportPhone === "string") allowed.supportPhone = body.supportPhone.slice(0, 30);
   if (typeof body.commissionRate === "number") {
     allowed.commissionRate = Math.max(0, Math.min(40, body.commissionRate));
+  }
+  if (body.commissions && typeof body.commissions === "object") {
+    allowed.commissions = normalizeServiceCommissions(body.commissions);
   }
   if (typeof body.defaultDeliveryFee === "number") {
     allowed.defaultDeliveryFee = Math.max(0, Math.min(100, body.defaultDeliveryFee));

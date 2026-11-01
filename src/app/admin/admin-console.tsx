@@ -16,6 +16,7 @@ import {
   MapPin,
   PackageCheck,
   Pencil,
+  Pill,
   Plus,
   RefreshCw,
   RotateCcw,
@@ -46,6 +47,11 @@ import { THEME_PRESETS } from "@/lib/theme";
 import { resizeImage } from "@/lib/image-client";
 import { CITY_SERVICES, cityServices } from "@/lib/city-services";
 import { computeAnalytics } from "@/lib/analytics";
+import {
+  SERVICE_COMMISSION_DEFINITIONS,
+  normalizeServiceCommissions,
+  serviceCommission,
+} from "@/lib/commissions";
 import type { AdminUserView, OrderView } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
 import type {
@@ -55,6 +61,7 @@ import type {
   Driver,
   OrderStatus,
   PlatformSettings,
+  ServiceCommissionId,
   TaxiRide,
   Store,
   StoreCategory,
@@ -122,6 +129,13 @@ const TABS: { id: Tab; label: string; icon: typeof MapPin }[] = [
   { id: "data", label: "Data sources", icon: Database },
   { id: "settings", label: "Settings", icon: Settings2 },
 ];
+
+const SERVICE_COMMISSION_ICONS = {
+  food: UtensilsCrossed,
+  grocery: ShoppingBasketIcon,
+  pharmacy: Pill,
+  taxi: CarTaxiFront,
+} satisfies Record<ServiceCommissionId, typeof UtensilsCrossed>;
 
 export function AdminConsole({
   initialOrders,
@@ -627,9 +641,23 @@ export function AdminConsole({
   }, [cities, cityQuery, cityFilter]);
 
   const analytics = useMemo(
-    () => computeAnalytics(orders, taxiRides, stores, users),
-    [orders, taxiRides, stores, users],
+    () => computeAnalytics(orders, taxiRides, stores, users, settings.commissions),
+    [orders, taxiRides, stores, users, settings.commissions],
   );
+
+  const commissions = useMemo(
+    () => normalizeServiceCommissions(settings.commissions),
+    [settings.commissions],
+  );
+
+  function updateCommission(
+    id: ServiceCommissionId,
+    patch: Partial<{ fixedFee: number; rate: number }>,
+  ) {
+    const next = normalizeServiceCommissions(settings.commissions);
+    next[id] = { ...next[id], ...patch };
+    setSettings({ ...settings, commissions: next });
+  }
 
   const statsCards = [
     { label: "Live orders", value: `${stats.liveOrders}` },
@@ -941,36 +969,49 @@ export function AdminConsole({
           <div>
             <h2 className="text-xl font-semibold tracking-[-0.04em]">Profit & growth</h2>
             <p className="mt-1 text-[11px] text-muted">
-              Wassl margin: 5 MAD per delivered order, 2 MAD per completed taxi
-              ride and 5% of grocery goods. Store commission stays separate.
+              Wassl keeps the per-service commission below. Fixed fees apply per
+              completed job; percentages apply to goods or fare. Store commission
+              stays separate.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             {[
               {
                 label: "Total profit",
                 value: money(analytics.profit.total),
-                note: `${analytics.deliveredOrders + analytics.completedRides} fulfilled jobs`,
+                note: `${analytics.deliveredOrders + analytics.completedRides} fulfilled ${
+                  analytics.deliveredOrders + analytics.completedRides === 1 ? "job" : "jobs"
+                }`,
                 icon: CircleDollarSign,
               },
               {
-                label: "Delivery margin",
-                value: money(analytics.profit.delivery),
-                note: `${analytics.deliveredOrders} delivered · 5 MAD each`,
+                label: "Food margin",
+                value: money(analytics.profit.food),
+                note: `${analytics.services.food.jobs} ${
+                  analytics.services.food.jobs === 1 ? "order" : "orders"
+                } · ${commissions.food.fixedFee} MAD + ${commissions.food.rate}%`,
                 icon: Truck,
-              },
-              {
-                label: "Taxi margin",
-                value: money(analytics.profit.taxi),
-                note: `${analytics.completedRides} trips · 2 MAD each`,
-                icon: CarTaxiFront,
               },
               {
                 label: "Grocery margin",
                 value: money(analytics.profit.grocery),
-                note: `${money(analytics.profit.grocerySales)} goods · 5%`,
+                note: `${money(analytics.profit.grocerySales)} goods · ${commissions.grocery.rate}%`,
                 icon: ShoppingBasketIcon,
+              },
+              {
+                label: "Pharmacy margin",
+                value: money(analytics.profit.pharmacy),
+                note: `${money(analytics.profit.pharmacySales)} goods · ${commissions.pharmacy.rate}%`,
+                icon: Pill,
+              },
+              {
+                label: "Taxi margin",
+                value: money(analytics.profit.taxi),
+                note: `${analytics.completedRides} ${
+                  analytics.completedRides === 1 ? "trip" : "trips"
+                } · ${commissions.taxi.fixedFee} MAD + ${commissions.taxi.rate}%`,
+                icon: CarTaxiFront,
               },
             ].map((item) => (
               <div key={item.label} className="card p-4">
@@ -984,6 +1025,67 @@ export function AdminConsole({
                 <div className="mt-1 text-[10px] leading-4 text-muted">{item.note}</div>
               </div>
             ))}
+          </div>
+
+          <div className="card p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-[15px] font-semibold">Commission detail</h3>
+                <p className="mt-0.5 text-[10px] text-muted">
+                  Live rates and earnings from delivered orders and completed rides.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTab("settings")}
+                className="pill hover:text-brand"
+              >
+                Set in Settings
+              </button>
+            </div>
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-[11px]">
+                <thead>
+                  <tr className="border-b border-line text-start text-[9px] uppercase tracking-[0.06em] text-muted">
+                    <th className="pb-2 text-start font-medium">Service</th>
+                    <th className="hidden pb-2 text-start font-medium sm:table-cell">Basis</th>
+                    <th className="pb-2 text-end font-medium">Jobs</th>
+                    <th className="pb-2 text-end font-medium">Base</th>
+                    <th className="pb-2 text-end font-medium">Fixed</th>
+                    <th className="pb-2 text-end font-medium">Rate</th>
+                    <th className="pb-2 text-end font-medium">Earned</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SERVICE_COMMISSION_DEFINITIONS.map((definition) => {
+                    const row = analytics.services[definition.id];
+                    return (
+                      <tr
+                        key={definition.id}
+                        className="border-b border-line/60 last:border-0"
+                      >
+                        <td className="py-2.5 pe-2 font-semibold">
+                          {definition.label}
+                          <span className="mt-0.5 block text-[9px] font-normal text-muted sm:hidden">
+                            {definition.basis}
+                          </span>
+                        </td>
+                        <td className="hidden py-2.5 text-muted sm:table-cell">
+                          {definition.basis}
+                        </td>
+                        <td className="py-2.5 text-end tnum">{row.jobs}</td>
+                        <td className="py-2.5 text-end tnum">{money(row.base)}</td>
+                        <td className="py-2.5 text-end tnum">{money(row.fixed)}</td>
+                        <td className="py-2.5 text-end tnum">{commissions[definition.id].rate}%</td>
+                        <td className="py-2.5 text-end font-semibold text-brand tnum">
+                          {money(row.earned)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.45fr_0.55fr]">
@@ -1886,7 +1988,7 @@ export function AdminConsole({
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="label">Commission %</span>
+                  <span className="label">Store commission %</span>
                   <input
                     type="number"
                     min={0}
@@ -1897,6 +1999,9 @@ export function AdminConsole({
                     }
                     className="input"
                   />
+                  <span className="mt-1 block text-[10px] leading-4 text-muted">
+                    Merchant payout commission. Service fees below are separate.
+                  </span>
                 </label>
                 <label className="block">
                   <span className="label">Default fee (MAD)</span>
@@ -1911,6 +2016,107 @@ export function AdminConsole({
                     className="input"
                   />
                 </label>
+              </div>
+              <div className="rounded-[8px] border border-line p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[12px] font-semibold">Service commissions</div>
+                    <div className="mt-0.5 text-[10px] leading-4 text-muted">
+                      Set what Wassl keeps per completed job. The percentage applies to
+                      goods or fare; the fixed part is charged per order or ride.
+                    </div>
+                  </div>
+                  <span className="pill shrink-0">
+                    {money(
+                      SERVICE_COMMISSION_DEFINITIONS.reduce(
+                        (sum, definition) =>
+                          sum +
+                          serviceCommission(commissions, definition.id, definition.exampleBase),
+                        0,
+                      ),
+                    )}{" "}
+                    example
+                  </span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {SERVICE_COMMISSION_DEFINITIONS.map((definition) => {
+                    const Icon = SERVICE_COMMISSION_ICONS[definition.id];
+                    const rule = commissions[definition.id];
+                    return (
+                      <div
+                        key={definition.id}
+                        data-commission={definition.id}
+                        className="rounded-[6px] bg-surface-2/70 p-2.5"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[5px] bg-brand-soft text-brand">
+                            <Icon size={13} />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-baseline justify-between gap-2">
+                              <span className="text-[11px] font-semibold">
+                                {definition.label}
+                              </span>
+                              <span className="text-[9px] uppercase tracking-[0.05em] text-muted">
+                                {definition.basis}
+                              </span>
+                            </div>
+                            <p className="mt-0.5 text-[10px] leading-4 text-muted">
+                              {definition.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                          <label className="block">
+                            <span className="label !text-[10px]">Fixed (MAD)</span>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              step={1}
+                              value={rule.fixedFee}
+                              onChange={(event) =>
+                                updateCommission(definition.id, {
+                                  fixedFee: Number(event.target.value),
+                                })
+                              }
+                              className="input h-9"
+                            />
+                          </label>
+                          <label className="block">
+                            <span className="label !text-[10px]">Rate (%)</span>
+                            <input
+                              type="number"
+                              min={0}
+                              max={40}
+                              step={0.5}
+                              value={rule.rate}
+                              onChange={(event) =>
+                                updateCommission(definition.id, {
+                                  rate: Number(event.target.value),
+                                })
+                              }
+                              className="input h-9"
+                            />
+                          </label>
+                        </div>
+                        <div className="mt-1 text-[10px] font-medium text-muted">
+                          On {definition.exampleBase} MAD:{" "}
+                          <span className="text-brand">
+                            {money(
+                              serviceCommission(
+                                commissions,
+                                definition.id,
+                                definition.exampleBase,
+                              ),
+                            )}
+                          </span>{" "}
+                          to Wassl
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div className="flex items-center justify-between rounded-[6px] bg-surface-2 p-3">
                 <div>
@@ -1967,7 +2173,7 @@ export function AdminConsole({
                   <span className="font-semibold text-ink">{money(stats.gmv)}</span>
                 </div>
                 <div className="flex justify-between text-muted">
-                  <span>Platform commission ({settings.commissionRate}%)</span>
+                  <span>Store commission ({settings.commissionRate}%)</span>
                   <span className="font-semibold text-brand">
                     {money(Math.round((stats.gmv * settings.commissionRate) / 100))}
                   </span>

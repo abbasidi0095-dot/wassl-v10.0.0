@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     };
     scope = "the authenticated merchant's own store only";
   } else {
-    const analytics = computeAnalytics(db.orders, db.taxiRides ?? [], db.stores, db.users);
+    const analytics = computeAnalytics(db.orders, db.taxiRides ?? [], db.stores, db.users, db.settings.commissions);
     context = {
       stats: analytics,
       activeOrders: db.orders.filter((order) => !["delivered", "cancelled"].includes(order.status)).length,

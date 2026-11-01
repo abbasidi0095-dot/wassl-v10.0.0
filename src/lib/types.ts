@@ -380,13 +380,27 @@ export interface AuditEntry {
   metadata?: Record<string, string | number | boolean | undefined>;
 }
 
+export type ServiceCommissionId = "food" | "grocery" | "pharmacy" | "taxi";
+
+export interface ServiceCommission {
+  /** Percentage of the goods subtotal or ride fare. */
+  rate: number;
+  /** Flat amount in MAD per fulfilled job. */
+  fixedFee: number;
+}
+
+export type ServiceCommissions = Record<ServiceCommissionId, ServiceCommission>;
+
 export interface PlatformSettings {
   brandName: string;
   brandNameAr: string;
   tagline: string;
   supportPhone: string;
   currency: string;
+  /** Merchant payout commission, separate from per-service platform fees. */
   commissionRate: number;
+  /** What Wassl keeps on each completed service. */
+  commissions?: ServiceCommissions;
   defaultDeliveryFee: number;
   primaryColor: string;
   accentColor?: string;

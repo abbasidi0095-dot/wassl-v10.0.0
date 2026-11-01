@@ -11,6 +11,7 @@ import {
 import { hashPassword } from "./security";
 import { GROCERY_PRESETS } from "./grocery-presets";
 import { DEFAULT_GROCERY_PROMOTIONS } from "./grocery-promotions";
+import { DEFAULT_SERVICE_COMMISSIONS } from "./commissions";
 import type {
   City,
   Database,
@@ -32,6 +33,7 @@ const settings: PlatformSettings = {
   supportPhone: "+212 660 00 00 00",
   currency: "MAD",
   commissionRate: 12,
+  commissions: DEFAULT_SERVICE_COMMISSIONS,
   defaultDeliveryFee: 12,
   primaryColor: "#2447e0",
   accentColor: "#ff8a3d",

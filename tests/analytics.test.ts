@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeAnalytics } from "@/lib/analytics";
+import { normalizeServiceCommissions } from "@/lib/commissions";
 import type { Order, Store, TaxiRide } from "@/lib/types";
 
 const stores = [
@@ -61,10 +62,57 @@ describe("admin analytics profit", () => {
       stores,
       [{ role: "customer" }, { role: "driver" }],
     );
-    expect(analytics.profit.delivery).toBe(10);
+    expect(analytics.profit.food).toBe(5);
     expect(analytics.profit.taxi).toBe(2);
-    expect(analytics.profit.grocery).toBe(5);
+    expect(analytics.profit.grocery).toBe(10);
+    expect(analytics.profit.pharmacy).toBe(0);
     expect(analytics.profit.total).toBe(17);
+    expect(analytics.services.food.jobs).toBe(1);
+    expect(analytics.services.grocery.base).toBe(100);
+    expect(analytics.services.grocery.fixed).toBe(5);
     expect(analytics.signups.drivers).toBe(1);
+  });
+
+  it("applies custom per-service fixed fees and rates", () => {
+    const commissions = normalizeServiceCommissions({
+      food: { fixedFee: 3, rate: 2 },
+      grocery: { fixedFee: 0, rate: 10 },
+      pharmacy: { fixedFee: 1, rate: 8 },
+      taxi: { fixedFee: 1, rate: 4 },
+    });
+    const analytics = computeAnalytics(
+      [
+        order({ id: "order_food" }),
+        order({
+          id: "order_grocery",
+          storeId: "store_grocery",
+          subtotal: 100,
+          total: 110,
+        }),
+      ],
+      [ride],
+      stores,
+      [{ role: "customer" }],
+      commissions,
+    );
+    // Food: 3 MAD fixed + 2% of 50 = 4.
+    expect(analytics.profit.food).toBe(4);
+    // Grocery: 10% of 100 goods, no fixed fee in this override.
+    expect(analytics.profit.grocery).toBe(10);
+    // Taxi: 1 MAD fixed + 4% of 25 = 2.
+    expect(analytics.profit.taxi).toBe(2);
+    expect(analytics.profit.total).toBe(16);
+    expect(analytics.services.food.percent).toBe(1);
+  });
+
+  it("clamps commission values to safe limits", () => {
+    const commissions = normalizeServiceCommissions({
+      food: { fixedFee: 999, rate: -4 },
+      taxi: { fixedFee: -2, rate: 200 },
+    });
+    expect(commissions.food.fixedFee).toBe(100);
+    expect(commissions.food.rate).toBe(0);
+    expect(commissions.taxi.fixedFee).toBe(0);
+    expect(commissions.taxi.rate).toBe(40);
   });
 });

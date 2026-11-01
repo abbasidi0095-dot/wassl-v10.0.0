@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.3.2** (1 November 2026; taxi in the dock)
+- Release: **11.4.0** (1 November 2026; per-service commissions)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,16 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.4.0 — per-service commissions
+- `PlatformSettings.commissions` stores fixed fee + rate for food, grocery,
+  pharmacy and taxi. Defaults: 5/0, 5/5, 5/5, 2/0.
+- `normalizeServiceCommissions()` clamps values; `serviceCommission()` rounds to
+  whole MAD.
+- Admin Settings has detailed editors with examples and separate store
+  commission.
+- Admin Analytics shows five profit cards plus a per-service commission table.
+- Pickup orders skip the fixed fee.
 
 ### 11.3.2 — taxi in the dock
 - Dock: Home, Food, Grocery, Pharmacy, Taxi, Account.
