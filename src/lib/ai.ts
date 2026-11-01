@@ -11,7 +11,7 @@ export type AiResult =
 
 const DEFAULT_MODEL = "nvidia/nemotron-3.5-lightning-30b-a3b";
 const ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
-const TIMEOUT_MS = 28_000;
+const ATTEMPT_TIMEOUT_MS = 12_000;
 
 export function aiConfigured(): boolean {
   return Boolean(process.env.NVIDIA_API_KEY?.trim());
@@ -26,13 +26,13 @@ type ProviderPayload = {
   title?: string;
 };
 
-function runCurl(body: string, key: string): Promise<AiResult> {
+function runCurl(body: string, key: string, timeoutMs: number): Promise<AiResult> {
   return new Promise<AiResult>((resolve) => {
     const child = spawn(
       "bash",
       [
         "-c",
-        `curl -sS --http2 --max-time 25 -X POST '${ENDPOINT}' -H 'Content-Type: application/json' -H 'Accept: application/json' -H "Authorization: Bearer $NVIDIA_API_KEY" --data-binary @-`,
+        `curl -sS --http2 --max-time ${Math.max(5, Math.floor(timeoutMs / 1000))} -X POST '${ENDPOINT}' -H 'Content-Type: application/json' -H 'Accept: application/json' -H "Authorization: Bearer $NVIDIA_API_KEY" --data-binary @-`,
       ],
       {
         env: { ...process.env, NVIDIA_API_KEY: key },
@@ -50,7 +50,7 @@ function runCurl(body: string, key: string): Promise<AiResult> {
     const timer = setTimeout(() => {
       child.kill("SIGKILL");
       finish({ ok: false, reason: "timeout" });
-    }, TIMEOUT_MS);
+    }, timeoutMs + 2000);
 
     child.stdout.on("data", (chunk: Buffer) => {
       stdout += chunk.toString("utf8");
@@ -120,12 +120,18 @@ export async function askWasslAssistant(
     messages,
     temperature: 0.25,
     top_p: 0.9,
-    max_tokens: 420,
+    max_tokens: 220,
     stream: false,
     // This model is a reasoning model; disable the long monologue so customer
     // support replies stay fast and the token budget goes to the answer.
     chat_template_kwargs: { enable_thinking: false },
   });
 
-  return runCurl(body, key);
+  const first = await runCurl(body, key, ATTEMPT_TIMEOUT_MS);
+  if (first.ok) return first;
+  const transportFailure =
+    first.reason === "timeout" ||
+    /curl:|timed out|socket|ECONN|network/i.test(first.detail ?? "");
+  if (!transportFailure) return first;
+  return runCurl(body, key, ATTEMPT_TIMEOUT_MS);
 }
