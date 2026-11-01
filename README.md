@@ -29,6 +29,23 @@ and dark themes.
 
 ## Release history
 
+### 11.0.0-alpha.6 — 1 November 2026 — Express, referrals, insights and alerts
+- Added **Wassl Express**: parcel booking with pickup/drop-off pins, size-based
+  pricing, recipient details, pickup and delivery codes, live status tracking,
+  driver queue, cash settlement and admin operations.
+- Extended **Wassl Club** with referral codes, a one-time 100-point referral
+  reward for both accounts, birthday storage and a yearly 100-point birthday
+  reward.
+- Added **Wassl Insights**: read-only AI analysis for merchants over their own
+  store data and for admins over platform operations.
+- Added admin **operational alerts** for orders without drivers, stalled orders,
+  offline drivers on active deliveries, stalled parcels, low stock, refund
+  backlog and cancellation spikes.
+- Express is a live-city service by default and appears in the home service
+  index, header navigation and mobile dock.
+- Added express unit and end-to-end tests for booking, driver acceptance,
+  pickup code, delivery code and cash settlement.
+
 ### 11.0.0-alpha.5 — 1 November 2026 — support, ratings and Wassl 11 identity
 - Added the **Wassl Assistant** on the NVIDIA NIM API with a server-only key, a
   Wassl-only system prompt, real order/ride/loyalty context, rate limits and a
@@ -560,6 +577,8 @@ staff out.
 - Customer support chat, driver/store conversations, admin support inbox and
   post-order/ride ratings
 - NVIDIA-backed Wassl Assistant with human fallback
+- Wassl Express parcel delivery with pickup/delivery verification
+- Referral and birthday rewards, merchant/admin AI insights and operational alerts
 - Original Wassl 11 identity and four complete themes
 - Persistent live tracker dock for active orders and taxi rides (progress bar,
   expandable list, minimise to a floating pill, auto-hides when complete)
@@ -817,12 +836,12 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 116 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 120 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three
   concurrent writers, rollback, durable audit trail)
-- Playwright suite (22 tests) covers password sign-in, new-account review and admin
+- Playwright suite (23 tests) covers password sign-in, new-account review and admin
   approval against the production build
 - API flow tested against a production build: create order with modifiers and a
   promo → server repriced options and discount → merchant accept/prepare/ready →

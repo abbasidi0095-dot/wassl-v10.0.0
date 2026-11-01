@@ -13,6 +13,7 @@ import { getTranslator } from "@/lib/i18n-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { money } from "@/lib/utils";
+import { LoyaltyActions } from "./loyalty-actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Wassl Club" };
@@ -162,6 +163,14 @@ export default async function LoyaltyPage() {
               {t("Tier multiplier applied automatically on completed orders.")}
             </div>
           </section>
+        </div>
+
+        <div className="mt-4">
+          <LoyaltyActions
+            referralCode={account.referralCode}
+            birthday={user?.birthday}
+            canClaimReferral={!account.referredBy && !account.referralRewarded}
+          />
         </div>
 
         <section className="mt-8">

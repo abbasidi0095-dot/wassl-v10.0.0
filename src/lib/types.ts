@@ -31,6 +31,8 @@ export interface City {
   launchStatus: CityStatus;
   /** Per-service activation. Missing keys fall back to safe defaults. */
   services?: Partial<Record<CityService, boolean>>;
+  /** Migration marker for service defaults. */
+  servicesVersion?: number;
 }
 
 export interface User {
@@ -51,6 +53,8 @@ export interface User {
   requestedKind?: DriverKind;
   requestedPlate?: string;
   loyaltyPoints?: number;
+  /** YYYY-MM-DD; used for the yearly birthday reward. */
+  birthday?: string;
   favorites?: string[];
   shoppingLists?: ShoppingList[];
   /**
@@ -459,6 +463,59 @@ export interface ShoppingListItem {
   checked?: boolean;
 }
 
+export type ParcelSize = "document" | "small" | "medium" | "large";
+
+export type ParcelStatus =
+  | "requested"
+  | "accepted"
+  | "picked_up"
+  | "in_transit"
+  | "delivered"
+  | "cancelled";
+
+export interface ParcelDelivery {
+  id: string;
+  code: string;
+  trackingCode: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  citySlug: string;
+  pickupLabel: string;
+  pickupLat: number;
+  pickupLng: number;
+  dropoffLabel: string;
+  dropoffLat: number;
+  dropoffLng: number;
+  recipientName: string;
+  recipientPhone: string;
+  size: ParcelSize;
+  description: string;
+  notes?: string;
+  distanceKm: number;
+  fare: number;
+  status: ParcelStatus;
+  driverId?: string;
+  driverName?: string;
+  driverPhone?: string;
+  /** Sender-only pickup verification code. */
+  pickupCode: string;
+  /** Sender-only handover code to share with the recipient. */
+  deliveryCode: string;
+  codeVerifiedAt?: string;
+  proofOfDelivery?: {
+    method: "pickup_code" | "delivery_code";
+    at: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  acceptedAt?: string;
+  pickedUpAt?: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
+}
+
 export type ChatTopic =
   | "support"
   | "order"
@@ -532,6 +589,7 @@ export interface LoyaltyAccount {
   tier: LoyaltyTier;
   referralCode: string;
   referredBy?: string;
+  referralRewarded?: boolean;
   joinedAt: string;
 }
 
@@ -653,6 +711,7 @@ export interface Database {
   loyaltyRewards?: LoyaltyReward[];
   chatThreads?: ChatThread[];
   chatMessages?: ChatMessage[];
+  parcels?: ParcelDelivery[];
 }
 
 /**

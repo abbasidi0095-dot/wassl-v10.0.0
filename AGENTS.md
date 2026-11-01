@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.0-alpha.5** (1 November 2026; support, ratings and Wassl 11 identity)
+- Release: **11.0.0-alpha.6** (1 November 2026; Express, referrals, insights and alerts)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,20 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.0-alpha.6 — Express, referrals, insights and alerts
+- `ParcelDelivery` model, `src/lib/express.ts` pricing/transitions, DB functions
+  and `/api/express` routes for booking, quoting, status, assignment and tracking.
+- `/express`, `/express/[id]`, `/driver/express`, `/admin/express`; pickup and
+  delivery codes are stripped from driver payloads.
+- Express service is enabled by default for live cities with a one-time
+  `servicesVersion` migration; operators can still disable it per city.
+- Loyalty referrals (`claimLoyaltyReferral`) and yearly birthday rewards, with
+  dashboard controls.
+- `/api/ai/insights` for merchant/admin read-only analysis; `/api/ai/chat`
+  remains customer-only.
+- `src/lib/alerts.ts` and an admin operational-alert panel.
+- Added express tests and Playwright parcel handover coverage.
 
 ### 11.0.0-alpha.5 — support, ratings and Wassl 11 identity
 - `src/lib/ai.ts` calls NVIDIA NIM with `node:https` and IPv4, reads

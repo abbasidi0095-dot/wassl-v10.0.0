@@ -258,3 +258,60 @@ test("a delivered order accepts one customer rating", async ({ page }) => {
   await page.getByRole("button", { name: "Send rating" }).click();
   await expect(page.getByText("Thank you for rating")).toBeVisible();
 });
+
+test("parcel booking moves through driver pickup and recipient handover", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("customer@wassl.ma");
+  await page.getByLabel("Password", { exact: true }).fill("Wsl-Customer-2Dkh!2026");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/(taxi|account|orders)/);
+
+  await page.goto("/express");
+  await page.getByLabel("Your name").fill("Mariam K.");
+  await page.getByLabel("Your phone").fill("+212600000000");
+  await page.getByLabel("Pickup point").fill("Avenue Mohammed V");
+  await page.getByLabel("Drop-off point").fill("Corniche Hotel");
+  await page.getByLabel("Recipient name").fill("Youssef");
+  await page.getByLabel("Recipient phone").fill("+212611111111");
+  await page.getByLabel("What is inside?").fill("Documents");
+  await page.getByRole("button", { name: /Book parcel/ }).click();
+  await expect(page.getByText(/Parcel WX-/)).toBeVisible();
+
+  const tracking = page.locator('a[href^="/express/"]').first();
+  await tracking.click();
+  await expect(page).toHaveURL(/\/express\/parcel_/);
+  const pickupLabel = await page
+    .getByLabel(/Pickup code:/)
+    .first()
+    .getAttribute("aria-label");
+  const deliveryLabel = await page
+    .getByLabel(/Recipient delivery code:/)
+    .first()
+    .getAttribute("aria-label");
+  const pickupCode = pickupLabel?.replace(/\D/g, "").slice(-4) ?? "";
+  const deliveryCode = deliveryLabel?.replace(/\D/g, "").slice(-4) ?? "";
+  expect(pickupCode).toMatch(/^\d{4}$/);
+  expect(deliveryCode).toMatch(/^\d{4}$/);
+
+  const driver = await page.context().browser()!.newContext();
+  await driver.request.post("/api/auth/login", {
+    data: { email: "driver@wassl.ma", password: "Wsl-Driver-9Lay!2026" },
+  });
+  const driverPage = await driver.newPage();
+  await driverPage.goto("/driver/express");
+  await expect(
+    driverPage.getByText("Nearby parcel requests"),
+  ).toBeVisible();
+  await driverPage.getByRole("button", { name: "Accept" }).first().click();
+  driverPage.once("dialog", (dialog) => dialog.accept(pickupCode));
+  await driverPage.getByRole("button", { name: "Confirm collection" }).click();
+  await driverPage.getByRole("button", { name: "Start delivery" }).click();
+  driverPage.once("dialog", (dialog) => dialog.accept(deliveryCode));
+  await driverPage.getByRole("button", { name: "Complete handover" }).click();
+  await expect(driverPage.getByText("Delivered").first()).toBeVisible({
+    timeout: 15_000,
+  });
+  await driver.close();
+});

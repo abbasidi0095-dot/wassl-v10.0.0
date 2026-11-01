@@ -7,6 +7,7 @@ import {
   getUsers,
 } from "@/lib/db";
 import { getDataSourceStatus } from "@/lib/data-source";
+import { operationalAlerts } from "@/lib/alerts";
 import { StaffHeader } from "@/components/staff-header";
 import { AdminConsole } from "./admin-console";
 
@@ -30,6 +31,7 @@ export default async function AdminPage() {
           { href: "/admin/accounts", label: "Accounts" },
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
+          { href: "/admin/express", label: "Express" },
           { href: "/admin/messages", label: "Messages" },
         ]}
         accent="ink"
@@ -46,6 +48,7 @@ export default async function AdminPage() {
           initialStats={await dashboardStats()}
           initialAuditLogs={await getAuditLogs({ limit: 150 })}
           initialDataSource={getDataSourceStatus()}
+          initialAlerts={operationalAlerts(db)}
         />
       </main>
     </div>

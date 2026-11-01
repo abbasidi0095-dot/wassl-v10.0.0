@@ -28,6 +28,7 @@ export default async function AdminTaxiPage() {
           { href: "/admin/accounts", label: "Accounts" },
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
+          { href: "/admin/express", label: "Express" },
           { href: "/admin/messages", label: "Messages" },
         ]}
         accent="ink"

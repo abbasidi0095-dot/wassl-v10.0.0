@@ -48,7 +48,7 @@ export function defaultCityServices(
     restaurant: live,
     grocery: live,
     taxi: live,
-    express: false,
+    express: live,
     services: false,
     business: false,
   };

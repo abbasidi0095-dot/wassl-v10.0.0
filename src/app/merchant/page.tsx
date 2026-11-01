@@ -8,6 +8,7 @@ import {
 } from "@/lib/db";
 import { StaffHeader } from "@/components/staff-header";
 import { MerchantDashboard } from "./merchant-dashboard";
+import { InsightsAssistant } from "@/components/insights-assistant";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Store dashboard" };
@@ -36,6 +37,9 @@ export default async function MerchantPage() {
         ]}
       />
       <main className="container-wassl py-6">
+        <div className="mb-4">
+          <InsightsAssistant role="merchant" />
+        </div>
         <MerchantDashboard
           store={store}
           initialProducts={products}

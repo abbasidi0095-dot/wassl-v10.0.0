@@ -22,6 +22,7 @@ export default async function DriverPage() {
         links={[
           { href: "/driver", label: "My route" },
           { href: "/driver/taxi", label: "Taxi rides" },
+          { href: "/driver/express", label: "Parcels" },
           { href: "/driver/messages", label: "Messages" },
           { href: "/driver#cash", label: "Cash & earnings" },
         ]}

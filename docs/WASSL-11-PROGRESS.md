@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.0.0-alpha.5** (1 November 2026).
+Current delivered baseline: **11.0.0-alpha.6** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -118,6 +118,32 @@ programme is complete.
   tokens.
 - Signature palette and WCAG checks documented in `docs/BRAND-11.md`.
 
+### Wassl Express
+
+- Customer booking at `/express` with map pickup/drop-off, recipient details,
+  four package sizes, distance-based cash fare and 80 km local limit.
+- Pickup and delivery codes; drivers must enter them at collection and handover
+  and never receive either code in advance.
+- Driver queue at `/driver/express`, admin operations at `/admin/express` and
+  tracking at `/express/[id]`.
+- Express is enabled for live cities by default and can be disabled per city.
+
+### Club referrals and birthday
+
+- Referral codes and a one-time 100-point reward for both accounts.
+- Birthday storage and a yearly 100-point reward, awarded once per year.
+- Dashboard controls for both.
+
+### Insights and alerts
+
+- Read-only merchant/admin AI insights over real store/platform data.
+- Admin alerts for missing drivers, stalled orders, offline drivers, stalled
+  parcels, low stock, refund backlog and cancellation spikes.
+
+Still missing from v11: local services marketplace, business/wholesale accounts,
+Taxi 2.0 scheduling/multi-stop/intercity, full merchant growth tools, and
+provider-side service bookings.
+
 ### Supporting changes
 
 - `src/lib/db.ts` adds `getPopularProducts()`.
@@ -133,7 +159,7 @@ programme is complete.
 ## Verification
 
 - `npx tsc --noEmit` — clean.
-- `npm test` — 116 passed, 4 skipped.
+- `npm test` — 120 passed, 4 skipped.
 - `npm run e2e` — 22 passed.
 - `npm run build` — clean.
 - Manual checks at 1440px and 390px: no horizontal overflow on home or search.
@@ -159,14 +185,14 @@ programme is complete.
 | Grocery 2.0 | Delivered (core) | Basket, split checkout, barcode, recurring lists, assistant, promotions and inventory intelligence delivered; merchant promotion builder and deeper forecasting remain |
 | Wassl Club | Partial | Ledger, tiers, earn/redeem, dashboard and admin adjustments delivered; referrals, birthday, reward codes, expiry and campaign controls remain |
 | Wassl AI | Partial | Customer support assistant with NVIDIA, real context, rate limits and human fallback; merchant/admin assistants remain |
-| Taxi 2.0 | Partial | Scheduled, multi-stop, saved places, ratings, lost-and-found, intercity, zones, heatmaps |
-| Wassl Express | Not started | Parcel vertical |
+| Taxi 2.0 | Partial | Scheduled, multi-stop, saved places, lost-and-found, intercity, zones and heatmaps remain |
+| Wassl Express | Delivered | Booking, driver queue, handover codes, tracking and admin operations |
 | Local services marketplace | Not started | Provider and booking workflows |
 | Business / wholesale | Not started | B2B accounts and catalogue |
 | Merchant Growth 2.0 | Partial | Order board and basic analytics; staff, campaigns, capacity, forecasting |
 | Driver Intelligence 2.0 | Partial | GPS, queue and wallet; heatmaps, break/emergency, incentives, batch |
 | Admin Intelligence 2.0 | Partial | Profit analytics, city service matrix and support inbox delivered; proactive alerts remain |
-| Advanced retention | Partial | Ratings and support conversations delivered; referrals, achievements, reminders and birthday remain |
+| Advanced retention | Partial | Ratings, support and referrals/birthday delivered; achievements, reminders and abandoned cart remain |
 | Maps and routing | Partial | MapLibre/OSM; no routing abstraction |
 | Security and privacy | Strong baseline | New verticals and AI tools still need validation |
 
@@ -181,7 +207,9 @@ programme is complete.
 - `src/lib/grocery-promotions.ts` — server-validated grocery offers.
 - `src/lib/inventory.ts` — inventory and replenishment intelligence.
 - `src/lib/loyalty.ts` — tiers, earning rules and rewards.
-- `src/lib/ai.ts` — NVIDIA NIM provider with IPv4 transport and graceful fallback.
+- `src/lib/ai.ts` — NVIDIA NIM provider with bounded retry and graceful fallback.
+- `src/lib/express.ts` — parcel pricing and state transitions.
+- `src/lib/alerts.ts` — deterministic operational alerts.
 - `src/components/chat-workspace.tsx` — shared customer/driver/merchant/admin inbox.
 - `src/components/rating-prompt.tsx` — post-order and post-ride rating UI.
 - `public/brand/` and `assets/` — original vector and native brand assets.
@@ -218,6 +246,7 @@ programme is complete.
 - `tests/loyalty.test.ts` — new.
 - `tests/chat.test.ts` — new.
 - `tests/brand.test.ts` — new.
+- `tests/express.test.ts` — new.
 - `e2e/customer.spec.ts` — two new cases.
 - `README.md`, `AGENTS.md`, `package.json` — milestone documentation.
 

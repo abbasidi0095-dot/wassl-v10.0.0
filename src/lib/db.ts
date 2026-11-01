@@ -33,6 +33,12 @@ import {
 } from "./loyalty";
 import { applyGroceryPromotions } from "./grocery-promotions";
 import {
+  PARCEL_SIZES,
+  canMoveParcel,
+  estimateParcelFare,
+  parcelDistance,
+} from "./express";
+import {
   BOOTSTRAP_ADMIN_EMAIL,
   BOOTSTRAP_ADMIN_PASSWORD,
   DEMO_CUSTOMER_EMAIL,
@@ -64,6 +70,9 @@ import type {
   LoyaltyAccount,
   Order,
   OrderEvent,
+  ParcelDelivery,
+  ParcelSize,
+  ParcelStatus,
   OrderStatus,
   PlatformSettings,
   Product,
@@ -3509,6 +3518,29 @@ export async function getLoyaltyOverview(userId: string) {
     const user = db.users.find((entry) => entry.id === userId);
     if (!user) throw new Error("Account not found");
     const account = ensureLoyaltyAccount(db, user);
+    // Yearly birthday reward, once per calendar year.
+    if (user.birthday) {
+      const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Africa/Casablanca",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+      const birthday = user.birthday.slice(5, 10);
+      const year = new Date().getUTCFullYear();
+      const already = (db.loyaltyTransactions ?? []).some(
+        (entry) =>
+          entry.userId === userId &&
+          entry.type === "birthday" &&
+          new Date(entry.createdAt).getUTCFullYear() === year,
+      );
+      if (today === birthday && !already) {
+        applyLoyaltyTransaction(db, account, user, {
+          type: "birthday",
+          points: 100,
+          note: "Birthday reward",
+        });
+      }
+    }
     const transactions = (db.loyaltyTransactions ?? [])
       .filter((entry) => entry.userId === userId)
       .sort(
@@ -3938,5 +3970,350 @@ export async function rateTaxiRide(
       metadata: { comment: rating.comment },
     });
     return ride;
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Wassl Express                                                               */
+/* -------------------------------------------------------------------------- */
+
+export type ParcelView = ParcelDelivery & { driver?: Driver };
+
+function parcelView(db: Database, parcel: ParcelDelivery): ParcelView {
+  return {
+    ...parcel,
+    driver: parcel.driverId
+      ? db.drivers.find((driver) => driver.id === parcel.driverId)
+      : undefined,
+  };
+}
+
+/** Never send pickup or delivery codes to a driver before handover. */
+export type DriverParcelView = Omit<
+  ParcelDelivery,
+  "pickupCode" | "deliveryCode"
+> & {
+  pickupCodeRequired: boolean;
+  deliveryCodeRequired: boolean;
+};
+
+export function parcelForDriver(parcel: ParcelDelivery): DriverParcelView {
+  const { pickupCode, deliveryCode, ...rest } = parcel;
+  return {
+    ...rest,
+    pickupCodeRequired: Boolean(pickupCode) && parcel.status === "accepted",
+    deliveryCodeRequired: Boolean(deliveryCode) && parcel.status === "in_transit",
+  };
+}
+
+export async function createParcel(
+  input: {
+    citySlug: string;
+    customerName: string;
+    customerPhone: string;
+    customerEmail?: string;
+    pickupLabel: string;
+    pickupLat: number;
+    pickupLng: number;
+    dropoffLabel: string;
+    dropoffLat: number;
+    dropoffLng: number;
+    recipientName: string;
+    recipientPhone: string;
+    size: ParcelSize;
+    description: string;
+    notes?: string;
+  },
+  actor: OrderActor,
+): Promise<ParcelDelivery> {
+  if (actor.role !== "customer" && actor.role !== "admin") {
+    throw new Error("Only customers can book a parcel");
+  }
+  const actorId = actor.id;
+  if (!actorId) throw new Error("A signed-in customer is required");
+  const size = PARCEL_SIZES.find((entry) => entry.id === input.size);
+  if (!size) throw new Error("Choose a valid parcel size");
+  if (!input.pickupLabel.trim() || !input.dropoffLabel.trim()) {
+    throw new Error("Pickup and drop-off are required");
+  }
+  if (!input.recipientName.trim() || !input.recipientPhone.trim()) {
+    throw new Error("Recipient name and phone are required");
+  }
+  const coords = [input.pickupLat, input.pickupLng, input.dropoffLat, input.dropoffLng];
+  if (coords.some((value) => !Number.isFinite(value))) {
+    throw new Error("Pickup and drop-off locations are invalid");
+  }
+  return mutate((db) => {
+    const city = db.cities.find((entry) => entry.slug === input.citySlug);
+    if (!city) throw new Error("City not found");
+    const distanceKm = parcelDistance(
+      { lat: input.pickupLat, lng: input.pickupLng },
+      { lat: input.dropoffLat, lng: input.dropoffLng },
+    );
+    if (distanceKm > 80) {
+      throw new Error("Express parcels are limited to 80 km; use an intercity request");
+    }
+    const now = new Date().toISOString();
+    const code = String(1000 + Math.floor(Math.random() * 9000));
+    const parcel: ParcelDelivery = {
+      id: randomId("parcel", 6),
+      code: `WX-${randomId("x", 6).slice(2).toUpperCase()}`,
+      trackingCode: `WXT-${randomId("x", 8).slice(2).toUpperCase()}`,
+      customerId: actorId,
+      customerName: input.customerName.trim(),
+      customerPhone: input.customerPhone.trim(),
+      customerEmail: input.customerEmail?.trim().toLowerCase(),
+      citySlug: input.citySlug,
+      pickupLabel: input.pickupLabel.trim(),
+      pickupLat: input.pickupLat,
+      pickupLng: input.pickupLng,
+      dropoffLabel: input.dropoffLabel.trim(),
+      dropoffLat: input.dropoffLat,
+      dropoffLng: input.dropoffLng,
+      recipientName: input.recipientName.trim(),
+      recipientPhone: input.recipientPhone.trim(),
+      size: input.size,
+      description: input.description.trim().slice(0, 300),
+      notes: input.notes?.trim().slice(0, 300),
+      distanceKm,
+      fare: estimateParcelFare(input.size, distanceKm),
+      status: "requested",
+      pickupCode: code,
+      deliveryCode: String(1000 + Math.floor(Math.random() * 9000)),
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.parcels ??= [];
+    db.parcels.unshift(parcel);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "parcel.create",
+      entity: "order",
+      entityId: parcel.id,
+      summary: `Parcel ${parcel.code}: ${parcel.pickupLabel} → ${parcel.dropoffLabel} (${parcel.fare} MAD)`,
+    });
+    publish({ type: "order", orderId: parcel.id, citySlug: parcel.citySlug });
+    return parcel;
+  });
+}
+
+export async function getParcels(filter?: {
+  customerId?: string;
+  driverId?: string;
+  citySlug?: string;
+  status?: ParcelStatus;
+  limit?: number;
+}): Promise<ParcelDelivery[]> {
+  const parcels = (await getDb()).parcels ?? [];
+  const filtered = parcels.filter(
+    (parcel) =>
+      (!filter?.customerId || parcel.customerId === filter.customerId) &&
+      (!filter?.driverId || parcel.driverId === filter.driverId) &&
+      (!filter?.citySlug || parcel.citySlug === filter.citySlug) &&
+      (!filter?.status || parcel.status === filter.status),
+  );
+  filtered.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return filter?.limit ? filtered.slice(0, filter.limit) : filtered;
+}
+
+export async function getParcel(
+  idOrCode: string,
+): Promise<ParcelView | undefined> {
+  const db = await getDb();
+  const parcel = (db.parcels ?? []).find(
+    (entry) =>
+      entry.id === idOrCode ||
+      entry.code.toLowerCase() === idOrCode.toLowerCase() ||
+      entry.trackingCode.toLowerCase() === idOrCode.toLowerCase(),
+  );
+  return parcel ? parcelView(db, parcel) : undefined;
+}
+
+export async function assignParcelDriver(
+  parcelId: string,
+  driverId: string,
+  actor: OrderActor,
+): Promise<ParcelDelivery> {
+  return mutate((db) => {
+    if (actor.role !== "admin") throw new Error("Only operations can assign a parcel");
+    const parcel = (db.parcels ?? []).find((entry) => entry.id === parcelId);
+    if (!parcel) throw new Error("Parcel not found");
+    if (parcel.status !== "requested") throw new Error("Parcel is already assigned");
+    const driver = db.drivers.find((entry) => entry.id === driverId);
+    if (!driver || !driver.active) throw new Error("Driver is not active");
+    if (driver.kind === "taxi") throw new Error("This driver does not take parcels");
+    parcel.driverId = driver.id;
+    parcel.driverName = driver.name;
+    parcel.driverPhone = driver.phone;
+    parcel.status = "accepted";
+    parcel.acceptedAt = new Date().toISOString();
+    parcel.updatedAt = parcel.acceptedAt;
+    driver.status = "busy";
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "parcel.assign",
+      entity: "order",
+      entityId: parcel.id,
+      summary: `Parcel ${parcel.code} assigned to ${driver.name}`,
+    });
+    publish({ type: "order", orderId: parcel.id, citySlug: parcel.citySlug, driverId: driver.id });
+    return parcel;
+  });
+}
+
+export async function updateParcelStatus(
+  parcelId: string,
+  next: ParcelStatus,
+  actor: OrderActor,
+  options: { proofCode?: string; note?: string } = {},
+): Promise<ParcelDelivery> {
+  return mutate((db) => {
+    const parcel = (db.parcels ?? []).find((entry) => entry.id === parcelId);
+    if (!parcel) throw new Error("Parcel not found");
+    if (!canMoveParcel(parcel.status, next)) {
+      throw new Error(`A ${parcel.status} parcel cannot move to ${next}`);
+    }
+    if (actor.role === "customer") {
+      if (parcel.customerId !== actor.id) throw new Error("This is not your parcel");
+      if (next !== "cancelled") throw new Error("Customers can only cancel a parcel");
+    } else if (actor.role === "driver") {
+      if (parcel.driverId !== actor.driverId) {
+        if (parcel.status === "requested" && next === "accepted") {
+          if (!actor.driverId) throw new Error("Driver profile is required");
+          parcel.driverId = actor.driverId;
+          const driver = db.drivers.find((entry) => entry.id === actor.driverId);
+          if (!driver || !driver.active) throw new Error("Driver is not active");
+          if (driver.kind === "taxi") throw new Error("This driver does not take parcels");
+          parcel.driverName = driver.name;
+          parcel.driverPhone = driver.phone;
+          driver.status = "busy";
+        } else {
+          throw new Error("This parcel is assigned to another driver");
+        }
+      }
+    } else if (actor.role !== "admin") {
+      throw new Error("You do not have access to this parcel");
+    }
+
+    if (next === "picked_up" && actor.role !== "admin") {
+      if ((options.proofCode ?? "").replace(/\D/g, "") !== parcel.pickupCode) {
+        throw new Error("Enter the sender's 4-digit pickup code");
+      }
+      parcel.proofOfDelivery = {
+        method: "pickup_code",
+        at: new Date().toISOString(),
+      };
+    }
+    if (next === "delivered" && actor.role !== "admin") {
+      if ((options.proofCode ?? "").replace(/\D/g, "") !== parcel.deliveryCode) {
+        throw new Error("Enter the recipient's 4-digit delivery code");
+      }
+      parcel.proofOfDelivery = {
+        method: "delivery_code",
+        at: new Date().toISOString(),
+      };
+    }
+
+    const now = new Date().toISOString();
+    const before = parcel.status;
+    parcel.status = next;
+    parcel.updatedAt = now;
+    if (next === "accepted") parcel.acceptedAt = now;
+    if (next === "picked_up") parcel.pickedUpAt = now;
+    if (next === "delivered") {
+      parcel.deliveredAt = now;
+      parcel.codeVerifiedAt = now;
+      if (parcel.driverId) {
+        const driver = db.drivers.find((entry) => entry.id === parcel.driverId);
+        if (driver) {
+          driver.cashOnHand += parcel.fare;
+          driver.status = "available";
+        }
+      }
+    }
+    if (next === "cancelled") {
+      parcel.cancelledAt = now;
+      if (parcel.driverId) {
+        const driver = db.drivers.find((entry) => entry.id === parcel.driverId);
+        if (driver && driver.status === "busy") driver.status = "available";
+      }
+    }
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "parcel.status",
+      entity: "order",
+      entityId: parcel.id,
+      summary: `Parcel ${parcel.code}: ${before} → ${next}`,
+      note: options.note?.trim() || undefined,
+    });
+    publish({ type: "order", orderId: parcel.id, citySlug: parcel.citySlug, status: next });
+    return parcel;
+  });
+}
+
+
+export async function claimLoyaltyReferral(
+  userId: string,
+  code: string,
+) {
+  const normalized = code.trim().toUpperCase();
+  if (normalized.length < 4) throw new Error("Enter a referral code");
+  return mutate((db) => {
+    const user = db.users.find((entry) => entry.id === userId);
+    if (!user) throw new Error("Account not found");
+    const account = ensureLoyaltyAccount(db, user);
+    if (account.referredBy || account.referralRewarded) {
+      throw new Error("This account has already used a referral");
+    }
+    const referrer = (db.loyaltyAccounts ?? []).find(
+      (entry) =>
+        entry.userId !== userId &&
+        entry.referralCode.toUpperCase() === normalized,
+    );
+    if (!referrer) throw new Error("That referral code was not found");
+    const referrerUser = db.users.find((entry) => entry.id === referrer.userId);
+    if (!referrerUser) throw new Error("Referrer not found");
+    account.referredBy = referrer.referralCode;
+    account.referralRewarded = true;
+    referrer.referralRewarded = true;
+    applyLoyaltyTransaction(db, account, user, {
+      type: "referral",
+      points: 100,
+      note: `Referral welcome · ${referrer.referralCode}`,
+    });
+    applyLoyaltyTransaction(db, referrer, referrerUser, {
+      type: "referral",
+      points: 100,
+      note: `Referred ${user.name}`,
+    });
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: user.id,
+      actorName: user.name,
+      action: "loyalty.referral",
+      entity: "auth",
+      entityId: user.id,
+      summary: `${user.email} claimed ${referrer.referralCode}`,
+    });
+    return { account, referrer: referrerUser.name };
+  });
+}
+
+export async function setLoyaltyBirthday(userId: string, birthday: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
+    throw new Error("Enter a valid birthday");
+  }
+  return mutate((db) => {
+    const user = db.users.find((entry) => entry.id === userId);
+    if (!user) throw new Error("Account not found");
+    user.birthday = birthday;
+    return { birthday };
   });
 }

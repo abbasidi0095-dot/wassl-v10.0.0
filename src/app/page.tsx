@@ -10,6 +10,7 @@ import {
   Clock3,
   KeyRound,
   MapPin,
+  Package,
   Pill,
   Route,
   ShoppingBasket,
@@ -125,6 +126,14 @@ export default async function HomePage() {
       icon: CarTaxiFront,
       count: null,
       enabled: enabledServices.taxi,
+    },
+    {
+      href: "/express",
+      label: t("Express"),
+      note: t("Parcels and documents"),
+      icon: Package,
+      count: null,
+      enabled: enabledServices.express,
     },
   ];
 

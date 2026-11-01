@@ -27,7 +27,7 @@ describe("city service activation", () => {
       restaurant: true,
       grocery: true,
       taxi: true,
-      express: false,
+      express: true,
       services: false,
       business: false,
     });

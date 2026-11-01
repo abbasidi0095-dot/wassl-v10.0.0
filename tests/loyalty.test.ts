@@ -131,3 +131,52 @@ describe("Wassl Club ledger flow", () => {
     ).toBe(true);
   });
 });
+
+describe("Wassl Club referrals and birthday", () => {
+  it("awards both accounts once for a valid referral", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const referrer = await db.getUserByEmail("customer@wassl.ma");
+    const friend = await db.createAccount({
+      email: "friend@wassl.ma",
+      name: "Friend",
+      passwordHash: "not-used",
+      role: "customer",
+      phone: "+212600000001",
+    });
+    const referrerOverview = await db.getLoyaltyOverview(referrer!.id);
+    const result = await db.claimLoyaltyReferral(
+      friend.id,
+      referrerOverview.account.referralCode,
+    );
+    expect(result.account.points).toBeGreaterThanOrEqual(100);
+    const friendOverview = await db.getLoyaltyOverview(friend.id);
+    const referrerAfter = await db.getLoyaltyOverview(referrer!.id);
+    expect(
+      friendOverview.transactions.some((entry) => entry.type === "referral"),
+    ).toBe(true);
+    expect(
+      referrerAfter.transactions.some((entry) => entry.type === "referral"),
+    ).toBe(true);
+    await expect(
+      db.claimLoyaltyReferral(friend.id, referrerOverview.account.referralCode),
+    ).rejects.toThrow(/already/i);
+  });
+
+  it("awards one birthday bonus on the member's birthday", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const user = await db.getUserByEmail("customer@wassl.ma");
+    const now = new Date();
+    const birthday = `1990-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+    await db.setLoyaltyBirthday(user!.id, birthday);
+    const first = await db.getLoyaltyOverview(user!.id);
+    const second = await db.getLoyaltyOverview(user!.id);
+    expect(
+      first.transactions.filter((entry) => entry.type === "birthday"),
+    ).toHaveLength(1);
+    expect(
+      second.transactions.filter((entry) => entry.type === "birthday"),
+    ).toHaveLength(1);
+  });
+});

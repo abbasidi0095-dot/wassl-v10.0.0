@@ -60,12 +60,14 @@ import type {
   StoreCategory,
 } from "@/lib/types";
 import type { DataSourceStatus } from "@/lib/data-source";
+import type { OperationalAlert } from "@/lib/alerts";
 import { getOpenState } from "@/lib/hours";
 import { availableTransitions } from "@/lib/order-machine";
 import { STATUS_META } from "@/lib/types";
 import { categoryLabel, money, timeAgo } from "@/lib/utils";
 import { MapView, type MapPoint } from "@/components/map-view";
 import { useLiveEvents } from "@/lib/use-live-events";
+import { InsightsAssistant } from "@/components/insights-assistant";
 
 type Stats = {
   ordersToday: number;
@@ -132,6 +134,7 @@ export function AdminConsole({
   initialStats,
   initialAuditLogs,
   initialDataSource,
+  initialAlerts,
 }: {
   initialOrders: OrderView[];
   initialTaxiRides: TaxiRide[];
@@ -143,6 +146,7 @@ export function AdminConsole({
   initialStats: Stats;
   initialAuditLogs: AuditEntry[];
   initialDataSource: DataSourceStatus;
+  initialAlerts: OperationalAlert[];
 }) {
   const [orders, setOrders] = useState(initialOrders);
   const [taxiRides, setTaxiRides] = useState(initialTaxiRides);
@@ -838,6 +842,49 @@ export function AdminConsole({
       ) : null}
 
       {tab === "overview" ? (
+        <>
+        <div className="mt-4">
+          <InsightsAssistant role="admin" />
+        </div>
+        {initialAlerts.length ? (
+          <section className="mt-4">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-[13px] font-semibold">Operational alerts</h2>
+              <span className="pill">{initialAlerts.length}</span>
+            </div>
+            <div className="mt-2 grid gap-2 lg:grid-cols-2">
+              {initialAlerts.map((alert) => (
+                <Link
+                  key={alert.id}
+                  href={alert.href || "/admin"}
+                  className={`rounded-[8px] border p-3 transition-colors hover:border-line-strong ${
+                    alert.severity === "critical"
+                      ? "border-danger/30 bg-danger-soft/60"
+                      : alert.severity === "warning"
+                        ? "border-saffron/30 bg-saffron/10"
+                        : "border-line bg-surface"
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                        alert.severity === "critical"
+                          ? "bg-danger"
+                          : alert.severity === "warning"
+                            ? "bg-saffron"
+                            : "bg-brand"
+                      }`}
+                    />
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-semibold">{alert.title}</div>
+                      <div className="mt-0.5 text-[10px] leading-4 text-muted">{alert.detail}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
         <section className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="card overflow-hidden">
             <MapView points={mapPoints} zoom={12} height={420} />
@@ -886,6 +933,7 @@ export function AdminConsole({
             ) : null}
           </div>
         </section>
+        </>
       ) : null}
 
       {tab === "analytics" ? (

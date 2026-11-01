@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   MapPin,
   Menu,
+  Package,
   ReceiptText,
   Search,
   ShoppingBag,
@@ -106,6 +107,9 @@ export function SiteHeader({
     ...(services.taxi
       ? [{ href: "/taxi", label: t("Taxi"), active: pathname.startsWith("/taxi") }]
       : []),
+    ...(services.express
+      ? [{ href: "/express", label: t("Express"), active: pathname.startsWith("/express") }]
+      : []),
     {
       href: "/orders",
       label: t("My orders"),
@@ -139,16 +143,14 @@ export function SiteHeader({
 
   const mobileNav = [
     { href: "/", label: t("Home"), icon: House },
-    {
-      href: currentCity ? `/city/${currentCity.slug}` : "/",
-      label: t("Stores"),
-      icon: Store,
-    },
     ...(services.grocery
       ? [{ href: "/grocery", label: t("Grocery"), icon: ShoppingBasket }]
       : []),
     ...(services.taxi
       ? [{ href: "/taxi", label: t("Taxi"), icon: CarTaxiFront }]
+      : []),
+    ...(services.express
+      ? [{ href: "/express", label: t("Express"), icon: Package }]
       : []),
     { href: "/orders", label: t("Orders"), icon: ReceiptText },
     {

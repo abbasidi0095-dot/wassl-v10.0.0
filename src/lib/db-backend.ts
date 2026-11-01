@@ -80,6 +80,7 @@ function hydrate(db: Database): Database {
   db.loyaltyRewards ??= DEFAULT_LOYALTY_REWARDS.map((reward) => ({ ...reward }));
   db.chatThreads ??= [];
   db.chatMessages ??= [];
+  db.parcels ??= [];
 
   // Migrate the legacy scalar balance into an immutable, ledger-backed account.
   for (const user of db.users) {
@@ -115,7 +116,15 @@ function hydrate(db: Database): Database {
   // City services are additive: existing cities keep their current three
   // verticals and new verticals stay off until an operator enables them.
   for (const city of db.cities) {
-    city.services = { ...defaultCityServices(city), ...(city.services ?? {}) };
+    const defaults = defaultCityServices(city);
+    if ((city.servicesVersion ?? 1) < 2) {
+      // Express becomes a default live-city service in v11. Future operator
+      // changes are preserved because the migration only runs once.
+      city.services = { ...defaults, ...(city.services ?? {}), express: defaults.express };
+      city.servicesVersion = 2;
+    } else {
+      city.services = { ...defaults, ...(city.services ?? {}) };
+    }
   }
 
   // Give existing records a handover code once. The code is persisted on the
