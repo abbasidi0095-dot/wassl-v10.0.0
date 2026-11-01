@@ -98,10 +98,18 @@ test("global search tolerates a typo and links into a product", async ({
   await expect(page.getByRole("dialog")).toBeVisible();
 });
 
-test("home surfaces a deterministic For you feed", async ({ page }) => {
+test("home is a simple launcher with services and open stores", async ({
+  page,
+}) => {
   await page.goto("/");
-  await expect(page.getByText("For you", { exact: true })).toBeVisible();
-  await expect(page.getByText("Popular in Dakhla")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /What do you need today|Salam,/ }),
+  ).toBeVisible();
+  await expect(page.getByPlaceholder("Search food, groceries, rides…")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Delivery/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Grocery/ }).first()).toBeVisible();
+  await expect(page.getByText("Open now in Dakhla")).toBeVisible();
+  await expect(page.locator(".tabbar a")).toHaveCount(5);
 });
 
 test("barcode lookup adds a real product to the multi-store basket", async ({

@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.4** (1 November 2026; floating cart and fixed chrome)
+- Release: **11.1.0** (1 November 2026; simple launcher home)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,16 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.1.0 — simple launcher home
+- `src/app/page.tsx` reduced from 879 to ~270 lines: search, quick links,
+  in-progress jobs, six services, open-now picks.
+- Mobile header trimmed to search, notifications, cart and menu; city, language,
+  theme and account live in the menu or on desktop.
+- Five-tab dock (Home, Grocery, Taxi, Orders, Account); Express, Services and
+  Business stay reachable from the launcher and menu.
+- `PwaUpdater` only prompts on genuine updates (controller existed at load).
+- Menu panel scrolls within the viewport with dock clearance.
 
 ### 11.0.4 — floating cart and fixed chrome
 - `FloatingCart` shows across the customer app after a cart item exists.

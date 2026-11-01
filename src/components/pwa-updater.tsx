@@ -11,6 +11,9 @@ export function PwaUpdater() {
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
+    // Only offer a reload when this is an update of an already-installed app.
+    // A first install has no controller and must not show the prompt.
+    const hadController = Boolean(navigator.serviceWorker.controller);
     let cancelled = false;
 
     function check(registration: ServiceWorkerRegistration) {
@@ -20,12 +23,16 @@ export function PwaUpdater() {
     navigator.serviceWorker.ready
       .then((registration) => {
         if (cancelled) return;
-        check(registration);
+        if (hadController) check(registration);
         registration.addEventListener("updatefound", () => {
           const worker = registration.installing;
           if (!worker) return;
           worker.addEventListener("statechange", () => {
-            if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            if (
+              hadController &&
+              worker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
               setUpdateReady(true);
             }
           });
@@ -34,7 +41,9 @@ export function PwaUpdater() {
       .catch(() => undefined);
 
     function onMessage(event: MessageEvent) {
-      if (event.data?.type === "WASSL_SW_UPDATED") setUpdateReady(true);
+      if (hadController && event.data?.type === "WASSL_SW_UPDATED") {
+        setUpdateReady(true);
+      }
     }
     navigator.serviceWorker.addEventListener("message", onMessage);
 

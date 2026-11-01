@@ -96,29 +96,6 @@ export function SiteHeader({
         business: false,
       };
 
-  const nav = [
-    {
-      href: currentCity ? `/city/${currentCity.slug}` : "/",
-      label: t("Discover"),
-      active: pathname.startsWith("/city/"),
-    },
-    ...(services.grocery
-      ? [{ href: "/grocery", label: t("Grocery"), active: pathname === "/grocery" }]
-      : []),
-    ...(services.taxi
-      ? [{ href: "/taxi", label: t("Taxi"), active: pathname.startsWith("/taxi") }]
-      : []),
-    ...(services.express
-      ? [{ href: "/express", label: t("Express"), active: pathname.startsWith("/express") }]
-      : []),
-    ...(services.services
-      ? [{ href: "/services", label: t("Services"), active: pathname.startsWith("/services") }]
-      : []),
-    ...(services.business
-      ? [{ href: "/business", label: t("Business"), active: pathname.startsWith("/business") }]
-      : []),
-  ];
-
   const cityOptions = (
     <>
       <optgroup label={t("Southern Morocco")}>
@@ -146,9 +123,6 @@ export function SiteHeader({
     ...(services.taxi
       ? [{ href: "/taxi", label: t("Taxi"), icon: CarTaxiFront }]
       : []),
-    ...(services.express
-      ? [{ href: "/express", label: t("Express"), icon: Package }]
-      : []),
     { href: "/orders", label: t("Orders"), icon: ReceiptText },
     {
       href: account ? accountHref(account) : "/login",
@@ -167,22 +141,6 @@ export function SiteHeader({
         <div className="container-wassl flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-7">
             <Logo responsive />
-            <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
-              {nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  data-active={item.active}
-                  className={cn(
-                    "relative px-3 py-2 text-[13px] font-medium text-muted transition-colors hover:text-ink",
-                    "after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:bg-transparent",
-                    item.active && "text-ink after:bg-brand",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -213,11 +171,15 @@ export function SiteHeader({
               <Search size={18} />
             </Link>
 
-            <LanguageSwitcher compact className="md:hidden" />
+            <div className="hidden sm:block md:hidden">
+              <LanguageSwitcher compact />
+            </div>
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
-            <ThemeToggle />
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
 
             <NotificationBell />
 
@@ -255,7 +217,7 @@ export function SiteHeader({
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
-              className={cn(iconButton, "lg:hidden")}
+              className={iconButton}
               aria-label={t("Menu")}
               aria-expanded={open}
             >
@@ -265,8 +227,17 @@ export function SiteHeader({
         </div>
 
         {open ? (
-          <div className="border-t border-line bg-surface lg:hidden">
-            <div className="container-wassl grid gap-1 py-3">
+          <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line bg-surface">
+            <div className="container-wassl grid gap-1 pb-28 pt-3">
+              <div className="mb-2 flex items-center justify-between gap-2 sm:hidden">
+                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
+                  {t("Language and appearance")}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <LanguageSwitcher />
+                  <ThemeToggle />
+                </div>
+              </div>
               <label className="relative mb-2">
                 <MapPin
                   size={15}
@@ -293,6 +264,15 @@ export function SiteHeader({
                 },
                 { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
                 { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
+                ...(services.express
+                  ? [{ href: "/express", label: t("Express"), icon: Package }]
+                  : []),
+                ...(services.services
+                  ? [{ href: "/services", label: t("Services"), icon: Wrench }]
+                  : []),
+                ...(services.business
+                  ? [{ href: "/business", label: t("Business"), icon: Building2 }]
+                  : []),
                 { href: "/orders", label: t("My orders"), icon: ReceiptText },
                 ...(account
                   ? [

@@ -29,6 +29,17 @@ and dark themes.
 
 ## Release history
 
+### 11.1.0 — 1 November 2026 — simple launcher home
+- Home is now a launcher: greeting, one search field, quick links, in-progress
+  jobs, six service tiles and open-now picks. The long editorial sections are
+  gone.
+- Header is quieter: search, notifications, cart and menu on phones; city,
+  language, theme and account remain on larger screens.
+- Five-tab dock: Home, Grocery, Taxi, Orders, Account. Express, Services and
+  Business live on the launcher and in the menu.
+- Update prompt only appears for real updates of an installed app.
+- Menu scrolls inside the viewport and clears the dock.
+
 ### 11.0.4 — 1 November 2026 — persistent cart and fixed chrome
 - Added a global floating cart after items are added, with count and subtotal.
 - Top header is sticky on mobile, tablet and desktop.
