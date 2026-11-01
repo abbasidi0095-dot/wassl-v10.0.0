@@ -163,7 +163,7 @@ export function SiteHeader({
 
   return (
     <>
-      <header className="site-header relative z-40 border-b border-line pt-[env(safe-area-inset-top)] lg:sticky lg:top-0">
+      <header className="site-header sticky top-0 z-40 border-b border-line pt-[env(safe-area-inset-top)]">
         <div className="container-wassl flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-7">
             <Logo responsive />

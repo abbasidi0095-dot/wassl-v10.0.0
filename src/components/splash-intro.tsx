@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useI18n } from "./locale-provider";
 
 const HOLD_MS = 1450;
@@ -10,6 +10,27 @@ export function SplashIntro() {
   const { t } = useI18n();
   const [visible, setVisible] = useState(true);
   const [leaving, setLeaving] = useState(false);
+  const timers = useRef<number[]>([]);
+  const hiddenAt = useRef<number | null>(null);
+
+  const clearTimers = useCallback(() => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current = [];
+  }, []);
+
+  const start = useCallback(() => {
+    clearTimers();
+    setLeaving(false);
+    setVisible(true);
+    document.documentElement.classList.add("wassl-splashing");
+    timers.current.push(
+      window.setTimeout(() => setLeaving(true), HOLD_MS),
+      window.setTimeout(() => {
+        setVisible(false);
+        document.documentElement.classList.remove("wassl-splashing");
+      }, HOLD_MS + EXIT_MS),
+    );
+  }, [clearTimers]);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -18,24 +39,35 @@ export function SplashIntro() {
       document.documentElement.classList.remove("wassl-splashing");
       return;
     }
-    const hold = window.setTimeout(() => setLeaving(true), HOLD_MS);
-    const finish = window.setTimeout(() => {
-      setVisible(false);
-      document.documentElement.classList.remove("wassl-splashing");
-    }, HOLD_MS + EXIT_MS);
+    start();
+
+    function onVisibility() {
+      if (document.visibilityState === "hidden") {
+        hiddenAt.current = Date.now();
+        return;
+      }
+      const awayFor = hiddenAt.current ? Date.now() - hiddenAt.current : 0;
+      hiddenAt.current = null;
+      // Reopening the home-screen app after a real pause behaves like a launch.
+      if (awayFor > 3000) start();
+    }
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      window.clearTimeout(hold);
-      window.clearTimeout(finish);
+      document.removeEventListener("visibilitychange", onVisibility);
+      clearTimers();
       document.documentElement.classList.remove("wassl-splashing");
     };
-  }, []);
+  }, [clearTimers, start]);
 
   function skip() {
+    clearTimers();
     setLeaving(true);
-    window.setTimeout(() => {
-      setVisible(false);
-      document.documentElement.classList.remove("wassl-splashing");
-    }, 180);
+    timers.current.push(
+      window.setTimeout(() => {
+        setVisible(false);
+        document.documentElement.classList.remove("wassl-splashing");
+      }, 180),
+    );
   }
 
   if (!visible) return null;
