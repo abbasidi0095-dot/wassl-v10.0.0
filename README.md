@@ -29,6 +29,11 @@ and dark themes.
 
 ## Release history
 
+### 11.6.2 — 1 November 2026 — manual mobile fallback
+- Admin → Accounts can mark a customer's Moroccan mobile verified when SMS and
+  WhatsApp are unavailable. The action is audited.
+- Existing email-only signup stays active while all OTP flags remain off.
+
 ### 11.6.1 — 1 November 2026 — verification-ready signup copy
 - The signup mobile field no longer promises an SMS while phone verification is
   switched off.

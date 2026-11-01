@@ -126,6 +126,28 @@ describe("SMS verification lifecycle", () => {
     if (!result.ok) expect(result.failure).toBe("no_phone");
   });
 
+  it("lets an admin verify a mobile as the manual fallback", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const user = await db.createAccount({
+      email: "manual@example.com",
+      name: "Manual User",
+      passwordHash: "hash",
+      role: "customer",
+      phone: "0612345678",
+    });
+    const verified = await db.verifyUserPhoneByAdmin({
+      userId: user.id,
+      actor: { id: "user_admin", name: "Ops", role: "admin" },
+    });
+    expect(verified.phoneVerified).toBe(true);
+    expect(verified.phoneVerifiedAt).toBeTruthy();
+    const logs = await db.getAuditLogs({ entity: "auth", entityId: user.id });
+    expect(
+      logs.some((entry) => entry.action === "auth.phone_verified_admin"),
+    ).toBe(true);
+  });
+
   it("enforces the SMS resend cooldown", async () => {
     const db = await import("@/lib/db");
     await db.resetDatabase();

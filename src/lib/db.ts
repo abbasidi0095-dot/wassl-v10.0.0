@@ -783,6 +783,33 @@ export async function getUsers(): Promise<AdminUserView[]> {
  * approves a self-service sign-up. A store implies a merchant account and a
  * driver profile implies a driver account.
  */
+/** Admin fallback for a verified phone when both OTP channels are unavailable. */
+export async function verifyUserPhoneByAdmin(input: {
+  userId: string;
+  actor: { id: string; name: string; role: Role };
+}): Promise<AdminUserView> {
+  return mutate((db) => {
+    const user = db.users.find((candidate) => candidate.id === input.userId);
+    if (!user) throw new Error("Account not found");
+    const phone = normalizeMoroccanPhone(user.phone);
+    if (!phone) throw new Error("This account has no valid Moroccan mobile number");
+    user.phone = phone;
+    user.phoneVerified = true;
+    user.phoneVerifiedAt = new Date().toISOString();
+    user.phoneVerification = undefined;
+    recordAudit(db, {
+      action: "auth.phone_verified_admin",
+      entity: "auth",
+      entityId: user.id,
+      summary: `${maskPhone(phone)} marked verified by operations`,
+      actorRole: input.actor.role,
+      actorId: input.actor.id,
+      actorName: input.actor.name,
+    });
+    return publicUser(user);
+  });
+}
+
 export async function updateUserAccess(input: {
   userId: string;
   role?: Role;

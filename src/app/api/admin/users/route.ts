@@ -4,6 +4,7 @@ import {
   getUsers,
   rejectUser,
   updateUserAccess,
+  verifyUserPhoneByAdmin,
 } from "@/lib/db";
 import { isResponse, requireApiRole } from "@/lib/api-auth";
 import type { Role } from "@/lib/types";
@@ -51,6 +52,13 @@ export async function PATCH(request: Request) {
     }
     if (body.action === "reject") {
       const user = await rejectUser({ userId: body.userId, actor });
+      return NextResponse.json({ ok: true, user });
+    }
+    if (body.action === "verify-phone") {
+      const user = await verifyUserPhoneByAdmin({
+        userId: body.userId,
+        actor,
+      });
       return NextResponse.json({ ok: true, user });
     }
 

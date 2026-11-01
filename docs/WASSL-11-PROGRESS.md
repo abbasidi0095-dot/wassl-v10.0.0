@@ -162,6 +162,12 @@ enhancements, not blocking the v11 core release.
 - Reduced-motion skip remains.
 - iOS PWA startup images and service-worker cache refresh.
 
+### Manual mobile fallback
+
+- Admin → Accounts can mark a mobile verified after checking it with the customer.
+- Audited; clears the OTP challenge.
+- Available while SMS and WhatsApp remain disabled.
+
 ### SMS or WhatsApp verification
 
 - Customer chooses SMS or WhatsApp on `/verify-phone`.

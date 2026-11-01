@@ -130,6 +130,12 @@ the session if needed and shows a fresh QR. OTP remains off until
 the email and phone send endpoints. Playwright enables both channels and picks
 WhatsApp by default. Never enable test mode in production.
 
+## Manual fallback
+
+If neither channel is available, an admin can open **Accounts** and use
+**Verify mobile** after checking the number with the customer. The action is
+audited and clears any outstanding challenge. Use it only as an exception.
+
 ## Operational checks
 
 - A 401 from Aion means the key is missing or rotated.

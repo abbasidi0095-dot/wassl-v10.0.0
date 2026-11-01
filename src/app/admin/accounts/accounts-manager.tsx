@@ -7,6 +7,7 @@ import {
   Loader2,
   ShieldCheck,
   ShieldX,
+  Smartphone,
   UserRound,
 } from "lucide-react";
 import type { AdminUserView } from "@/lib/db";
@@ -349,6 +350,13 @@ export function AccountsManager({
                           {user.phone || user.citySlug ? (
                             <div className="text-[11px] text-muted">
                               {[user.phone, user.citySlug].filter(Boolean).join(" · ")}
+                              {user.phone
+                                ? user.phoneVerified === false
+                                  ? " · Mobile unverified"
+                                  : user.phoneVerified
+                                    ? " · Mobile verified"
+                                    : ""
+                                : ""}
                             </div>
                           ) : null}
                         </div>
@@ -491,6 +499,32 @@ export function AccountsManager({
                           </button>
                         ) : adminCount > 1 ? (
                           <span className="text-[10px] font-medium text-muted">Admin</span>
+                        ) : null}
+                        {user.phone && user.phoneVerified === false ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (
+                                !window.confirm(
+                                  `Mark ${user.phone} as verified for ${user.name}? Only do this after checking the number with the customer.`,
+                                )
+                              ) {
+                                return;
+                              }
+                              void callApi(user, { action: "verify-phone" }).then(
+                                (updated) => {
+                                  if (updated) {
+                                    setToast(`${user.name}'s mobile marked verified`);
+                                  }
+                                },
+                              );
+                            }}
+                            disabled={working}
+                            className="btn btn-ghost btn-sm"
+                            title="Manual fallback when SMS and WhatsApp are unavailable"
+                          >
+                            <Smartphone size={13} /> Verify mobile
+                          </button>
                         ) : null}
                         {dirty ? (
                           <button
