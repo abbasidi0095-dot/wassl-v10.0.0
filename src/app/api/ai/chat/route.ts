@@ -182,8 +182,22 @@ export async function POST(request: Request) {
   const result = await askWasslAssistant(turns);
   if (!result.ok) {
     console.warn("[ai] provider unavailable", result.reason, result.detail?.slice(0, 200));
+    const text = message.toLowerCase();
+    const orderRef = linkedOrder ? ` ${linkedOrder.code}` : "";
     const fallback =
-      "I can’t reach the Wassl assistant right now. Your message is saved in this conversation, and a human agent can reply here. For an urgent order issue, please use the order’s support option.";
+      /refund|cancel|complaint|damage|wrong/.test(text)
+        ? `A human Wassl agent needs to confirm refunds, cancellations and complaints. Your message is saved here${orderRef ? ` with order${orderRef}` : ""}; an agent can reply in this conversation.`
+        : /parcel|package|document|express/.test(text)
+          ? "You can follow the parcel from Express → the active parcel. The driver enters the pickup code at collection and the recipient code at handover. If the status has not moved, a human agent can check it here."
+          : /taxi|ride|driver|fare/.test(text)
+            ? "Open Taxi → your active ride to see the live status and fare. Cash is paid to the driver. If the ride is stuck, a human agent can check it in this conversation."
+            : /late|delay|where|status|order/.test(text)
+              ? `Check Orders for the latest status${orderRef ? ` on order${orderRef}` : ""}. I do not have a live ETA in this fallback mode. If the status has not moved, a human agent can investigate here.`
+              : /pay|card|cash|price|fare/.test(text)
+                ? "Wassl is cash only: cash on delivery, cash taxi fare and cash on parcel delivery. Never share card details. A human agent can help with a specific charge or fare."
+                : /login|account|password|email/.test(text)
+                  ? "Use the normal sign-in page. If you cannot access your account, leave a message here and a human agent can help without asking for your password."
+                  : "I can help with orders, grocery, taxi, parcels, ratings, account and cash payments. Tell me what happened and I will point you to the right step; a human agent can take over for account or refund changes.";
     const reply = await addChatMessage(thread.id, session, fallback, {
       senderRole: "assistant",
       senderName: "Wassl Assistant",
