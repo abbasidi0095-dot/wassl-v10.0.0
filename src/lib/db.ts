@@ -22,6 +22,7 @@ import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
 import { casablancaNow } from "./hours";
 import { sanitizeCityServices } from "./city-services";
+import { nextRecurringDate } from "./basket";
 import {
   BOOTSTRAP_ADMIN_EMAIL,
   BOOTSTRAP_ADMIN_PASSWORD,
@@ -56,6 +57,7 @@ import type {
   RefundRequest,
   Role,
   ShoppingList,
+  ShoppingListRecurring,
   Store,
   TaxiRide,
   TaxiStatus,
@@ -2868,6 +2870,42 @@ function assertCoordinate(lat: number, lng: number): void {
   if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
     throw new Error("Pickup or drop-off location is invalid");
   }
+}
+
+export async function updateShoppingListRecurring(
+  userId: string,
+  listId: string,
+  input: { enabled: boolean; frequency: "weekly" | "monthly"; remind?: boolean },
+): Promise<ShoppingList> {
+  return mutate((db) => {
+    const user = db.users.find((item) => item.id === userId);
+    if (!user) throw new Error("Account not found");
+    const list = user.shoppingLists?.find((item) => item.id === listId);
+    if (!list) throw new Error("List not found");
+    const now = new Date();
+    const frequency = input.frequency === "monthly" ? "monthly" : "weekly";
+    const recurring: ShoppingListRecurring = {
+      enabled: Boolean(input.enabled),
+      frequency,
+      remind: input.remind !== false,
+      nextAt: input.enabled
+        ? nextRecurringDate(frequency, now)
+        : undefined,
+    };
+    list.recurring = recurring;
+    list.updatedAt = now.toISOString();
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: user.id,
+      actorName: user.name,
+      action: "grocery.list.recurring",
+      entity: "auth",
+      entityId: user.id,
+      summary: `${list.name}: recurring ${recurring.enabled ? frequency : "off"}`,
+      metadata: { listId: list.id, frequency, remind: recurring.remind },
+    });
+    return list;
+  });
 }
 
 export async function createTaxiRide(

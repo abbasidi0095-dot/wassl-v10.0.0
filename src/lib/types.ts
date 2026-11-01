@@ -451,10 +451,21 @@ export interface ShoppingListItem {
   checked?: boolean;
 }
 
+export type RecurringFrequency = "weekly" | "monthly";
+
+export interface ShoppingListRecurring {
+  enabled: boolean;
+  frequency: RecurringFrequency;
+  /** ISO date for the next reminder. Never creates an automatic order. */
+  nextAt?: string;
+  remind: boolean;
+}
+
 export interface ShoppingList {
   id: string;
   name: string;
   items: ShoppingListItem[];
+  recurring?: ShoppingListRecurring;
   createdAt: string;
   updatedAt: string;
 }

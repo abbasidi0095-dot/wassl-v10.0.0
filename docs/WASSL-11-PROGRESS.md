@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.0.0-alpha.2** (1 November 2026).
+Current delivered baseline: **11.0.0-alpha.3** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -55,6 +55,26 @@ programme is complete.
   active services.
 - Turning one service off never disables the others.
 
+### Grocery 2.0 subset
+
+- **Wassl Basket** at `/grocery/basket`: searches grocery products across
+  stores, compares prices, groups lines by store, shows per-store delivery fees
+  and minimums, and lets the customer choose substitutions.
+- **Split checkout** at `/grocery/basket/checkout`: one delivery address creates
+  one independent cash order per store. Each order keeps its own delivery fee,
+  driver and handover code. Successful stores are removed from the basket;
+  failed stores remain for retry with idempotency keys.
+- **Barcode lookup** at `/grocery/scan` and `/api/grocery/barcode`: camera
+  scanning when `BarcodeDetector` is available, manual entry everywhere.
+- **Recurring baskets**: shopping lists store weekly/monthly frequency, a next
+  reminder date and a remind toggle. No automatic orders are placed.
+- Unit tests cover grouping, fees, minimums, malformed storage, stock caps,
+  mixed cities and recurring dates.
+- Playwright covers barcode → basket and recurring-list settings.
+
+Still missing from Grocery 2.0: natural-language shopping assistant, flash and
+quantity promotion engine, inventory history and replenishment forecasting.
+
 ### Supporting changes
 
 - `src/lib/db.ts` adds `getPopularProducts()`.
@@ -70,8 +90,8 @@ programme is complete.
 ## Verification
 
 - `npx tsc --noEmit` — clean.
-- `npm test` — 85 passed, 4 skipped.
-- `npm run e2e` — 13 passed.
+- `npm test` — 91 passed, 4 skipped.
+- `npm run e2e` — 15 passed.
 - `npm run build` — clean.
 - Manual checks at 1440px and 390px: no horizontal overflow on home or search.
 - Product deep link opens the product dialog.
@@ -93,7 +113,7 @@ programme is complete.
 | Consistent bottom navigation | Delivered | Delivery, grocery, taxi, orders and account remain visible |
 | Home prioritization | Partial | Restaurants, grocery, taxi, services and business exist; Express and local services await their workflows |
 | Personalized discovery | Delivered (deterministic) | Uses real orders, favourites, stock, hours and time of day |
-| Grocery 2.0 | Not started | Basket comparison, recurring baskets, barcode, advanced promos, forecasting |
+| Grocery 2.0 | Partial | Basket comparison, split checkout, barcode and recurring lists delivered; smart assistant, advanced promotions, inventory history/forecasting remain |
 | Wassl Club | Partial | Grocery points only; ledger, tiers, referrals, rewards and admin controls missing |
 | Wassl AI | Not started | Provider abstraction and three assistants |
 | Taxi 2.0 | Partial | Scheduled, multi-stop, saved places, ratings, lost-and-found, intercity, zones, heatmaps |
@@ -113,6 +133,7 @@ programme is complete.
 
 - `src/lib/search.ts` — new search scorer and result builder.
 - `src/lib/city-services.ts` — new service defaults, merge and sanitisation.
+- `src/lib/basket.ts` — cross-store basket grouping, totals and recurring dates.
 - `src/lib/personalization.ts` — new deterministic home-feed builder.
 - `src/app/api/search/route.ts` — new search API.
 - `src/app/search/page.tsx` — search route shell.
@@ -128,12 +149,17 @@ programme is complete.
 - `src/app/grocery/page.tsx` — query/filter parameters.
 - `src/app/grocery/grocery-browser.tsx` — initial query/filter.
 - `src/lib/db.ts` — popular products query and city service patch.
+- `src/app/grocery/basket/` — planner and split checkout.
+- `src/app/grocery/scan/` — barcode scanner.
+- `src/app/api/grocery/barcode/route.ts` — barcode resolution.
+- `src/app/grocery/lists/lists-view.tsx` — recurring list controls.
 - `src/app/admin/admin-console.tsx` — per-city services dialog.
 - `src/app/api/admin/cities/route.ts` — service patch validation.
 - `src/lib/i18n.ts` — EN/FR/ES/AR strings.
 - `tests/search.test.ts` — new.
 - `tests/personalization.test.ts` — new.
 - `tests/city-services.test.ts` — new.
+- `tests/basket.test.ts` — new.
 - `e2e/customer.spec.ts` — two new cases.
 - `README.md`, `AGENTS.md`, `package.json` — milestone documentation.
 
@@ -141,16 +167,15 @@ programme is complete.
 
 ## Exact next steps
 
-1. **Phase 1B — foundations**
+1. **Phase 1B — remaining foundations**
    - Merchant favourites and shared favourite surfaces.
    - Server-validated promotion engine foundation for flash, quantity and bulk
      offers.
    - Support-ticket base and notification preferences.
-2. **Phase 2 — Grocery 2.0**
-   - Multi-store Wassl Basket with transparent split orders.
-   - Cross-store price and fee comparison.
-   - Recurring baskets, barcode scanning, advanced promotions and inventory
-     history/forecasting.
+2. **Phase 2 — Grocery 2.0 remaining**
+   - Natural-language shopping assistant.
+   - Flash, quantity and bulk promotion engine.
+   - Inventory history, slow-moving products and replenishment forecasting.
 3. **Phase 3 — Wassl Club**
    - Immutable loyalty ledger, tiers, referrals, rewards and admin controls.
 4. **Later phases**

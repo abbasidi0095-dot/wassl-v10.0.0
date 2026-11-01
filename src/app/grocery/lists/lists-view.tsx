@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, ListChecks, Trash2 } from "lucide-react";
+import { ArrowRight, CalendarClock, ListChecks, Repeat, Trash2 } from "lucide-react";
 import { useI18n } from "@/components/locale-provider";
 import { money } from "@/lib/utils";
 
@@ -22,12 +22,51 @@ type List = {
   name: string;
   createdAt: string;
   updatedAt: string;
+  recurring?: {
+    enabled: boolean;
+    frequency: "weekly" | "monthly";
+    nextAt?: string;
+    remind: boolean;
+  };
   items: ListItem[];
 };
 
 export function ListsView({ initialLists }: { initialLists: List[] }) {
   const { t } = useI18n();
   const [lists, setLists] = useState(initialLists);
+
+  async function updateRecurring(
+    list: List,
+    patch: {
+      enabled?: boolean;
+      frequency?: "weekly" | "monthly";
+      remind?: boolean;
+    },
+  ) {
+    const recurring = {
+      enabled: patch.enabled ?? list.recurring?.enabled ?? false,
+      frequency: patch.frequency ?? list.recurring?.frequency ?? "weekly",
+      remind: patch.remind ?? list.recurring?.remind ?? true,
+    };
+    setLists((current) =>
+      current.map((item) =>
+        item.id === list.id ? { ...item, recurring: { ...item.recurring, ...recurring } } : item,
+      ),
+    );
+    const response = await fetch("/api/grocery/lists", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listId: list.id, recurring }),
+    }).catch(() => undefined);
+    if (response?.ok) {
+      const data = (await response.json()) as { list?: List };
+      if (data.list) {
+        setLists((current) =>
+          current.map((item) => (item.id === list.id ? { ...item, recurring: data.list!.recurring } : item)),
+        );
+      }
+    }
+  }
 
   async function update(listId: string, productId: string, patch: { checked?: boolean; remove?: boolean; qty?: number }) {
     setLists((current) =>
@@ -79,11 +118,68 @@ export function ListsView({ initialLists }: { initialLists: List[] }) {
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <div>
               <div className="text-sm font-semibold">{list.name}</div>
-              <div className="text-[11px] font-bold text-muted">
-                {list.items.length} {t("items")}
+              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-medium text-muted">
+                <span>{list.items.length} {t("items")}</span>
+                {list.recurring?.enabled ? (
+                  <span className="inline-flex items-center gap-1 text-brand">
+                    <Repeat size={10} />
+                    {list.recurring.frequency === "weekly" ? t("Weekly") : t("Monthly")}
+                  </span>
+                ) : (
+                  <span>{t("One-off basket")}</span>
+                )}
               </div>
             </div>
             <ListChecks size={16} className="text-brand" />
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-surface-2/50 px-4 py-2.5 text-[11px]">
+            <label className="inline-flex items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                checked={Boolean(list.recurring?.enabled)}
+                onChange={(event) => void updateRecurring(list, { enabled: event.target.checked })}
+                className="h-3.5 w-3.5 accent-teal"
+              />
+              {t("Recurring basket")}
+            </label>
+            <label className="inline-flex items-center gap-1.5 text-muted">
+              <Repeat size={11} />
+              <select
+                value={list.recurring?.frequency ?? "weekly"}
+                onChange={(event) =>
+                  void updateRecurring(list, {
+                    frequency: event.target.value as "weekly" | "monthly",
+                  })
+                }
+                disabled={!list.recurring?.enabled}
+                aria-label={t("Recurring frequency")}
+                className="h-7 rounded-[4px] border border-line bg-surface px-1.5 text-[11px] text-ink disabled:opacity-40"
+              >
+                <option value="weekly">{t("Weekly")}</option>
+                <option value="monthly">{t("Monthly")}</option>
+              </select>
+            </label>
+            <label className="inline-flex items-center gap-1.5 text-muted">
+              <input
+                type="checkbox"
+                checked={list.recurring?.remind ?? true}
+                onChange={(event) => void updateRecurring(list, { remind: event.target.checked })}
+                disabled={!list.recurring?.enabled}
+                className="h-3.5 w-3.5 accent-teal disabled:opacity-40"
+              />
+              {t("Remind me")}
+            </label>
+            {list.recurring?.enabled && list.recurring.nextAt ? (
+              <span className="inline-flex items-center gap-1 text-muted">
+                <CalendarClock size={11} />
+                {t("Next reminder {date}", {
+                  date: new Intl.DateTimeFormat("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                  }).format(new Date(list.recurring.nextAt)),
+                })}
+              </span>
+            ) : null}
           </div>
           <div className="divide-y divide-ink/5">
             {list.items.map((item) => (

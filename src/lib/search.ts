@@ -23,6 +23,21 @@ export type SearchHit = {
   titleIsKey?: boolean;
   /** True when the subtitle is an i18n key rather than merchant data. */
   subtitleIsKey?: boolean;
+  /** Structured product/store data for the grocery basket. */
+  storeId?: string;
+  storeSlug?: string;
+  storeName?: string;
+  storeCategory?: Store["category"];
+  citySlug?: string;
+  storeLat?: number;
+  storeLng?: number;
+  price?: number;
+  unit?: string;
+  category?: string;
+  stock?: number;
+  deliveryFee?: number;
+  minOrder?: number;
+  barcode?: string;
   score: number;
 };
 
@@ -417,6 +432,20 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
       meta: `${product.price} MAD`,
       image: shortImage(product.image),
       badge: soldOut ? "Sold out" : undefined,
+      storeId: store.id,
+      storeSlug: store.slug,
+      storeName: store.name,
+      storeCategory: store.category,
+      citySlug: store.citySlug,
+      storeLat: store.lat,
+      storeLng: store.lng,
+      price: product.price,
+      unit: product.unit,
+      category: product.category,
+      stock,
+      deliveryFee: store.deliveryFee,
+      minOrder: store.minOrder,
+      barcode: product.barcode,
       score,
     });
   }

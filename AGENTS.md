@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.0-alpha.2** (1 November 2026; unified search, home feed and city service activation)
+- Release: **11.0.0-alpha.3** (1 November 2026; Grocery 2.0 basket, barcode and recurring lists)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,19 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.0-alpha.3 — Grocery 2.0 basket, barcode and recurring lists
+- `src/lib/basket.ts` groups cross-store lines, computes per-store fees/minimums
+  and totals, parses untrusted local storage and calculates recurring dates.
+- `/grocery/basket` compares products across stores and shows transparent
+  splits. `/grocery/basket/checkout` creates one order per store with an
+  idempotency key, removes successful groups and keeps failed groups for retry.
+- `/grocery/scan` uses `BarcodeDetector` when available with a manual fallback;
+  `/api/grocery/barcode` resolves real product/store pairs.
+- `ShoppingList.recurring` and `updateShoppingListRecurring()` add weekly/monthly
+  frequency, next reminder date and a remind flag. No automatic orders.
+- Added `tests/basket.test.ts`, barcode/recurring Playwright cases and the
+  Grocery 2.0 routes.
 
 ### 11.0.0-alpha.2 — service-level city activation
 - `City.services` stores independent flags for restaurant, grocery, taxi,

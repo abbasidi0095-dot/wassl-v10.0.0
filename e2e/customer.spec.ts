@@ -103,3 +103,36 @@ test("home surfaces a deterministic For you feed", async ({ page }) => {
   await expect(page.getByText("For you", { exact: true })).toBeVisible();
   await expect(page.getByText("Popular in Dakhla")).toBeVisible();
 });
+
+test("barcode lookup adds a real product to the multi-store basket", async ({
+  page,
+}) => {
+  await page.goto("/grocery/scan");
+  await page.getByLabel("Barcode number").fill("6111200000017");
+  await page.getByRole("button", { name: "Look up" }).click();
+  await expect(page.getByText("Water 6 x 1.5L").first()).toBeVisible();
+  await page.getByRole("button", { name: "Add to basket" }).click();
+  await expect(page.getByText(/added to your basket/)).toBeVisible();
+  await page.getByRole("link", { name: /Open Wassl Basket/ }).click();
+  await expect(page).toHaveURL(/\/grocery\/basket/);
+  await expect(page.getByText("Water 6 x 1.5L").first()).toBeVisible();
+});
+
+test("a shopping list can become a recurring basket", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("customer@wassl.ma");
+  await page.getByLabel("Password", { exact: true }).fill("Wsl-Customer-2Dkh!2026");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/(taxi|account|orders)/);
+
+  const created = await page.request.post("/api/grocery/lists", {
+    data: { productId: "product_017", qty: 2 },
+  });
+  expect(created.ok()).toBeTruthy();
+
+  await page.goto("/grocery/lists");
+  await page.getByRole("checkbox", { name: "Recurring basket" }).check();
+  await page.getByLabel("Recurring frequency").selectOption("monthly");
+  await expect(page.getByText(/Next reminder/)).toBeVisible();
+  await expect(page.getByText("Monthly").first()).toBeVisible();
+});

@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Clock3, Heart, ListChecks, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Clock3,
+  Heart,
+  ListChecks,
+  ScanBarcode,
+  ShoppingBasket,
+  Sparkles,
+} from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities, getDrivers, getProducts, getStores } from "@/lib/db";
@@ -102,6 +110,12 @@ export default async function GroceryPage({
               </dl>
 
               <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-7">
+                <Link href="/grocery/basket" className="btn btn-primary btn-sm h-9">
+                  <ShoppingBasket size={13} /> {t("Wassl Basket")}
+                </Link>
+                <Link href="/grocery/scan" className="btn btn-ghost btn-sm h-9">
+                  <ScanBarcode size={13} /> {t("Scan barcode")}
+                </Link>
                 <Link href="/grocery/favorites" className="btn btn-ghost btn-sm h-9">
                   <Heart size={13} /> {t("Favourites")}
                 </Link>

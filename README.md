@@ -29,6 +29,21 @@ and dark themes.
 
 ## Release history
 
+### 11.0.0-alpha.3 — 1 November 2026 — Grocery 2.0 basket and scanner
+- Added **Wassl Basket**: search grocery products across stores, compare
+  prices, choose substitutions and check out as separate orders per store with
+  their own delivery fee, driver and handover code.
+- Added **split checkout**: one delivery address creates independent cash
+  orders; a failed store stays in the basket for retry.
+- Added **barcode lookup**: camera scanning where the browser supports
+  `BarcodeDetector`, with manual barcode entry everywhere; results add to the
+  basket or open the product in its store.
+- Shopping lists can become **recurring baskets** with weekly/monthly
+  frequency, a next-reminder date and a remind toggle. No order is created
+  automatically.
+- Added 6 basket unit tests, 2 Playwright cases and the new routes
+  `/grocery/basket`, `/grocery/basket/checkout` and `/grocery/scan`.
+
 ### 11.0.0-alpha.2 — 1 November 2026 — service-level city activation
 - Cities now carry independent activation for restaurants, grocery, taxi,
   Express, local services and business. Turning one service off never disables
@@ -499,6 +514,8 @@ staff out.
   live status timeline, driver card and trip history
 - Wassl Grocery: store discovery, aisles, search, variants, stock, favourites,
   shopping lists, pickup/express/scheduled checkout, loyalty and refunds
+- Wassl Basket: cross-store grocery comparison and split checkout into
+  independent orders, barcode lookup and recurring shopping lists
 - Persistent live tracker dock for active orders and taxi rides (progress bar,
   expandable list, minimise to a floating pill, auto-hides when complete)
 - Notification centre with unread badge, in-app history, browser Web Push and
@@ -755,12 +772,12 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 85 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 91 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three
   concurrent writers, rollback, durable audit trail)
-- Playwright suite (13 tests) covers password sign-in, new-account review and admin
+- Playwright suite (15 tests) covers password sign-in, new-account review and admin
   approval against the production build
 - API flow tested against a production build: create order with modifiers and a
   promo → server repriced options and discount → merchant accept/prepare/ready →

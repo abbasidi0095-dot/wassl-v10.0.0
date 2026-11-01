@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { addToShoppingList, getUserById, updateShoppingList } from "@/lib/db";
+import {
+  addToShoppingList,
+  getUserById,
+  updateShoppingList,
+  updateShoppingListRecurring,
+} from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,12 +44,34 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Please sign in" }, { status: 401 });
   }
   const body = (await request.json().catch(() => null)) as
-    | { listId?: string; productId?: string; qty?: number; checked?: boolean; remove?: boolean }
+    | {
+        listId?: string;
+        productId?: string;
+        qty?: number;
+        checked?: boolean;
+        remove?: boolean;
+        recurring?: {
+          enabled?: boolean;
+          frequency?: "weekly" | "monthly";
+          remind?: boolean;
+        };
+      }
     | null;
-  if (!body?.listId || !body.productId) {
-    return NextResponse.json({ error: "listId and productId are required" }, { status: 400 });
+  if (!body?.listId) {
+    return NextResponse.json({ error: "listId is required" }, { status: 400 });
   }
   try {
+    if (body.recurring) {
+      const list = await updateShoppingListRecurring(session.userId, body.listId, {
+        enabled: Boolean(body.recurring.enabled),
+        frequency: body.recurring.frequency === "monthly" ? "monthly" : "weekly",
+        remind: body.recurring.remind,
+      });
+      return NextResponse.json({ ok: true, list });
+    }
+    if (!body.productId) {
+      return NextResponse.json({ error: "productId is required" }, { status: 400 });
+    }
     const list = await updateShoppingList(session.userId, body.listId, {
       productId: body.productId,
       qty: body.qty,
