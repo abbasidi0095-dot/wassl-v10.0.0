@@ -51,6 +51,10 @@ import type {
   AccountStatus,
   AuditEntity,
   AuditEntry,
+  ChatMessage,
+  ChatThread,
+  ChatThreadStatus,
+  ChatTopic,
   City,
   CustomerAddress,
   Database,
@@ -65,7 +69,9 @@ import type {
   Product,
   PushSubscriptionRecord,
   RefundRequest,
+  Rating,
   Role,
+  Session,
   ShoppingList,
   ShoppingListRecurring,
   Store,
@@ -2997,6 +3003,16 @@ export async function getTaxiRide(rideId: string): Promise<TaxiRide | undefined>
   return (await getDb()).taxiRides?.find((ride) => ride.id === rideId);
 }
 
+export type DriverTaxiRide = Omit<TaxiRide, "verificationCode"> & {
+  handoverRequired: boolean;
+};
+
+/** Strip the customer's handover code before a ride reaches a driver. */
+export function taxiRideForDriver(ride: TaxiRide): DriverTaxiRide {
+  const { verificationCode, ...rest } = ride;
+  return { ...rest, handoverRequired: Boolean(verificationCode) };
+}
+
 export async function getTaxiRides(filter?: {
   customerId?: string;
   driverId?: string;
@@ -3549,5 +3565,378 @@ export async function adjustLoyaltyPoints(
       note: note.trim() || undefined,
     });
     return account;
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Chat, support and ratings                                                   */
+/* -------------------------------------------------------------------------- */
+
+function chatCanAccess(session: Session, thread: ChatThread): boolean {
+  if (session.role === "admin") return true;
+  if (session.role === "customer") {
+    return (
+      thread.customerId === session.userId ||
+      Boolean(
+        session.email &&
+          thread.customerEmail &&
+          thread.customerEmail.toLowerCase() === session.email.toLowerCase(),
+      )
+    );
+  }
+  if (session.role === "merchant") {
+    return Boolean(session.storeId && thread.storeId === session.storeId);
+  }
+  if (session.role === "driver") {
+    return Boolean(session.driverId && thread.driverId === session.driverId);
+  }
+  return false;
+}
+
+export async function getChatThreads(
+  session: Session,
+  filter?: { status?: ChatThreadStatus; orderId?: string; rideId?: string },
+): Promise<ChatThread[]> {
+  const db = await getDb();
+  return (db.chatThreads ?? [])
+    .filter((thread) => chatCanAccess(session, thread))
+    .filter((thread) => (filter?.status ? thread.status === filter.status : true))
+    .filter((thread) => (filter?.orderId ? thread.orderId === filter.orderId : true))
+    .filter((thread) => (filter?.rideId ? thread.rideId === filter.rideId : true))
+    .sort(
+      (a, b) =>
+        new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime(),
+    );
+}
+
+export async function getChatThread(
+  threadId: string,
+  session: Session,
+): Promise<ChatThread | undefined> {
+  const thread = (await getDb()).chatThreads?.find((entry) => entry.id === threadId);
+  return thread && chatCanAccess(session, thread) ? thread : undefined;
+}
+
+export async function getChatMessages(
+  threadId: string,
+  session: Session,
+): Promise<ChatMessage[]> {
+  const db = await getDb();
+  const thread = db.chatThreads?.find((entry) => entry.id === threadId);
+  if (!thread || !chatCanAccess(session, thread)) return [];
+  return (db.chatMessages ?? [])
+    .filter((message) => message.threadId === threadId)
+    .sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+}
+
+export async function markChatThreadRead(
+  threadId: string,
+  session: Session,
+): Promise<boolean> {
+  return mutate((db) => {
+    const thread = db.chatThreads?.find((entry) => entry.id === threadId);
+    if (!thread || !chatCanAccess(session, thread)) return false;
+    for (const message of db.chatMessages ?? []) {
+      if (message.threadId !== threadId) continue;
+      if (!message.readBy.includes(session.userId)) {
+        message.readBy.push(session.userId);
+      }
+    }
+    return true;
+  });
+}
+
+export async function createChatThread(
+  input: {
+    topic: ChatTopic;
+    subject?: string;
+    orderId?: string;
+    rideId?: string;
+    storeId?: string;
+    driverId?: string;
+    customerId?: string;
+    customerEmail?: string;
+    initialMessage?: string;
+    aiEnabled?: boolean;
+  },
+  session: Session,
+): Promise<ChatThread> {
+  return mutate((db) => {
+    const order = input.orderId
+      ? db.orders.find((entry) => entry.id === input.orderId)
+      : undefined;
+    const ride = input.rideId
+      ? (db.taxiRides ?? []).find((entry) => entry.id === input.rideId)
+      : undefined;
+    if (input.orderId && !order) throw new Error("Order not found");
+    if (input.rideId && !ride) throw new Error("Ride not found");
+
+    if (session.role === "customer") {
+      if (order) {
+        if (
+          !order.customerEmail ||
+          !session.email ||
+          order.customerEmail.toLowerCase() !== session.email.toLowerCase()
+        ) {
+          throw new Error("You can only message about your own order");
+        }
+      }
+      if (ride && ride.customerId !== session.userId) {
+        throw new Error("You can only message about your own ride");
+      }
+    } else if (session.role !== "admin") {
+      throw new Error("Only customers and operations can start a thread");
+    }
+
+    const customerId =
+      input.customerId ??
+      ride?.customerId ??
+      (session.role === "customer" ? session.userId : undefined);
+    const customerEmail =
+      input.customerEmail ??
+      order?.customerEmail ??
+      (session.role === "customer" ? session.email : undefined);
+    const customerName =
+      order?.customerName ||
+      ride?.customerName ||
+      (session.role === "customer" ? session.name : "Wassl customer");
+    const storeId = input.storeId ?? order?.storeId;
+    const driverId = input.driverId ?? order?.driverId ?? ride?.driverId;
+
+    const existing = (db.chatThreads ?? []).find(
+      (thread) =>
+        thread.status !== "closed" &&
+        thread.topic === input.topic &&
+        (order ? thread.orderId === order.id : true) &&
+        (ride ? thread.rideId === ride.id : true) &&
+        (storeId ? thread.storeId === storeId : true) &&
+        (driverId ? thread.driverId === driverId : true) &&
+        (customerId ? thread.customerId === customerId : true),
+    );
+    if (existing) return existing;
+
+    const now = new Date().toISOString();
+    const subject =
+      input.subject?.trim().slice(0, 120) ||
+      (order
+        ? `Order ${order.code}`
+        : ride
+          ? `Ride ${ride.id.slice(-6)}`
+          : input.topic === "support"
+            ? "Support request"
+            : "Wassl conversation");
+    const thread: ChatThread = {
+      id: randomId("chat", 6),
+      topic: input.topic,
+      subject,
+      customerId,
+      customerName,
+      customerEmail,
+      orderId: order?.id,
+      rideId: ride?.id,
+      storeId,
+      driverId,
+      status: "open",
+      aiEnabled:
+        typeof input.aiEnabled === "boolean"
+          ? input.aiEnabled
+          : input.topic === "support" && session.role === "customer",
+      createdAt: now,
+      updatedAt: now,
+      lastMessageAt: now,
+      lastMessagePreview: "",
+    };
+    db.chatThreads ??= [];
+    db.chatThreads.unshift(thread);
+
+    if (input.initialMessage?.trim()) {
+      const message: ChatMessage = {
+        id: randomId("msg", 6),
+        threadId: thread.id,
+        senderId: session.userId,
+        senderRole: session.role,
+        senderName: session.name,
+        body: input.initialMessage.trim().slice(0, 2000),
+        source: "user",
+        readBy: [session.userId],
+        createdAt: now,
+      };
+      db.chatMessages ??= [];
+      db.chatMessages.push(message);
+      thread.lastMessagePreview = message.body.slice(0, 120);
+    }
+    recordAudit(db, {
+      actorRole: session.role,
+      actorId: session.userId,
+      actorName: session.name,
+      action: "chat.create",
+      entity: "auth",
+      entityId: session.userId,
+      summary: `Chat ${thread.id}: ${subject}`,
+    });
+    return thread;
+  });
+}
+
+export async function addChatMessage(
+  threadId: string,
+  session: Session,
+  body: string,
+  options?: {
+    senderRole?: ChatMessage["senderRole"];
+    senderName?: string;
+    source?: ChatMessage["source"];
+  },
+): Promise<ChatMessage> {
+  const text = body.trim().slice(0, 2000);
+  if (!text) throw new Error("Write a message first");
+  return mutate((db) => {
+    const thread = db.chatThreads?.find((entry) => entry.id === threadId);
+    if (!thread) throw new Error("Conversation not found");
+    if (!chatCanAccess(session, thread)) throw new Error("Conversation not found");
+    if (thread.status === "closed") throw new Error("This conversation is closed");
+
+    const now = new Date().toISOString();
+    const role = options?.senderRole ?? session.role;
+    const message: ChatMessage = {
+      id: randomId("msg", 6),
+      threadId,
+      senderId: session.userId,
+      senderRole: role,
+      senderName: options?.senderName ?? session.name,
+      body: text,
+      source: options?.source ?? "user",
+      readBy: [session.userId],
+      createdAt: now,
+    };
+    db.chatMessages ??= [];
+    db.chatMessages.push(message);
+    thread.updatedAt = now;
+    thread.lastMessageAt = now;
+    thread.lastMessagePreview = text.slice(0, 120);
+    thread.status = "open";
+    if (
+      role === "admin" ||
+      role === "merchant" ||
+      role === "driver"
+    ) {
+      // A human team member has taken over; stop automatic assistant replies.
+      thread.aiEnabled = false;
+    }
+    return message;
+  });
+}
+
+export async function setChatThreadStatus(
+  threadId: string,
+  status: ChatThreadStatus,
+  session: Session,
+): Promise<ChatThread> {
+  return mutate((db) => {
+    const thread = db.chatThreads?.find((entry) => entry.id === threadId);
+    if (!thread || !chatCanAccess(session, thread)) {
+      throw new Error("Conversation not found");
+    }
+    thread.status = status;
+    thread.updatedAt = new Date().toISOString();
+    return thread;
+  });
+}
+
+function updateDriverRating(driver: Driver, stars: number) {
+  const count = Math.max(0, driver.ratingsCount ?? driver.deliveries ?? 0);
+  driver.rating = Math.round(((driver.rating * count + stars) / (count + 1)) * 10) / 10;
+  driver.ratingsCount = count + 1;
+}
+
+function updateStoreRating(store: Store, stars: number) {
+  const count = Math.max(0, store.reviews ?? 0);
+  store.rating = Math.round(((store.rating * count + stars) / (count + 1)) * 10) / 10;
+  store.reviews = count + 1;
+}
+
+export async function rateOrder(
+  orderId: string,
+  session: Session,
+  stars: number,
+  comment?: string,
+): Promise<Order> {
+  const ratingStars = Math.round(stars);
+  if (ratingStars < 1 || ratingStars > 5) throw new Error("Choose 1 to 5 stars");
+  return mutate((db) => {
+    const order = db.orders.find((entry) => entry.id === orderId);
+    if (!order) throw new Error("Order not found");
+    if (session.role !== "customer") throw new Error("Only customers can rate orders");
+    if (
+      !order.customerEmail ||
+      !session.email ||
+      order.customerEmail.toLowerCase() !== session.email.toLowerCase()
+    ) {
+      throw new Error("You can only rate an order placed with your account");
+    }
+    if (order.status !== "delivered") throw new Error("Rate the order after delivery");
+    if (order.rating) throw new Error("This order is already rated");
+    const rating: Rating = {
+      stars: ratingStars,
+      comment: comment?.trim().slice(0, 500) || undefined,
+      at: new Date().toISOString(),
+    };
+    order.rating = rating;
+    const store = db.stores.find((entry) => entry.id === order.storeId);
+    if (store) updateStoreRating(store, ratingStars);
+    const driver = db.drivers.find((entry) => entry.id === order.driverId);
+    if (driver) updateDriverRating(driver, ratingStars);
+    recordAudit(db, {
+      actorRole: session.role,
+      actorId: session.userId,
+      actorName: session.name,
+      action: "order.rating",
+      entity: "order",
+      entityId: order.id,
+      summary: `Order ${order.code} rated ${ratingStars}/5`,
+      metadata: { comment: rating.comment },
+    });
+    return order;
+  });
+}
+
+export async function rateTaxiRide(
+  rideId: string,
+  session: Session,
+  stars: number,
+  comment?: string,
+): Promise<TaxiRide> {
+  const ratingStars = Math.round(stars);
+  if (ratingStars < 1 || ratingStars > 5) throw new Error("Choose 1 to 5 stars");
+  return mutate((db) => {
+    const ride = (db.taxiRides ?? []).find((entry) => entry.id === rideId);
+    if (!ride) throw new Error("Ride not found");
+    if (session.role !== "customer" || ride.customerId !== session.userId) {
+      throw new Error("You can only rate your own ride");
+    }
+    if (ride.status !== "completed") throw new Error("Rate the ride after it finishes");
+    if (ride.rating) throw new Error("This ride is already rated");
+    const rating: Rating = {
+      stars: ratingStars,
+      comment: comment?.trim().slice(0, 500) || undefined,
+      at: new Date().toISOString(),
+    };
+    ride.rating = rating;
+    const driver = db.drivers.find((entry) => entry.id === ride.driverId);
+    if (driver) updateDriverRating(driver, ratingStars);
+    recordAudit(db, {
+      actorRole: session.role,
+      actorId: session.userId,
+      actorName: session.name,
+      action: "ride.rating",
+      entity: "taxi",
+      entityId: ride.id,
+      summary: `Ride ${ride.id} rated ${ratingStars}/5`,
+      metadata: { comment: rating.comment },
+    });
+    return ride;
   });
 }

@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-touch-icon.png",
@@ -50,7 +51,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   colorScheme: "light dark",
-  themeColor: "#0b4a45",
+  themeColor: "#153F37",
 };
 
 export default async function RootLayout({
@@ -67,6 +68,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dirFor(locale)}
+      data-theme={settings.themePreset ?? "coastal"}
       style={themeStyle(settings)}
       suppressHydrationWarning
     >

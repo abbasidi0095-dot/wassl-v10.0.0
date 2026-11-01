@@ -22,6 +22,7 @@ export default async function AccountsPage() {
           { href: "/admin/accounts", label: "Accounts" },
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
+          { href: "/admin/messages", label: "Messages" },
         ]}
         accent="ink"
       />

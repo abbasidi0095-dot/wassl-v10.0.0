@@ -15,6 +15,7 @@ import { StoreMenu } from "@/components/store-menu";
 import { CartMini } from "@/components/cart-mini";
 import { MapView } from "@/components/map-view";
 import { GroceryStore } from "@/components/grocery-store";
+import { StartChatButton } from "@/components/start-chat-button";
 import {
   getCities,
   getCity,
@@ -80,6 +81,14 @@ export default async function StorePage({
       <>
         <SiteHeader cities={cities} currentCity={city} />
         <main className="container-wassl py-6">
+          <div className="mb-3 flex justify-end">
+            <StartChatButton
+              topic="grocery"
+              storeId={store.id}
+              subject={`${store.name} support`}
+              label="Message store"
+            />
+          </div>
           <GroceryStore
             store={store}
             photo={storePhoto(store)}
@@ -156,6 +165,14 @@ export default async function StorePage({
                 ) : null}
               </div>
 
+              <div className="mt-2 flex justify-end">
+                <StartChatButton
+                  topic="delivery"
+                  storeId={store.id}
+                  subject={`${store.name} support`}
+                  label="Message store"
+                />
+              </div>
               <h1 className="display mt-4 text-[clamp(2.4rem,1.6rem+3vw,4.2rem)]">
                 {store.name}
               </h1>

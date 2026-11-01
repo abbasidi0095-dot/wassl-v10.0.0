@@ -164,3 +164,97 @@ test("Wassl Club dashboard shows tier, points and rewards", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Points history" })).toBeVisible();
   await expect(page.getByText("10 MAD grocery credit")).toBeVisible();
 });
+
+test("customer chats with support and receives a saved reply", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("customer@wassl.ma");
+  await page.getByLabel("Password", { exact: true }).fill("Wsl-Customer-2Dkh!2026");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/(taxi|account|orders)/);
+
+  const created = await page.request.post("/api/chat/threads", {
+    data: {
+      topic: "support",
+      subject: "E2E support thread",
+      initialMessage: "I need help with a late order.",
+    },
+  });
+  expect(created.ok()).toBeTruthy();
+  const { thread } = (await created.json()) as { thread: { id: string } };
+
+  await page.goto(`/messages?thread=${thread.id}`);
+  await expect(page.getByText("E2E support thread").first()).toBeVisible();
+  await page.getByLabel("Message").fill("My grocery order is late.");
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(page.getByText(/human agent|Wassl Assistant/).first()).toBeVisible({
+    timeout: 20_000,
+  });
+});
+
+test("a delivered order accepts one customer rating", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("customer@wassl.ma");
+  await page.getByLabel("Password", { exact: true }).fill("Wsl-Customer-2Dkh!2026");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/(taxi|account|orders)/);
+
+  const created = await page.request.post("/api/orders", {
+    data: {
+      citySlug: "dakhla",
+      storeId: "store_dakhla_grill",
+      customerName: "Mariam K.",
+      customerPhone: "+212600000000",
+      address: "12 Rue de la Plage",
+      landmark: "Lighthouse",
+      lat: 23.69,
+      lng: -15.94,
+      items: [{ productId: "product_001", qty: 2 }],
+    },
+  });
+  expect(created.ok()).toBeTruthy();
+  const { order } = (await created.json()) as { order: { id: string } };
+
+  const admin = await page.context().browser()!.newContext();
+  await admin.request.post("/api/auth/login", {
+    data: { email: "admin@wassl.ma", password: "admin" },
+  });
+  const state = (await (await admin.request.get("/api/admin/state")).json()) as {
+    drivers: Array<{ id: string; active: boolean; citySlug: string }>;
+  };
+  const driver = state.drivers.find(
+    (entry) => entry.active && entry.citySlug === "dakhla",
+  )!;
+  for (const status of ["accepted", "preparing", "ready"]) {
+    expect(
+      (
+        await admin.request.post(`/api/orders/${order.id}/status`, {
+          data: { status },
+        })
+      ).ok(),
+    ).toBeTruthy();
+  }
+  expect(
+    (
+      await admin.request.post(`/api/orders/${order.id}/assign`, {
+        data: { driverId: driver.id },
+      })
+    ).ok(),
+  ).toBeTruthy();
+  for (const status of ["picked_up", "en_route", "delivered"]) {
+    expect(
+      (
+        await admin.request.post(`/api/orders/${order.id}/status`, {
+          data: { status },
+        })
+      ).ok(),
+    ).toBeTruthy();
+  }
+  await admin.close();
+
+  await page.goto(`/orders/${order.id}`);
+  await expect(page.getByText("How was your order?")).toBeVisible();
+  await page.getByRole("button", { name: "5 stars" }).click();
+  await page.getByLabel("Optional comment").fill("E2E rating");
+  await page.getByRole("button", { name: "Send rating" }).click();
+  await expect(page.getByText("Thank you for rating")).toBeVisible();
+});

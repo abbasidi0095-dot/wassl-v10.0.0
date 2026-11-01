@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.0-alpha.4** (1 November 2026; grocery intelligence, promotions and Wassl Club)
+- Release: **11.0.0-alpha.5** (1 November 2026; support, ratings and Wassl 11 identity)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,24 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.0-alpha.5 — support, ratings and Wassl 11 identity
+- `src/lib/ai.ts` calls NVIDIA NIM with `node:https` and IPv4, reads
+  `NVIDIA_API_KEY` only on the server, and returns a degraded result when the
+  provider is unavailable.
+- Chat models (`ChatThread`, `ChatMessage`) plus DB/API access control for
+  customers, drivers, merchants and admins. Human replies set `aiEnabled=false`.
+- `/api/ai/chat` injects real order/ride/loyalty context and a strict Wassl-only
+  prompt; it never exposes handover codes or provider errors.
+- Ratings on `Order` and `TaxiRide`, with store/driver averages and duplicate
+  guards.
+- New `/messages`, `/driver/messages`, `/merchant/messages` and
+  `/admin/messages`; entry points on order tracking, taxi, store pages and
+  account.
+- Original SVG monogram, wordmarks, lockups and app icon; four complete theme
+  palettes; semantic tokens; PWA/Capacitor assets regenerated.
+- Added `tests/chat.test.ts`, `tests/brand.test.ts`, chat/rating Playwright
+  cases and `docs/BRAND-11.md`.
 
 ### 11.0.0-alpha.4 — grocery intelligence, promotions and Wassl Club
 - `src/lib/grocery-assistant.ts` turns recipes, cheapest requests and usual

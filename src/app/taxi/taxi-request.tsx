@@ -18,6 +18,8 @@ import type { City, TaxiRide } from "@/lib/types";
 import { estimateTaxiFare, haversineKm } from "@/lib/taxi";
 import { TAXI_STATUS_TEXT } from "@/lib/taxi-status";
 import { money } from "@/lib/utils";
+import { StartChatButton } from "@/components/start-chat-button";
+import { RatingPrompt } from "@/components/rating-prompt";
 
 type Target = "pickup" | "dropoff";
 
@@ -179,6 +181,15 @@ export function TaxiRequest({
                 {t("Track ride")}
                 <ArrowRight size={15} className="rtl:-scale-x-100" />
               </Link>
+              {activeRide.driverId ? (
+                <StartChatButton
+                  topic="ride"
+                  rideId={activeRide.id}
+                  driverId={activeRide.driverId}
+                  subject={`Ride ${activeRide.id.slice(-6)}`}
+                  label={t("Message driver")}
+                />
+              ) : null}
             </div>
           </div>
         </div>
@@ -370,6 +381,21 @@ function TaxiHistory({ rides }: { rides: TaxiRide[] }) {
           </Link>
         ))}
       </div>
+      {(() => {
+        const unrated = rides.find(
+          (ride) => ride.status === "completed" && !ride.rating,
+        );
+        return unrated ? (
+          <div className="border-t border-line p-4">
+            <RatingPrompt
+              kind="ride"
+              id={unrated.id}
+              initial={unrated.rating}
+              subject={`${unrated.pickupLabel} → ${unrated.dropoffLabel}`}
+            />
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }

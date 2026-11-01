@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0F6E6E</color>
-    <color name="colorPrimaryDark">#0A4F4F</color>
-    <color name="colorAccent">#E8A33D</color>
-    <color name="wasslCream">#F7F3EB</color>
-    <color name="wasslInk">#14211F</color>
-    <color name="wasslTeal">#0F6E6E</color>
-    <color name="wasslSaffron">#E8A33D</color>
+    <color name="colorPrimary">#153F37</color>
+    <color name="colorPrimaryDark">#0E2C26</color>
+    <color name="colorAccent">#E6A23A</color>
+    <color name="wasslCream">#F4F0E6</color>
+    <color name="wasslInk">#153F37</color>
+    <color name="wasslTeal">#153F37</color>
+    <color name="wasslSaffron">#E6A23A</color>
 </resources>

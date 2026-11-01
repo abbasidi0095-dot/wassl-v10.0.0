@@ -10,19 +10,21 @@ import { useBrand } from "./brand-provider";
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 32 32"
+      viewBox="0 0 64 64"
       fill="none"
       aria-hidden="true"
       className={className}
     >
       <path
-        d="M5 8.5 10.2 23.5 16 13.2 21.8 23.5 27 8.5"
+        d="M9 18.5 21.5 47 32 28.5 42.5 47 55 18.5"
         stroke="currentColor"
-        strokeWidth="2.9"
+        strokeWidth="6.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="27" cy="8.5" r="2.6" className="fill-saffron" />
+      <circle cx="9" cy="18.5" r="2.2" fill="currentColor" />
+      <circle cx="55" cy="18.5" r="4.6" fill="none" strokeWidth="2.6" className="stroke-saffron" />
+      <circle cx="55" cy="18.5" r="1.5" className="fill-saffron" />
     </svg>
   );
 }
@@ -50,7 +52,7 @@ export function Logo({
             ? "bg-[#f7f4ec]"
             : light
               ? "bg-white/10 text-on-dark"
-              : "bg-teal text-on-dark"
+              : "bg-brand text-on-dark"
         }`}
       >
         {logoImage ? (
@@ -61,7 +63,7 @@ export function Logo({
             className="h-full w-full object-contain p-0.5"
           />
         ) : (
-          <LogoMark className="h-[21px] w-[21px]" />
+          <LogoMark className="h-[22px] w-[22px]" />
         )}
       </span>
       {!compact ? (

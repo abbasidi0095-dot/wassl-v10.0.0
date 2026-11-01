@@ -247,6 +247,8 @@ export interface Driver {
   lat: number;
   lng: number;
   rating: number;
+  /** Number of customer ratings contributing to the average. */
+  ratingsCount?: number;
   deliveries: number;
   cashOnHand: number;
   cashLimit: number;
@@ -329,6 +331,8 @@ export interface Order {
   pickupCode?: string;
   /** True when a four-digit handover is required; safe to expose to drivers. */
   handoverRequired?: boolean;
+  /** Customer rating submitted after delivery. */
+  rating?: Rating;
   substitutionPreference?: "allow" | "refund" | "contact";
   loyaltyPointsUsed?: number;
   loyaltyDiscount?: number;
@@ -432,6 +436,7 @@ export interface TaxiRide {
   /** Safe driver-facing flag; the code itself is never sent to drivers. */
   handoverRequired?: boolean;
   codeVerifiedAt?: string;
+  rating?: Rating;
   createdAt: string;
   updatedAt: string;
   completedAt?: string;
@@ -452,6 +457,61 @@ export interface ShoppingListItem {
   productId: string;
   qty: number;
   checked?: boolean;
+}
+
+export type ChatTopic =
+  | "support"
+  | "order"
+  | "ride"
+  | "delivery"
+  | "grocery"
+  | "account";
+
+export type ChatParticipantRole =
+  | "customer"
+  | "driver"
+  | "merchant"
+  | "admin"
+  | "assistant";
+
+export type ChatThreadStatus = "open" | "waiting" | "closed";
+
+export interface ChatThread {
+  id: string;
+  topic: ChatTopic;
+  subject: string;
+  customerId?: string;
+  customerName: string;
+  customerEmail?: string;
+  orderId?: string;
+  rideId?: string;
+  storeId?: string;
+  driverId?: string;
+  status: ChatThreadStatus;
+  /** True while the Wassl assistant may answer customer messages. */
+  aiEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastMessageAt: string;
+  lastMessagePreview: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  threadId: string;
+  senderId?: string;
+  senderRole: ChatParticipantRole;
+  senderName: string;
+  body: string;
+  source: "user" | "ai" | "system";
+  readBy: string[];
+  createdAt: string;
+}
+
+export interface Rating {
+  stars: number;
+  comment?: string;
+  at: string;
 }
 
 export type LoyaltyTier = "basic" | "plus" | "premium";
@@ -591,6 +651,8 @@ export interface Database {
   loyaltyAccounts?: LoyaltyAccount[];
   loyaltyTransactions?: LoyaltyTransaction[];
   loyaltyRewards?: LoyaltyReward[];
+  chatThreads?: ChatThread[];
+  chatMessages?: ChatMessage[];
 }
 
 /**

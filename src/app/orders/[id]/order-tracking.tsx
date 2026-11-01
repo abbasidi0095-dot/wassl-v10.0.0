@@ -23,6 +23,8 @@ import { STATUS_META } from "@/lib/types";
 import { clock, money, timeAgo } from "@/lib/utils";
 import { MapView } from "@/components/map-view";
 import { OrderRefundPanel } from "./order-refund-panel";
+import { StartChatButton } from "@/components/start-chat-button";
+import { RatingPrompt } from "@/components/rating-prompt";
 import { useLiveEvents } from "@/lib/use-live-events";
 
 const STEPS: { status: string; label: string; caption: string }[] = [
@@ -427,10 +429,27 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             <a href="tel:+212660000000" className="btn btn-saffron mt-4 w-full">
               <Phone size={14} /> Call support
             </a>
+            <div className="mt-2">
+              <StartChatButton
+                topic="support"
+                orderId={order.id}
+                storeId={order.storeId}
+                driverId={order.driverId}
+                subject={`Support · ${order.code}`}
+                label="Message support"
+                className="btn btn-ghost btn-sm w-full border-white/20 text-on-dark"
+              />
+            </div>
           </div>
 
           {delivered ? (
             <>
+              <RatingPrompt
+                kind="order"
+                id={order.id}
+                initial={order.rating}
+                subject={order.store?.name}
+              />
               {order.store?.category === "grocery" ? (
                 <OrderRefundPanel orderId={order.id} />
               ) : null}

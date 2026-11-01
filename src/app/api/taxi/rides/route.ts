@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { actorFromSession, isResponse, requireApiRole } from "@/lib/api-auth";
-import { createTaxiRide, getTaxiRides } from "@/lib/db";
+import { createTaxiRide, getTaxiRides, taxiRideForDriver } from "@/lib/db";
 import type { TaxiStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -17,7 +17,9 @@ export async function GET(request: Request) {
     status: status ?? undefined,
     limit: session.role === "admin" ? 100 : 20,
   });
-  return NextResponse.json({ rides });
+  return NextResponse.json({
+    rides: session.role === "driver" ? rides.map(taxiRideForDriver) : rides,
+  });
 }
 
 export async function POST(request: Request) {

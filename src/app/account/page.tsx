@@ -10,6 +10,7 @@ import {
   MapPin,
   PackageCheck,
   ReceiptText,
+  MessageCircle,
   ShoppingBag,
   ShoppingBasket,
   Star,
@@ -73,6 +74,12 @@ export default async function AccountPage() {
       label: t("Wassl Club"),
       note: t("Points, tiers and rewards"),
       icon: Star,
+    },
+    {
+      href: "/messages",
+      label: t("Messages"),
+      note: t("Support, stores and drivers"),
+      icon: MessageCircle,
     },
     {
       href: "/grocery/favorites",

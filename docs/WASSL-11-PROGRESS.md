@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.0.0-alpha.4** (1 November 2026).
+Current delivered baseline: **11.0.0-alpha.5** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -95,6 +95,29 @@ programme is complete.
 - Still missing: referral attribution, birthday rewards, reward redemption
   codes, expiration jobs, campaign bonuses and admin threshold/ratio controls.
 
+### Support, messaging and ratings
+
+- Customer, driver, store and admin conversations share one `ChatThread` /
+  `ChatMessage` ledger with role-scoped access.
+- Customer support threads start with the NVIDIA-backed Wassl Assistant; a
+  human admin, merchant or driver reply disables automatic replies.
+- `/messages`, `/driver/messages`, `/merchant/messages` and `/admin/messages`
+  provide inboxes. Order, ride, store and account pages link into them.
+- Post-order and post-ride ratings support a 1–5 score and optional comment,
+  reject duplicates and update the store/driver average.
+- AI is optional: without `NVIDIA_API_KEY`, the thread saves the message and
+  offers human support instead of inventing an answer.
+
+### Wassl 11 identity
+
+- Original vector monogram, Latin/Arabic wordmarks, horizontal/stacked lockups,
+  transparent, reversed and monochrome variants.
+- 32/48/192/512 icons, maskable icon, Apple touch icon and favicon.
+- Regenerated Android/iOS/PWA assets and splash screens.
+- Four full themes: Coastal, Aero, Midnight and Sand, each with light and dark
+  tokens.
+- Signature palette and WCAG checks documented in `docs/BRAND-11.md`.
+
 ### Supporting changes
 
 - `src/lib/db.ts` adds `getPopularProducts()`.
@@ -110,8 +133,8 @@ programme is complete.
 ## Verification
 
 - `npx tsc --noEmit` — clean.
-- `npm test` — 108 passed, 4 skipped.
-- `npm run e2e` — 19 passed.
+- `npm test` — 116 passed, 4 skipped.
+- `npm run e2e` — 22 passed.
 - `npm run build` — clean.
 - Manual checks at 1440px and 390px: no horizontal overflow on home or search.
 - Product deep link opens the product dialog.
@@ -135,15 +158,15 @@ programme is complete.
 | Personalized discovery | Delivered (deterministic) | Uses real orders, favourites, stock, hours and time of day |
 | Grocery 2.0 | Delivered (core) | Basket, split checkout, barcode, recurring lists, assistant, promotions and inventory intelligence delivered; merchant promotion builder and deeper forecasting remain |
 | Wassl Club | Partial | Ledger, tiers, earn/redeem, dashboard and admin adjustments delivered; referrals, birthday, reward codes, expiry and campaign controls remain |
-| Wassl AI | Not started | Provider abstraction and three assistants |
+| Wassl AI | Partial | Customer support assistant with NVIDIA, real context, rate limits and human fallback; merchant/admin assistants remain |
 | Taxi 2.0 | Partial | Scheduled, multi-stop, saved places, ratings, lost-and-found, intercity, zones, heatmaps |
 | Wassl Express | Not started | Parcel vertical |
 | Local services marketplace | Not started | Provider and booking workflows |
 | Business / wholesale | Not started | B2B accounts and catalogue |
 | Merchant Growth 2.0 | Partial | Order board and basic analytics; staff, campaigns, capacity, forecasting |
 | Driver Intelligence 2.0 | Partial | GPS, queue and wallet; heatmaps, break/emergency, incentives, batch |
-| Admin Intelligence 2.0 | Partial | Profit analytics and city service matrix; alerts and support still missing |
-| Advanced retention | Not started | Referrals, achievements, reminders, birthday, abandoned cart |
+| Admin Intelligence 2.0 | Partial | Profit analytics, city service matrix and support inbox delivered; proactive alerts remain |
+| Advanced retention | Partial | Ratings and support conversations delivered; referrals, achievements, reminders and birthday remain |
 | Maps and routing | Partial | MapLibre/OSM; no routing abstraction |
 | Security and privacy | Strong baseline | New verticals and AI tools still need validation |
 
@@ -158,6 +181,11 @@ programme is complete.
 - `src/lib/grocery-promotions.ts` — server-validated grocery offers.
 - `src/lib/inventory.ts` — inventory and replenishment intelligence.
 - `src/lib/loyalty.ts` — tiers, earning rules and rewards.
+- `src/lib/ai.ts` — NVIDIA NIM provider with IPv4 transport and graceful fallback.
+- `src/components/chat-workspace.tsx` — shared customer/driver/merchant/admin inbox.
+- `src/components/rating-prompt.tsx` — post-order and post-ride rating UI.
+- `public/brand/` and `assets/` — original vector and native brand assets.
+- `docs/BRAND-11.md` — identity, tokens, contrast and asset rules.
 - `src/lib/personalization.ts` — new deterministic home-feed builder.
 - `src/app/api/search/route.ts` — new search API.
 - `src/app/search/page.tsx` — search route shell.
@@ -188,6 +216,8 @@ programme is complete.
 - `tests/grocery-promotions.test.ts` — new.
 - `tests/inventory.test.ts` — new.
 - `tests/loyalty.test.ts` — new.
+- `tests/chat.test.ts` — new.
+- `tests/brand.test.ts` — new.
 - `e2e/customer.spec.ts` — two new cases.
 - `README.md`, `AGENTS.md`, `package.json` — milestone documentation.
 

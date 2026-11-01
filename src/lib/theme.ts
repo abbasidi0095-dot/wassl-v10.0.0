@@ -13,35 +13,35 @@ export const THEME_PRESETS: {
   {
     id: "coastal",
     label: "Coastal",
-    primary: "#0b4a45",
-    accent: "#955b0b",
-    note: "Atlantic green and saffron",
+    primary: "#153f37",
+    accent: "#e6a23a",
+    note: "Atlantic ink, limestone and saffron",
   },
   {
     id: "aero",
     label: "Aero",
-    primary: "#0a5c8a",
-    accent: "#0f8bd1",
-    note: "Glass blue and signal cyan",
+    primary: "#0e5a66",
+    accent: "#2fb3c6",
+    note: "Sea glass and signal cyan",
   },
   {
     id: "midnight",
     label: "Midnight",
-    primary: "#5a4a8f",
-    accent: "#c9a227",
-    note: "Indigo with warm gold",
+    primary: "#1b2a4a",
+    accent: "#e6a23a",
+    note: "Atlantic night with warm gold",
   },
   {
     id: "sand",
     label: "Sand",
     primary: "#7a4b2a",
-    accent: "#b86b2b",
-    note: "Earth and terracotta",
+    accent: "#c07a3a",
+    note: "Earth, clay and dune light",
   },
 ];
 
-const DEFAULT_PRIMARY = "#0b4a45";
-const DEFAULT_ACCENT = "#955b0b";
+const DEFAULT_PRIMARY = "#153f37";
+const DEFAULT_ACCENT = "#e6a23a";
 
 function normalizeHex(value: string | undefined, fallback: string): string {
   if (!value) return fallback;
@@ -111,7 +111,7 @@ export function themeStyle(settings: PlatformSettings): CSSProperties {
     "--brand-soft-custom-dark": mix(primary, "#0a1211", 0.82),
     "--brand-ink-custom-dark": "#06201d",
     "--signal-custom": accent,
-    "--signal-ink-custom": mix(accent, "#000000", 0.25),
+    "--signal-ink-custom": mix(accent, "#000000", 0.45),
     "--signal-soft-custom": mix(accent, "#ffffff", 0.82),
     "--signal-custom-dark": mix(accent, "#ffffff", 0.28),
     "--signal-ink-custom-dark": mix(accent, "#ffffff", 0.48),

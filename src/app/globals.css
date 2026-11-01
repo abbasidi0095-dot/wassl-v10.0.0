@@ -115,21 +115,21 @@
 
 :root {
   color-scheme: light;
-  --paper: #efede8;
-  --surface: #faf9f6;
-  --surface-2: #e9e1d2;
-  --ink: #0c1a17;
-  --on-ink: #f7f4ec;
-  --muted: #5c6a64;
-  --line: #dcd3c4;
-  --line-strong: #c7bcaa;
-  --brand: var(--brand-custom, #0b4a45);
-  --brand-deep: var(--brand-deep-custom, #07332f);
-  --brand-soft: var(--brand-soft-custom, #dfe9e4);
-  --brand-ink: var(--brand-ink-custom, #f7f4ec);
-  --signal: var(--signal-custom, #955b0b);
-  --signal-ink: var(--signal-ink-custom, #7a4c0d);
-  --signal-soft: var(--signal-soft-custom, #f1e1c3);
+  --paper: #f4f0e6;
+  --surface: #fbf8f1;
+  --surface-2: #eae2d3;
+  --ink: #153f37;
+  --on-ink: #f4f0e6;
+  --muted: #5b6a63;
+  --line: #d9d0bf;
+  --line-strong: #c4b8a4;
+  --brand: var(--brand-custom, #153f37);
+  --brand-deep: var(--brand-deep-custom, #0e2c26);
+  --brand-soft: var(--brand-soft-custom, #dfe8e2);
+  --brand-ink: var(--brand-ink-custom, #f4f0e6);
+  --signal: var(--signal-custom, #e6a23a);
+  --signal-ink: var(--signal-ink-custom, #8a5a11);
+  --signal-soft: var(--signal-soft-custom, #f3e2c4);
   --danger: #a63a22;
   --danger-soft: #f6e2db;
   --success: #1e6b4f;
@@ -178,12 +178,75 @@
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
+/* Complete theme palettes. Brand and accent still come from the admin
+   settings; these tokens finish the paper, surface, ink and line system. */
+html[data-theme="aero"] {
+  --paper: #eef5f6;
+  --surface: #f8fcfc;
+  --surface-2: #dfeaed;
+  --ink: #0e3b45;
+  --on-ink: #f2fbfc;
+  --muted: #526b73;
+  --line: #cbdde1;
+  --line-strong: #b3cdd3;
+}
+html[data-theme="midnight"] {
+  --paper: #eef0f7;
+  --surface: #f9f9fd;
+  --surface-2: #e0e2ee;
+  --ink: #1b2a4a;
+  --on-ink: #f3f5ff;
+  --muted: #58627a;
+  --line: #d2d5e2;
+  --line-strong: #b9bed1;
+}
+html[data-theme="sand"] {
+  --paper: #f6efe3;
+  --surface: #fcf8ef;
+  --surface-2: #eadfce;
+  --ink: #4b3424;
+  --on-ink: #fff8ed;
+  --muted: #6c5b4b;
+  --line: #ddd0bd;
+  --line-strong: #c9b79e;
+}
+html.dark[data-theme="aero"] {
+  --paper: #081418;
+  --surface: #0e1f24;
+  --surface-2: #142a30;
+  --ink: #e4f3f5;
+  --on-ink: #081418;
+  --muted: #91aab1;
+  --line: #1d363d;
+  --line-strong: #2a4a53;
+}
+html.dark[data-theme="midnight"] {
+  --paper: #070b18;
+  --surface: #0d1426;
+  --surface-2: #141d33;
+  --ink: #e8ebff;
+  --on-ink: #070b18;
+  --muted: #98a0be;
+  --line: #1d2842;
+  --line-strong: #2b3a5c;
+}
+html.dark[data-theme="sand"] {
+  --paper: #17110c;
+  --surface: #211810;
+  --surface-2: #2c2117;
+  --ink: #f5e9d8;
+  --on-ink: #17110c;
+  --muted: #b6a48d;
+  --line: #3c2e21;
+  --line-strong: #554231;
+}
+
 html.dark {
   color-scheme: dark;
-  --paper: #0a1211;
-  --surface: #111b19;
-  --surface-2: #17231f;
-  --ink: #e9f0ea;
+  --paper: #0b1512;
+  --surface: #101d18;
+  --surface-2: #17261f;
+  --ink: #e9f0e6;
   --on-ink: #0a1211;
   --muted: #94a59e;
   --line: #243430;

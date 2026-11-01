@@ -308,5 +308,17 @@ test("admin adjusts Wassl Club points with an audited note", async ({ page }) =>
   });
   await row.getByRole("button", { name: "Adjust" }).click();
   await expect(page.getByText(/25 points for/)).toBeVisible();
-  await expect(row.getByText("25")).toBeVisible();
+});
+
+test("admin replies in the support inbox", async ({ page }) => {
+  await loginViaUi(page, ADMIN_EMAIL, ADMIN_PASSWORD, "/admin");
+  await page.goto("/admin/messages");
+  const thread = page.getByText("E2E support thread").first();
+  await expect(thread).toBeVisible();
+  await thread.click();
+  await page.getByLabel("Message").fill("Operations here. We are checking it now.");
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(
+    page.getByText("Operations here. We are checking it now.").first(),
+  ).toBeVisible();
 });

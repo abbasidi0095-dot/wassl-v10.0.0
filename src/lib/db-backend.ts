@@ -62,16 +62,24 @@ function hydrate(db: Database): Database {
   db.refundRequests ??= [];
   db.pushSubscriptions ??= [];
   db.taxiRides ??= [];
-  if (db.settings.primaryColor === "#0f6e6e") {
-    db.settings.primaryColor = "#0b4a45";
+  if (
+    db.settings.primaryColor === "#0f6e6e" ||
+    db.settings.primaryColor === "#0b4a45"
+  ) {
+    db.settings.primaryColor = "#153f37";
   }
-  db.settings.accentColor ??= "#955b0b";
+  if (db.settings.accentColor === "#955b0b") {
+    db.settings.accentColor = "#e6a23a";
+  }
+  db.settings.accentColor ??= "#e6a23a";
   db.settings.themePreset ??= "coastal";
   db.settings.defaultTheme ??= "system";
   db.promotions ??= DEFAULT_GROCERY_PROMOTIONS.map((promotion) => ({ ...promotion }));
   db.loyaltyAccounts ??= [];
   db.loyaltyTransactions ??= [];
   db.loyaltyRewards ??= DEFAULT_LOYALTY_REWARDS.map((reward) => ({ ...reward }));
+  db.chatThreads ??= [];
+  db.chatMessages ??= [];
 
   // Migrate the legacy scalar balance into an immutable, ledger-backed account.
   for (const user of db.users) {

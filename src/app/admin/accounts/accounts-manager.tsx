@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Loader2,
@@ -46,6 +47,7 @@ export function AccountsManager({
   stores: Store[];
   drivers: Driver[];
 }) {
+  const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
   const [drafts, setDrafts] = useState<Record<string, Draft>>(() =>
     Object.fromEntries(
@@ -182,6 +184,35 @@ export function AccountsManager({
       setToast(
         `${points > 0 ? "+" : ""}${points} points for ${user.name}. Balance ${data.account.points}.`,
       );
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function messageUser(user: AdminUserView) {
+    setBusy(user.id);
+    setError("");
+    try {
+      const response = await fetch("/api/chat/threads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: "support",
+          subject: "Operations follow-up",
+          customerId: user.id,
+          customerEmail: user.email,
+          aiEnabled: false,
+        }),
+      });
+      const data = (await response.json()) as {
+        thread?: { id: string };
+        error?: string;
+      };
+      if (!response.ok || !data.thread) {
+        setError(data.error || "Could not open a conversation");
+        return;
+      }
+      router.push(`/admin/messages?thread=${encodeURIComponent(data.thread.id)}`);
     } finally {
       setBusy("");
     }
@@ -404,14 +435,24 @@ export function AccountsManager({
                           {user.loyaltyPoints ?? 0}
                         </span>
                         {user.role === "customer" ? (
-                          <button
-                            type="button"
-                            onClick={() => void adjustPoints(user)}
-                            disabled={working}
-                            className="text-[11px] font-medium text-brand disabled:opacity-40"
-                          >
-                            Adjust
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => void adjustPoints(user)}
+                              disabled={working}
+                              className="text-[11px] font-medium text-brand disabled:opacity-40"
+                            >
+                              Adjust
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void messageUser(user)}
+                              disabled={working}
+                              className="text-[11px] font-medium text-brand disabled:opacity-40"
+                            >
+                              Message
+                            </button>
+                          </>
                         ) : null}
                       </div>
                     </td>

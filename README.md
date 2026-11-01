@@ -29,6 +29,24 @@ and dark themes.
 
 ## Release history
 
+### 11.0.0-alpha.5 — 1 November 2026 — support, ratings and Wassl 11 identity
+- Added the **Wassl Assistant** on the NVIDIA NIM API with a server-only key, a
+  Wassl-only system prompt, real order/ride/loyalty context, rate limits and a
+  human-support fallback. The browser never receives the key.
+- Added customer **Messages** at `/messages`, order/ride/store chat entry points,
+  driver and store inboxes, and an admin **Support inbox** at `/admin/messages`.
+  Human replies stop automatic assistant replies.
+- Added **post-order and post-ride ratings** with comments, one-rating guards,
+  and store/driver average updates.
+- Replaced the brand with the original **Wassl 11 monogram**, Latin and Arabic
+  wordmarks, transparent/reversed/monochrome variants, favicon and app icons.
+- Added four complete theme palettes (Coastal, Aero, Midnight, Sand) on semantic
+  tokens, with WCAG AA contrast. Signature palette: Atlantic Ink `#153F37`,
+  Limestone `#F4F0E6`, Signal Saffron `#E6A23A`.
+- Regenerated PWA icons, Capacitor app icons, splash screens and native status
+  bar colours. Brand documentation is in `docs/BRAND-11.md`.
+- Added 7 unit tests and 3 Playwright cases for chat, ratings and brand assets.
+
 ### 11.0.0-alpha.4 — 1 November 2026 — grocery intelligence and Wassl Club
 - Added the **Smart Shopping Assistant** at `/grocery/assistant`: natural
   language requests become editable product lists using real grocery stock and
@@ -357,6 +375,8 @@ Copy `.env.example` to `.env.local` for a documented template.
 | `WASSL_DEMO_STORE_PASSWORD` | demo fallback | Password for the seeded store accounts |
 | `WASSL_DEMO_DRIVER_PASSWORD` | demo fallback | Password for the seeded driver accounts |
 | `WASSL_DEMO_CUSTOMER_PASSWORD` | demo fallback | Password for the seeded customer account |
+| `NVIDIA_API_KEY` | unset | Server-only NVIDIA NIM key for the Wassl Assistant; never expose to the browser |
+| `NVIDIA_MODEL` | `meta/llama-3.2-90b-vision-instruct` | NVIDIA model used by the assistant |
 | `BREVO_API_KEY` | unset | Brevo transactional email key for verification and receipts |
 | `BREVO_SENDER_EMAIL` | `abbasidi0095@gmail.com` | Verified Brevo sender address |
 | `BREVO_SENDER_NAME` | `Wassl` | Sender display name |
@@ -537,6 +557,10 @@ staff out.
 - Smart shopping assistant, server-validated grocery promotions and inventory
   intelligence
 - Wassl Club: ledger-backed points, tiers, redemption and points history
+- Customer support chat, driver/store conversations, admin support inbox and
+  post-order/ride ratings
+- NVIDIA-backed Wassl Assistant with human fallback
+- Original Wassl 11 identity and four complete themes
 - Persistent live tracker dock for active orders and taxi rides (progress bar,
   expandable list, minimise to a floating pill, auto-hides when complete)
 - Notification centre with unread badge, in-app history, browser Web Push and
@@ -793,12 +817,12 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 108 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 116 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three
   concurrent writers, rollback, durable audit trail)
-- Playwright suite (19 tests) covers password sign-in, new-account review and admin
+- Playwright suite (22 tests) covers password sign-in, new-account review and admin
   approval against the production build
 - API flow tested against a production build: create order with modifiers and a
   promo → server repriced options and discount → merchant accept/prepare/ready →
