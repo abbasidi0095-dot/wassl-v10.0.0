@@ -376,7 +376,7 @@ Copy `.env.example` to `.env.local` for a documented template.
 | `WASSL_DEMO_DRIVER_PASSWORD` | demo fallback | Password for the seeded driver accounts |
 | `WASSL_DEMO_CUSTOMER_PASSWORD` | demo fallback | Password for the seeded customer account |
 | `NVIDIA_API_KEY` | unset | Server-only NVIDIA NIM key for the Wassl Assistant; never expose to the browser |
-| `NVIDIA_MODEL` | `meta/llama-3.2-90b-vision-instruct` | NVIDIA model used by the assistant |
+| `NVIDIA_MODEL` | `nvidia/nemotron-3.5-lightning-30b-a3b` | NVIDIA model used by the assistant |
 | `BREVO_API_KEY` | unset | Brevo transactional email key for verification and receipts |
 | `BREVO_SENDER_EMAIL` | `abbasidi0095@gmail.com` | Verified Brevo sender address |
 | `BREVO_SENDER_NAME` | `Wassl` | Sender display name |
