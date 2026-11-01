@@ -16,6 +16,7 @@ const HIDDEN_PREFIXES = [
   "/login",
   "/signup",
   "/verify-email",
+  "/verify-phone",
   "/pending",
 ];
 

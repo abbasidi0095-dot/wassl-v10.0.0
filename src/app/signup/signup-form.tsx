@@ -85,7 +85,7 @@ export function SignupForm({
     emailValid &&
     passwordValid &&
     matches &&
-    (role === "customer" || phone.trim().length > 0) &&
+    phone.trim().length > 0 &&
     (role !== "merchant" || storeName.trim().length > 0) &&
     (role !== "driver" || kind === "delivery" || plate.trim().length > 0);
 
@@ -231,20 +231,22 @@ export function SignupForm({
 
         <label className="block">
           <span className="label">
-            Phone{" "}
-            {role === "customer" ? (
-              <span className="font-normal text-muted">(for delivery updates)</span>
-            ) : null}
+            Moroccan mobile{" "}
+            <span className="font-normal text-muted">(we text a code)</span>
           </span>
           <input
             type="tel"
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
             className="input"
-            placeholder="+212 6.. .. .. .."
+            placeholder="06 12 34 56 78"
             autoComplete="tel"
-            required={role !== "customer"}
+            inputMode="tel"
+            required
           />
+          <span className="mt-1 block text-[10px] leading-4 text-muted">
+            Used for verification, delivery updates and driver contact.
+          </span>
         </label>
 
         <label className="block">

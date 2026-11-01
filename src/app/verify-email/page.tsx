@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getUserByEmail } from "@/lib/db";
 import { isEmailVerified, maskEmail } from "@/lib/email-verification";
+import { isPhoneVerified } from "@/lib/phone";
 import { homeForRole } from "@/lib/auth-config";
 import { VerifyEmailForm } from "./verify-email-form";
 
@@ -27,6 +28,9 @@ export default async function VerifyEmailPage({
 
   // Seeded and staff-provisioned accounts are verified by definition.
   if (isEmailVerified(user)) {
+    if (!isPhoneVerified(user)) {
+      redirect(`/verify-phone?email=${encodeURIComponent(user.email)}`);
+    }
     const session = await getSession();
     redirect(session ? homeForRole(session.role) : "/login");
   }

@@ -53,7 +53,7 @@ async function signupMerchant(
   await page.goto("/signup?role=merchant");
   await page.getByLabel("Full name").fill(input.name);
   await page.getByLabel("Email").fill(input.email);
-  await page.getByLabel("Phone").fill("+212 600 111 222");
+  await page.getByLabel(/Moroccan mobile/).fill("+212 600 111 222");
   await page.getByLabel("Store name").fill(input.storeName);
   await page.getByLabel("Password", { exact: true }).fill(input.password);
   await page.getByLabel("Confirm password").fill(input.password);
@@ -72,8 +72,24 @@ async function signupMerchant(
   expect(body.devCode).toMatch(/^\d{6}$/);
   await expect(page).toHaveURL(/\/verify-email/, { timeout: 15_000 });
 
+  const emailConfirm = page.waitForResponse(
+    (candidate) =>
+      candidate.url().includes("/api/auth/verify/confirm") &&
+      candidate.request().method() === "POST",
+  );
   for (let index = 0; index < 6; index += 1) {
     await page.getByLabel(`Digit ${index + 1}`).fill(body.devCode![index]);
+  }
+  const phoneBody = (await (await emailConfirm).json()) as {
+    needsPhone?: boolean;
+    devPhoneCode?: string;
+  };
+  expect(phoneBody.needsPhone).toBe(true);
+  expect(phoneBody.devPhoneCode).toMatch(/^\d{6}$/);
+  await expect(page).toHaveURL(/\/verify-phone/, { timeout: 15_000 });
+
+  for (let index = 0; index < 6; index += 1) {
+    await page.getByLabel(`Digit ${index + 1}`).fill(phoneBody.devPhoneCode![index]);
   }
   await expect(page).toHaveURL(/\/pending/, { timeout: 15_000 });
 }

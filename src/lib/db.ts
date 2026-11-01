@@ -19,6 +19,7 @@ import {
   type VerificationFailure,
 } from "./email-verification";
 import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
+import { maskPhone, normalizeMoroccanPhone } from "./phone";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
 import { casablancaNow } from "./hours";
 import { sanitizeCityServices } from "./city-services";
@@ -208,21 +209,24 @@ export async function createAccount(input: {
       throw new Error("An account with this email already exists");
     }
 
+    const normalizedPhone = normalizeMoroccanPhone(input.phone);
     const user: User = {
       id: randomId("user", 8),
       email,
       passwordHash: input.passwordHash,
       name: input.name.trim(),
       role: input.role,
-      phone: input.phone?.trim() || undefined,
+      phone: normalizedPhone ?? (input.phone?.trim() || undefined),
       citySlug: input.citySlug || undefined,
       requestedStoreName: input.requestedStoreName?.trim() || undefined,
       requestedVehicle: input.requestedVehicle?.trim() || undefined,
       requestedKind: input.requestedKind,
       requestedPlate: input.requestedPlate?.trim() || undefined,
       accountStatus: input.role === "customer" ? "active" : "pending",
-      // New self-service accounts must confirm the address before a session.
+      // New self-service accounts must confirm the address and mobile before a
+      // session. Accounts provisioned without a mobile keep legacy access.
       emailVerified: false,
+      phoneVerified: normalizedPhone ? false : undefined,
       createdAt: new Date().toISOString(),
     };
     db.users.push(user);
@@ -402,6 +406,172 @@ export async function confirmEmailVerification(
       entity: "auth",
       entityId: user.id,
       summary: `${user.email} verified their email`,
+      actorRole: "system",
+      actorName: user.name,
+    });
+
+    return { ok: true as const, user };
+  });
+}
+
+export type IssuePhoneVerificationResult =
+  | {
+      ok: true;
+      code: string;
+      email: string;
+      phone: string;
+      name: string;
+      expiresAt: string;
+      resendAfterSeconds: number;
+    }
+  | {
+      ok: false;
+      failure: Extract<
+        VerificationFailure,
+        "not_found" | "already_verified" | "cooldown" | "rate_limited" | "no_phone"
+      >;
+      retryAfterSeconds?: number;
+    };
+
+/** Creates a six-digit SMS challenge for the account's Moroccan mobile. */
+export async function issuePhoneVerification(
+  email: string,
+): Promise<IssuePhoneVerificationResult> {
+  const normalizedEmail = email.trim().toLowerCase();
+  return mutate((db) => {
+    const user = db.users.find(
+      (candidate) => candidate.email.toLowerCase() === normalizedEmail,
+    );
+    if (!user) return { ok: false, failure: "not_found" as const };
+    if (user.phoneVerified === true) {
+      return { ok: false, failure: "already_verified" as const };
+    }
+    const phone = normalizeMoroccanPhone(user.phone);
+    if (!phone) return { ok: false, failure: "no_phone" as const };
+    user.phone = phone;
+
+    const now = Date.now();
+    const previous = user.phoneVerification;
+    const windowStart = previous ? Date.parse(previous.windowStartedAt) : 0;
+    const inWindow =
+      Boolean(previous) &&
+      Number.isFinite(windowStart) &&
+      now - windowStart < OTP_SEND_WINDOW_MS;
+    const sends = inWindow ? previous!.sends : 0;
+
+    if (inWindow && sends >= OTP_MAX_SENDS) {
+      return {
+        ok: false,
+        failure: "rate_limited" as const,
+        retryAfterSeconds: Math.max(
+          1,
+          Math.ceil((windowStart + OTP_SEND_WINDOW_MS - now) / 1000),
+        ),
+      };
+    }
+
+    if (previous) {
+      const lastSent = Date.parse(previous.lastSentAt);
+      if (Number.isFinite(lastSent) && now - lastSent < OTP_RESEND_COOLDOWN_MS) {
+        return {
+          ok: false,
+          failure: "cooldown" as const,
+          retryAfterSeconds: Math.max(
+            1,
+            Math.ceil((lastSent + OTP_RESEND_COOLDOWN_MS - now) / 1000),
+          ),
+        };
+      }
+    }
+
+    const code = generateVerificationCode();
+    const expiresAt = new Date(now + OTP_TTL_MS).toISOString();
+
+    user.phoneVerified = false;
+    user.phoneVerification = {
+      codeHash: hashVerificationCode(phone, code),
+      expiresAt,
+      attempts: 0,
+      sends: sends + 1,
+      windowStartedAt: inWindow
+        ? previous!.windowStartedAt
+        : new Date(now).toISOString(),
+      lastSentAt: new Date(now).toISOString(),
+    };
+
+    recordAudit(db, {
+      action: "auth.phone_verification_sent",
+      entity: "auth",
+      entityId: user.id,
+      summary: `Mobile verification code sent to ${maskPhone(phone)}`,
+      actorRole: "system",
+      actorName: user.name,
+    });
+
+    return {
+      ok: true as const,
+      code,
+      email: user.email,
+      phone,
+      name: user.name,
+      expiresAt,
+      resendAfterSeconds: Math.ceil(OTP_RESEND_COOLDOWN_MS / 1000),
+    };
+  });
+}
+
+export type ConfirmPhoneVerificationResult =
+  | { ok: true; user: User }
+  | { ok: false; failure: VerificationFailure };
+
+/** Checks the SMS code, counts attempts and marks the mobile verified. */
+export async function confirmPhoneVerification(
+  email: string,
+  code: string,
+): Promise<ConfirmPhoneVerificationResult> {
+  const normalizedEmail = email.trim().toLowerCase();
+  return mutate((db) => {
+    const user = db.users.find(
+      (candidate) => candidate.email.toLowerCase() === normalizedEmail,
+    );
+    if (!user) return { ok: false, failure: "not_found" as const };
+    if (user.phoneVerified === true) {
+      return { ok: false, failure: "already_verified" as const };
+    }
+    const phone = normalizeMoroccanPhone(user.phone);
+    if (!phone) return { ok: false, failure: "no_phone" as const };
+
+    const challenge = user.phoneVerification;
+    if (!challenge) return { ok: false, failure: "no_code" as const };
+
+    if (Date.now() > Date.parse(challenge.expiresAt)) {
+      user.phoneVerification = undefined;
+      return { ok: false, failure: "expired" as const };
+    }
+    if (challenge.attempts >= OTP_MAX_ATTEMPTS) {
+      user.phoneVerification = undefined;
+      return { ok: false, failure: "too_many_attempts" as const };
+    }
+
+    challenge.attempts += 1;
+
+    if (!codeMatches(phone, code, challenge.codeHash)) {
+      if (challenge.attempts >= OTP_MAX_ATTEMPTS) {
+        user.phoneVerification = undefined;
+      }
+      return { ok: false, failure: "incorrect" as const };
+    }
+
+    user.phone = phone;
+    user.phoneVerified = true;
+    user.phoneVerifiedAt = new Date().toISOString();
+    user.phoneVerification = undefined;
+
+    recordAudit(db, {
+      action: "auth.phone_verified",
+      entity: "auth",
+      entityId: user.id,
+      summary: `${maskPhone(phone)} verified their mobile`,
       actorRole: "system",
       actorName: user.name,
     });

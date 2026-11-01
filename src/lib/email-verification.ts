@@ -66,6 +66,7 @@ export function isTestMode(): boolean {
 
 export type VerificationFailure =
   | "not_found"
+  | "no_phone"
   | "already_verified"
   | "cooldown"
   | "rate_limited"
@@ -76,6 +77,8 @@ export type VerificationFailure =
 
 export function failureMessage(failure: VerificationFailure): string {
   switch (failure) {
+    case "no_phone":
+      return "Add a Moroccan mobile number to verify this account.";
     case "expired":
       return "This code has expired. Request a new one.";
     case "too_many_attempts":

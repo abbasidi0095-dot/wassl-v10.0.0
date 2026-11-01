@@ -29,6 +29,18 @@ and dark themes.
 
 ## Release history
 
+### 11.5.0 — 1 November 2026 — email and SMS verification
+- New accounts must verify both their **email** and their **Moroccan mobile**
+  before a session opens.
+- Email codes use Brevo; mobile codes use **Aion Messaging** with a server-only
+  API key and approved sender ID.
+- Added `/verify-phone` with six-digit inputs, paste, auto-submit, masked number,
+  resend cooldown and EN/FR/ES/AR copy.
+- Phone endpoints require a short-lived signed ticket issued after email
+  verification or a correct password.
+- Signup now requires a Moroccan mobile for every role (`06`/`07`).
+- Existing accounts without the new flags keep their access.
+
 ### 11.4.0 — 1 November 2026 — per-service commissions
 - Added **Service commissions** in Admin → Settings for Food to go, Grocery,
   Pharmacy and Taxi.
@@ -500,6 +512,9 @@ Copy `.env.example` to `.env.local` for a documented template.
 | `NVIDIA_API_KEY` | unset | Server-only NVIDIA NIM key for the Wassl Assistant; never expose to the browser |
 | `NVIDIA_MODEL` | `nvidia/nemotron-3.5-lightning-30b-a3b` | NVIDIA model used by the assistant |
 | `BREVO_API_KEY` | unset | Brevo transactional email key for verification and receipts |
+| `AION_API_KEY` | unset | Server-only Aion Messaging key for SMS verification |
+| `AION_SENDER_ID` | `WASSL` | Approved Aion sender ID for Morocco SMS |
+| `AION_BASE_URL` | `https://aionmessaging.com/api/v1` | Optional Aion API base override |
 | `BREVO_SENDER_EMAIL` | `abbasidi0095@gmail.com` | Verified Brevo sender address |
 | `BREVO_SENDER_NAME` | `Wassl` | Sender display name |
 | `BREVO_REPLY_TO` | unset | Optional reply-to address |

@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.4.0** (1 November 2026).
+Current delivered baseline: **11.5.0** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -161,6 +161,13 @@ enhancements, not blocking the v11 core release.
 - Runs on every full app launch/reload; internal navigation is splash-free.
 - Reduced-motion skip remains.
 - iOS PWA startup images and service-worker cache refresh.
+
+### Email and SMS verification
+
+- Email and Moroccan mobile are both mandatory for new accounts.
+- Aion Messaging SMS with a server-only key and approved sender ID.
+- Signed phone tickets, HMAC challenges, rate limits and masked numbers.
+- `/verify-phone` plus login/email gates; legacy accounts keep access.
 
 ### Per-service commissions
 

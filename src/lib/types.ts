@@ -66,6 +66,13 @@ export interface User {
   emailVerifiedAt?: string;
   /** Hashed one-time challenge; the plaintext code is never stored. */
   emailVerification?: EmailVerificationChallenge;
+  /**
+   * Mobile verification. Legacy accounts leave this undefined and keep their
+   * access; new self-service accounts start as `false`.
+   */
+  phoneVerified?: boolean;
+  phoneVerifiedAt?: string;
+  phoneVerification?: PhoneVerificationChallenge;
   createdAt?: string;
   lastLoginAt?: string;
 }
@@ -79,6 +86,8 @@ export interface EmailVerificationChallenge {
   windowStartedAt: string;
   lastSentAt: string;
 }
+
+export type PhoneVerificationChallenge = EmailVerificationChallenge;
 
 export type StoreCategory =
   | "restaurant"

@@ -66,7 +66,12 @@ PORT=3000
 BREVO_API_KEY=...
 BREVO_SENDER_EMAIL=...
 BREVO_SENDER_NAME=Wassl
+AION_API_KEY=...
+AION_SENDER_ID=WASSL
 ```
+
+The Aion sender ID must be approved and the wallet funded. See
+[docs/AUTH-OTP.md](AUTH-OTP.md).
 
 `WASSL_OTP_TEST_MODE` must stay unset in production.
 

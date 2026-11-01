@@ -9,6 +9,7 @@ import {
 import { sendVerificationEmail } from "@/lib/email";
 import { isTestMode } from "@/lib/email-verification";
 import { hashPassword } from "@/lib/security";
+import { normalizeMoroccanPhone } from "@/lib/phone";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
   const password = body.password || "";
   const role = body.role?.trim().toLowerCase() || "customer";
   const phone = body.phone?.trim() || "";
+  const normalizedPhone = normalizeMoroccanPhone(phone);
   const citySlug = body.citySlug?.trim() || "";
   const storeName = body.storeName?.trim() || "";
   const vehicle = body.vehicle?.trim() || "";
@@ -75,9 +77,12 @@ export async function POST(request: Request) {
       { status: 403 },
     );
   }
-  if ((role === "merchant" || role === "driver") && !phone) {
+  if (!normalizedPhone) {
     return NextResponse.json(
-      { error: "A phone number is required for store and driver accounts" },
+      {
+        error:
+          "Enter a valid Moroccan mobile number (06 or 07) so we can text your verification code.",
+      },
       { status: 400 },
     );
   }
@@ -124,7 +129,7 @@ export async function POST(request: Request) {
       name,
       passwordHash: hashPassword(password),
       role,
-      phone: phone || undefined,
+      phone: normalizedPhone,
       citySlug: city?.slug,
       requestedStoreName: storeName || undefined,
       requestedVehicle: vehicle || undefined,

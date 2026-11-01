@@ -140,6 +140,7 @@ export function VerifyEmailForm({
       const data = (await response.json()) as {
         error?: string;
         redirect?: string;
+        needsPhone?: boolean;
       };
       if (!response.ok) {
         setError(data.error || t("That code is not correct. Try again."));
@@ -147,7 +148,11 @@ export function VerifyEmailForm({
         focus(0);
         return;
       }
-      setNotice(t("Email verified. Opening your account…"));
+      setNotice(
+        data.needsPhone
+          ? t("Email verified. Now verify your mobile.")
+          : t("Email verified. Opening your account…"),
+      );
       router.push(data.redirect || "/account");
       router.refresh();
     } catch {

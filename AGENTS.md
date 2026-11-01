@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.4.0** (1 November 2026; per-service commissions)
+- Release: **11.5.0** (1 November 2026; email and SMS verification)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -82,14 +82,27 @@ persists; every mutation should add an audit entry via `recordAudit`.
    client price/stock; use `resolveProductStock` and `groceryFees`. Release on
    cancellation, commit on delivery, restock on refund.
 10. Verification codes are stored only as HMACs; never log a code, return it
-    outside `WASSL_OTP_TEST_MODE`, or email it to an address the user did not
-    just prove they control.
+    outside `WASSL_OTP_TEST_MODE`, or send it to a contact the user did not just
+    prove they control. Phone endpoints also require a signed ticket issued
+    after email confirmation or a correct password.
 11. Customer-facing strings should go through `t()`; the English string is the
     dictionary key and missing translations fall back safely.
 12. Never commit secrets. `WASSL_SECRET`, `VAPID_*`, database URLs and admin
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.5.0 — email and SMS verification
+- New accounts require email + Moroccan mobile verification before a session.
+- `src/lib/phone.ts`: normalization, masking, tickets, legacy semantics.
+- `src/lib/sms.ts`: Aion Messaging `POST /sms/send`, 15s timeout, server-only key.
+- `issuePhoneVerification` / `confirmPhoneVerification` with HMACs, TTL, attempts,
+  cooldown and rate limit; `User.phoneVerified` and `phoneVerification`.
+- `/verify-phone`, `/api/auth/verify/phone/send`, `/api/auth/verify/phone/confirm`.
+- Signup requires `06`/`07` for every role; login and email confirmation gate on
+  the mobile step.
+- Env: `AION_API_KEY`, `AION_SENDER_ID`; sender must be approved and wallet funded.
+- Full runbook: `docs/AUTH-OTP.md`.
 
 ### 11.4.0 — per-service commissions
 - `PlatformSettings.commissions` stores fixed fee + rate for food, grocery,
@@ -545,7 +558,8 @@ persists; every mutation should add an audit entry via `recordAudit`.
   NSG. Host firewalld allows `ssh`, `http`, `https` only.
 - Required secrets: `WASSL_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
   `VAPID_SUBJECT`, `WASSL_ADMIN_EMAIL`, `WASSL_ADMIN_PASSWORD`, plus
-  `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`.
+  `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`, `AION_API_KEY`,
+  `AION_SENDER_ID`.
 - Operator email for v10: `admin@wassl.ma`; password is intentionally not
   committed. Rotate it in `/etc/wassl.env`, then the next sign-in calls
   `ensureBootstrapAdmin()` and applies it.

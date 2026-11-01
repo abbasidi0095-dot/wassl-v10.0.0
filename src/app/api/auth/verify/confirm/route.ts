@@ -3,11 +3,14 @@ import {
   confirmEmailVerification,
   effectiveAccountStatus,
   getUserByEmail,
+  issuePhoneVerification,
 } from "@/lib/db";
 import { createSessionToken } from "@/lib/security";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { homeForRole } from "@/lib/auth-config";
-import { failureMessage } from "@/lib/email-verification";
+import { failureMessage, isTestMode } from "@/lib/email-verification";
+import { isSmsConfigured, otpSmsBody, sendSms } from "@/lib/sms";
+import { createPhoneTicket, maskPhone } from "@/lib/phone";
 import type { Session } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -51,6 +54,74 @@ export async function POST(request: Request) {
   // Refresh the account in case approval changed the role or bindings between
   // the issue and the confirmation.
   const user = (await getUserByEmail(email)) ?? result.user;
+
+  /*
+   * Email is confirmed, but a new account is not admitted until the mobile is
+   * verified too. Send the SMS immediately so the next screen only asks for
+   * the code.
+   */
+  if (user.phoneVerified === false) {
+    const phoneIssue = await issuePhoneVerification(user.email);
+    if (!phoneIssue.ok && phoneIssue.failure === "no_phone") {
+      console.error("[auth] account has no valid mobile for SMS verification");
+    } else {
+      let sent = false;
+      let warning: string | undefined;
+      if (phoneIssue.ok) {
+        if (isTestMode()) {
+          sent = true;
+        } else if (!isSmsConfigured()) {
+          warning =
+            "SMS verification is not configured. Contact support if this repeats.";
+        } else {
+          const delivery = await sendSms(
+            phoneIssue.phone,
+            otpSmsBody(phoneIssue.code),
+          );
+          sent = delivery.ok;
+          if (!delivery.ok) {
+            console.error("[auth] verification SMS failed:", delivery.error);
+            warning =
+              "We could not send the SMS. Use resend on the next screen or contact support.";
+          }
+        }
+      } else {
+        warning = failureMessage(phoneIssue.failure);
+      }
+
+      const params = new URLSearchParams({
+        email: user.email,
+        ticket: createPhoneTicket(user.email),
+      });
+      if (sent) {
+        params.set("sent", "1");
+        params.set(
+          "cooldown",
+          String(phoneIssue.ok ? phoneIssue.resendAfterSeconds : 60),
+        );
+      } else {
+        params.set(
+          "cooldown",
+          String(phoneIssue.ok ? 60 : phoneIssue.retryAfterSeconds ?? 30),
+        );
+      }
+      if (warning) params.set("warning", "1");
+
+      return NextResponse.json({
+        ok: true,
+        verified: "email",
+        needsPhone: true,
+        email: user.email,
+        maskedPhone: phoneIssue.ok ? maskPhone(phoneIssue.phone) : undefined,
+        sent,
+        warning,
+        redirect: `/verify-phone?${params.toString()}`,
+        ...(sent && phoneIssue.ok && isTestMode()
+          ? { devPhoneCode: phoneIssue.code }
+          : {}),
+      });
+    }
+  }
 
   const session: Session = {
     userId: user.id,
