@@ -231,8 +231,7 @@ export function SignupForm({
 
         <label className="block">
           <span className="label">
-            Moroccan mobile{" "}
-            <span className="font-normal text-muted">(we text a code)</span>
+            Moroccan mobile
           </span>
           <input
             type="tel"
@@ -245,7 +244,7 @@ export function SignupForm({
             required
           />
           <span className="mt-1 block text-[10px] leading-4 text-muted">
-            Used for verification, delivery updates and driver contact.
+            Used for delivery updates, driver contact and account verification.
           </span>
         </label>
 

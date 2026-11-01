@@ -29,6 +29,10 @@ and dark themes.
 
 ## Release history
 
+### 11.6.1 — 1 November 2026 — verification-ready signup copy
+- The signup mobile field no longer promises an SMS while phone verification is
+  switched off.
+
 ### 11.6.0 — 1 November 2026 — SMS or WhatsApp verification
 - Phone verification now offers **SMS or WhatsApp**, chosen by the customer.
 - SMS uses Aion; WhatsApp uses a self-hosted **OpenWA** session.
