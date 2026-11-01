@@ -53,6 +53,7 @@ export interface User {
   requestedKind?: DriverKind;
   requestedPlate?: string;
   loyaltyPoints?: number;
+  businessAccountId?: string;
   /** YYYY-MM-DD; used for the yearly birthday reward. */
   birthday?: string;
   favorites?: string[];
@@ -219,6 +220,9 @@ export interface Product {
   variants?: ProductVariant[];
   substitutionAllowed?: boolean;
   limitPerOrder?: number;
+  /** Optional wholesale price for approved business accounts. */
+  businessPrice?: number;
+  businessMinQty?: number;
 }
 
 export interface ProductVariant {
@@ -414,6 +418,22 @@ export type TaxiStatus =
   | "completed"
   | "cancelled";
 
+export interface TaxiStop {
+  id: string;
+  label: string;
+  lat: number;
+  lng: number;
+}
+
+export type TaxiRideType = "local" | "intercity" | "airport";
+
+export interface TaxiLostItem {
+  description: string;
+  contact: string;
+  status: "open" | "resolved";
+  createdAt: string;
+}
+
 export interface TaxiRide {
   id: string;
   customerId: string;
@@ -440,6 +460,15 @@ export interface TaxiRide {
   /** Safe driver-facing flag; the code itself is never sent to drivers. */
   handoverRequired?: boolean;
   codeVerifiedAt?: string;
+  rideType?: TaxiRideType;
+  scheduledFor?: string;
+  stops?: TaxiStop[];
+  passengerCount?: number;
+  luggage?: string;
+  notes?: string;
+  /** Public read-only live link token. */
+  shareToken?: string;
+  lostItem?: TaxiLostItem;
   rating?: Rating;
   createdAt: string;
   updatedAt: string;
@@ -461,6 +490,102 @@ export interface ShoppingListItem {
   productId: string;
   qty: number;
   checked?: boolean;
+}
+
+export type ServiceCategory =
+  | "laundry"
+  | "cleaning"
+  | "plumbing"
+  | "electrical"
+  | "maintenance"
+  | "moving"
+  | "other";
+
+export type ServiceProviderStatus = "pending" | "approved" | "suspended";
+
+export interface ServiceProvider {
+  id: string;
+  name: string;
+  category: ServiceCategory;
+  citySlug: string;
+  description: string;
+  phone: string;
+  address: string;
+  priceFrom: number;
+  rating: number;
+  reviews: number;
+  active: boolean;
+  status: ServiceProviderStatus;
+  accessCode: string;
+  createdAt: string;
+}
+
+export type ServiceBookingStatus =
+  | "requested"
+  | "confirmed"
+  | "completed"
+  | "cancelled";
+
+export interface ServiceBooking {
+  id: string;
+  code: string;
+  providerId: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  citySlug: string;
+  service: string;
+  description: string;
+  address: string;
+  landmark: string;
+  date: string;
+  slot: string;
+  status: ServiceBookingStatus;
+  amount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BusinessAccountStatus = "pending" | "approved" | "rejected";
+
+export interface BusinessAccount {
+  id: string;
+  ownerId: string;
+  companyName: string;
+  contactName: string;
+  phone: string;
+  email: string;
+  citySlug: string;
+  category: string;
+  status: BusinessAccountStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BusinessOrderStatus = "requested" | "confirmed" | "cancelled";
+
+export interface BusinessOrderLine {
+  productId: string;
+  storeId: string;
+  name: string;
+  qty: number;
+  unitPrice: number;
+}
+
+export interface BusinessOrder {
+  id: string;
+  code: string;
+  accountId: string;
+  customerId: string;
+  citySlug: string;
+  storeId: string;
+  items: BusinessOrderLine[];
+  subtotal: number;
+  deliveryDate: string;
+  notes?: string;
+  status: BusinessOrderStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type ParcelSize = "document" | "small" | "medium" | "large";
@@ -712,6 +837,10 @@ export interface Database {
   chatThreads?: ChatThread[];
   chatMessages?: ChatMessage[];
   parcels?: ParcelDelivery[];
+  serviceProviders?: ServiceProvider[];
+  serviceBookings?: ServiceBooking[];
+  businessAccounts?: BusinessAccount[];
+  businessOrders?: BusinessOrder[];
 }
 
 /**

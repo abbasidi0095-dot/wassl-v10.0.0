@@ -79,3 +79,88 @@ describe("taxi ratings", () => {
     expect(updatedDriver!.ratingsCount).toBeGreaterThan(0);
   });
 });
+
+describe("Taxi 2.0", () => {
+  it("stores scheduled intercity requests, stops and a share token", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const user = await db.getUserByEmail("customer@wassl.ma");
+    const ride = await db.createTaxiRide(
+      {
+        citySlug: "dakhla",
+        pickupLabel: "Dakhla",
+        dropoffLabel: "Laâyoune",
+        pickupLat: 23.69,
+        pickupLng: -15.94,
+        dropoffLat: 27.15,
+        dropoffLng: -13.19,
+        rideType: "intercity",
+        scheduledFor: "2026-12-01T09:00:00.000Z",
+        stops: [{ label: "Boujdour", lat: 26.12, lng: -14.48 }],
+        passengerCount: 3,
+        luggage: "2 suitcases",
+        notes: "Family trip",
+      },
+      { role: "customer", id: user!.id, name: user!.name },
+    );
+    expect(ride.rideType).toBe("intercity");
+    expect(ride.scheduledFor).toBe("2026-12-01T09:00:00.000Z");
+    expect(ride.stops?.[0]?.label).toBe("Boujdour");
+    expect(ride.passengerCount).toBe(3);
+    expect(ride.shareToken).toBeTruthy();
+    expect(await db.getTaxiRideByShareToken(ride.shareToken!)).toBeTruthy();
+  });
+
+  it("reports a lost item after a completed ride", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const user = await db.getUserByEmail("customer@wassl.ma");
+    const ride = await db.createTaxiRide(
+      {
+        citySlug: "dakhla",
+        pickupLabel: "A",
+        dropoffLabel: "B",
+        pickupLat: 23.69,
+        pickupLng: -15.94,
+        dropoffLat: 23.68,
+        dropoffLng: -15.95,
+      },
+      { role: "customer", id: user!.id, name: user!.name },
+    );
+    await db.updateTaxiRideStatus(ride.id, "accepted", {
+      role: "driver",
+      id: "user_driver",
+      name: "Driver",
+      driverId: "driver_youssef",
+    });
+    await db.updateTaxiRideStatus(ride.id, "arriving", {
+      role: "driver",
+      id: "user_driver",
+      name: "Driver",
+      driverId: "driver_youssef",
+    });
+    await db.updateTaxiRideStatus(ride.id, "in_progress", {
+      role: "driver",
+      id: "user_driver",
+      name: "Driver",
+      driverId: "driver_youssef",
+    });
+    await db.updateTaxiRideStatus(ride.id, "completed", {
+      role: "admin",
+      id: "user_admin",
+      name: "Ops",
+    });
+    const reported = await db.reportTaxiLostItem(
+      ride.id,
+      { role: "customer", id: user!.id, name: user!.name },
+      { description: "Blue umbrella", contact: "+212600000000" },
+    );
+    expect(reported.lostItem?.description).toBe("Blue umbrella");
+    const resolved = await db.resolveTaxiLostItem(ride.id, {
+      role: "admin",
+      id: "user_admin",
+      name: "Ops",
+    });
+    expect(resolved.lostItem?.status).toBe("resolved");
+  });
+});

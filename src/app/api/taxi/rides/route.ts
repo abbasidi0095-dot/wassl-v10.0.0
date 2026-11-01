@@ -35,6 +35,12 @@ export async function POST(request: Request) {
         pickupLng?: number;
         dropoffLat?: number;
         dropoffLng?: number;
+        rideType?: "local" | "intercity" | "airport";
+        scheduledFor?: string;
+        stops?: Array<{ label?: string; lat?: number; lng?: number }>;
+        passengerCount?: number;
+        luggage?: string;
+        notes?: string;
       }
     | null;
 
@@ -61,6 +67,25 @@ export async function POST(request: Request) {
         pickupLng: body.pickupLng as number,
         dropoffLat: body.dropoffLat as number,
         dropoffLng: body.dropoffLng as number,
+        rideType: body.rideType,
+        scheduledFor: body.scheduledFor,
+        stops: Array.isArray(body.stops)
+          ? body.stops
+              .filter(
+                (stop) =>
+                  typeof stop.label === "string" &&
+                  typeof stop.lat === "number" &&
+                  typeof stop.lng === "number",
+              )
+              .map((stop) => ({
+                label: stop.label as string,
+                lat: stop.lat as number,
+                lng: stop.lng as number,
+              }))
+          : undefined,
+        passengerCount: body.passengerCount,
+        luggage: body.luggage,
+        notes: body.notes,
       },
       actorFromSession(session),
     );

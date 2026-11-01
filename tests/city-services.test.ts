@@ -28,8 +28,8 @@ describe("city service activation", () => {
       grocery: true,
       taxi: true,
       express: true,
-      services: false,
-      business: false,
+      services: true,
+      business: true,
     });
   });
 
@@ -47,7 +47,7 @@ describe("city service activation", () => {
     expect(cityServiceEnabled(city, "restaurant")).toBe(true);
     expect(cityServiceEnabled(city, "grocery")).toBe(false);
     expect(cityServiceEnabled(city, "express")).toBe(true);
-    expect(cityServiceEnabled(city, "services")).toBe(false);
+    expect(cityServiceEnabled(city, "services")).toBe(true);
   });
 
   it("rejects unknown keys and non-boolean values", () => {

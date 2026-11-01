@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  Building2,
   CarTaxiFront,
   ChevronDown,
   House,
@@ -17,6 +18,7 @@ import {
   ShoppingBasket,
   Store,
   UserRound,
+  Wrench,
   X,
 } from "lucide-react";
 import type { City } from "@/lib/types";
@@ -100,7 +102,6 @@ export function SiteHeader({
       label: t("Discover"),
       active: pathname.startsWith("/city/"),
     },
-    { href: `/search?city=${selected}`, label: t("Search"), active: pathname.startsWith("/search") },
     ...(services.grocery
       ? [{ href: "/grocery", label: t("Grocery"), active: pathname === "/grocery" }]
       : []),
@@ -110,16 +111,12 @@ export function SiteHeader({
     ...(services.express
       ? [{ href: "/express", label: t("Express"), active: pathname.startsWith("/express") }]
       : []),
-    {
-      href: "/orders",
-      label: t("My orders"),
-      active: pathname.startsWith("/orders"),
-    },
-    {
-      href: "/signup/store",
-      label: t("For business"),
-      active: false,
-    },
+    ...(services.services
+      ? [{ href: "/services", label: t("Services"), active: pathname.startsWith("/services") }]
+      : []),
+    ...(services.business
+      ? [{ href: "/business", label: t("Business"), active: pathname.startsWith("/business") }]
+      : []),
   ];
 
   const cityOptions = (

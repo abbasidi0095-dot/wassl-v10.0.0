@@ -8,7 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# AGENTS — Wassl v10.0.0
+# AGENTS — Wassl v11.0.0
 
 This file is the handover guide for coding agents. Read it before changing the
 app. The user-facing summary lives in [README.md](README.md); this file records
@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.0-alpha.6** (1 November 2026; Express, referrals, insights and alerts)
+- Release: **11.0.0** (1 November 2026; super-app release)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,13 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.0 — the super-app release
+- Express parcel vertical, local services marketplace, business wholesale and
+  Taxi 2.0 core.
+- Club referrals/birthday/achievements, merchant/admin insights, admin alerts.
+- Unified navigation for all first-class services; six-tab mobile dock.
+- Production release prepared after 124 unit tests and 23 Playwright tests.
 
 ### 11.0.0-alpha.6 — Express, referrals, insights and alerts
 - `ParcelDelivery` model, `src/lib/express.ts` pricing/transitions, DB functions

@@ -27,6 +27,8 @@ export default async function AdminMessagesPage({
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
           { href: "/admin/express", label: "Express" },
+          { href: "/admin/services", label: "Services" },
+          { href: "/admin/business", label: "Business" },
           { href: "/admin/messages", label: "Messages" },
         ]}
         accent="ink"

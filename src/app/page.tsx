@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Banknote,
+  Building2,
   Check,
   Bike,
   CarTaxiFront,
@@ -15,6 +16,7 @@ import {
   Route,
   ShoppingBasket,
   UtensilsCrossed,
+  Wrench,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -134,6 +136,22 @@ export default async function HomePage() {
       icon: Package,
       count: null,
       enabled: enabledServices.express,
+    },
+    {
+      href: "/services",
+      label: t("Services"),
+      note: t("Laundry, cleaning and repairs"),
+      icon: Wrench,
+      count: null,
+      enabled: enabledServices.services,
+    },
+    {
+      href: "/business",
+      label: t("Business"),
+      note: t("Wholesale and bulk ordering"),
+      icon: Building2,
+      count: null,
+      enabled: enabledServices.business,
     },
   ];
 

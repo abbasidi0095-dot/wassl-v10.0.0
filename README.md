@@ -1,4 +1,4 @@
-# Wassl · وصّل — v10.0.0
+# Wassl · وصّل — v11.0.0
 
 **From the store to your door. From the curb to your destination.**
 **من المتجر إلى بابك، ومن الرصيف إلى وجهتك.**
@@ -28,6 +28,22 @@ and dark themes.
 ---
 
 ## Release history
+
+### 11.0.0 — 1 November 2026 — the super-app release
+- **Wassl Express** parcel delivery: booking, sizes, pricing, pickup and
+  delivery codes, driver queue, tracking, cash settlement and admin operations.
+- **Wassl Services** local marketplace: seeded approved providers, category
+  filters, booking requests, provider access-code workspace, customer bookings
+  and admin provider/booking operations.
+- **Wassl Business** wholesale: business applications, admin approval,
+  wholesale catalog, bulk order requests and admin confirmation.
+- **Taxi 2.0 core**: scheduled rides, intercity/airport requests, multiple stops,
+  passengers, luggage, driver notes, shareable live links and lost-and-found.
+- **Wassl Club**: referrals, yearly birthday reward and achievements.
+- **Wassl Insights** for merchants/admins and operational alerts.
+- Unified header/navigation for delivery, grocery, taxi, Express, Services,
+  Business and account, with the mobile dock kept to six essential tabs.
+- 124 unit tests, 23 Playwright tests, clean production build.
 
 ### 11.0.0-alpha.6 — 1 November 2026 — Express, referrals, insights and alerts
 - Added **Wassl Express**: parcel booking with pickup/drop-off pins, size-based
@@ -836,7 +852,7 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 120 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 124 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three

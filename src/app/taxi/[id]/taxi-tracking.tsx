@@ -18,6 +18,8 @@ import { useI18n } from "@/components/locale-provider";
 import type { TaxiRide } from "@/lib/types";
 import { TAXI_STATUS_ORDER, TAXI_STATUS_TEXT } from "@/lib/taxi-status";
 import { money } from "@/lib/utils";
+import { RatingPrompt } from "@/components/rating-prompt";
+import { LostItemPanel } from "./lost-item-panel";
 
 export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role: string }) {
   const { t } = useI18n();
@@ -108,6 +110,15 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
           </div>
         </div>
 
+        {ride.status === "completed" ? (
+          <RatingPrompt
+            kind="ride"
+            id={ride.id}
+            initial={ride.rating}
+            subject={`${ride.pickupLabel} → ${ride.dropoffLabel}`}
+          />
+        ) : null}
+
         <div className="card p-5">
           <div className="text-sm font-semibold">{t("Ride details")}</div>
           <div className="mt-3 space-y-3 text-sm">
@@ -154,6 +165,9 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
       </div>
 
       <div className="space-y-4">
+        {ride.status === "completed" ? (
+          <LostItemPanel ride={ride} onUpdated={setRide} />
+        ) : null}
         {active && role !== "driver" && ride.verificationCode ? (
           <HandoverCode
             code={ride.verificationCode}

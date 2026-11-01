@@ -53,6 +53,13 @@ export function TaxiRequest({
   const [submitting, setSubmitting] = useState(false);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
+  const [rideType, setRideType] = useState<"local" | "intercity" | "airport">("local");
+  const [scheduledFor, setScheduledFor] = useState("");
+  const [destinationCity, setDestinationCity] = useState("");
+  const [passengers, setPassengers] = useState("1");
+  const [luggage, setLuggage] = useState("");
+  const [notes, setNotes] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const distance = useMemo(
     () => haversineKm(pickup, dropoff),
@@ -118,6 +125,13 @@ export function TaxiRequest({
           pickupLng: pickup.lng,
           dropoffLat: dropoff.lat,
           dropoffLng: dropoff.lng,
+          rideType,
+          scheduledFor: scheduledFor
+            ? new Date(scheduledFor).toISOString()
+            : undefined,
+          passengerCount: Number(passengers) || 1,
+          luggage,
+          notes,
         }),
       });
       const data = (await response.json()) as { ride?: TaxiRide; error?: string };
@@ -166,6 +180,21 @@ export function TaxiRequest({
               </div>
             </div>
             <div className="flex flex-col justify-end gap-2">
+              <div className="flex flex-wrap gap-2 text-[10px] text-muted">
+                <span className="rounded-full bg-surface-2 px-2 py-1 capitalize">
+                  {t(activeRide.rideType || "local")}
+                </span>
+                {activeRide.scheduledFor ? (
+                  <span className="rounded-full bg-surface-2 px-2 py-1">
+                    {new Date(activeRide.scheduledFor).toLocaleString()}
+                  </span>
+                ) : null}
+                {activeRide.passengerCount ? (
+                  <span className="rounded-full bg-surface-2 px-2 py-1">
+                    {activeRide.passengerCount} {t("passengers")}
+                  </span>
+                ) : null}
+              </div>
               {activeRide.driverName ? (
                 <div className="rounded-[6px] bg-surface-2 p-3 text-[13px]">
                   <div className="text-[11px] text-muted">
@@ -181,6 +210,25 @@ export function TaxiRequest({
                 {t("Track ride")}
                 <ArrowRight size={15} className="rtl:-scale-x-100" />
               </Link>
+              {activeRide.shareToken ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `${window.location.origin}/track/ride/${activeRide.shareToken}`,
+                      );
+                      setCopied(true);
+                      window.setTimeout(() => setCopied(false), 1800);
+                    } catch {
+                      setCopied(false);
+                    }
+                  }}
+                  className="btn btn-ghost btn-sm"
+                >
+                  {copied ? t("Link copied") : t("Share live location")}
+                </button>
+              ) : null}
               {activeRide.driverId ? (
                 <StartChatButton
                   topic="ride"
@@ -307,6 +355,89 @@ export function TaxiRequest({
                 value={dropoffLabel}
                 onChange={(event) => setDropoffLabel(event.target.value)}
                 placeholder={t("Where to?")}
+              />
+            </label>
+          </div>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="label">{t("Ride type")}</span>
+              <select
+                value={rideType}
+                onChange={(event) => {
+                  const value = event.target.value as "local" | "intercity" | "airport";
+                  setRideType(value);
+                  if (value === "local") setDestinationCity("");
+                }}
+                className="input"
+              >
+                <option value="local">{t("Local ride")}</option>
+                <option value="intercity">{t("Intercity")}</option>
+                <option value="airport">{t("Airport transfer")}</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="label">{t("When")}</span>
+              <input
+                type="datetime-local"
+                value={scheduledFor}
+                onChange={(event) => setScheduledFor(event.target.value)}
+                className="input"
+              />
+            </label>
+            {rideType === "intercity" ? (
+              <label className="block sm:col-span-2">
+                <span className="label">{t("Destination city")}</span>
+                <select
+                  value={destinationCity}
+                  onChange={(event) => {
+                    const slug = event.target.value;
+                    setDestinationCity(slug);
+                    const city = cities.find((entry) => entry.slug === slug);
+                    if (city) {
+                      setDropoff({ lat: city.lat, lng: city.lng });
+                      setDropoffLabel(city.name);
+                    }
+                  }}
+                  className="input"
+                >
+                  <option value="">{t("Choose a city…")}</option>
+                  {cities
+                    .filter((city) => city.slug !== citySlug)
+                    .map((city) => (
+                      <option key={city.slug} value={city.slug}>
+                        {city.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            ) : null}
+            <label className="block">
+              <span className="label">{t("Passengers")}</span>
+              <input
+                type="number"
+                min={1}
+                max={6}
+                value={passengers}
+                onChange={(event) => setPassengers(event.target.value)}
+                className="input"
+              />
+            </label>
+            <label className="block">
+              <span className="label">{t("Luggage")}</span>
+              <input
+                value={luggage}
+                onChange={(event) => setLuggage(event.target.value)}
+                className="input"
+                placeholder={t("e.g. 2 suitcases")}
+              />
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="label">{t("Notes for the driver")}</span>
+              <input
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                className="input"
               />
             </label>
           </div>

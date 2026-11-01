@@ -14,6 +14,7 @@ import { DEFAULT_GROCERY_PROMOTIONS } from "./grocery-promotions";
 import type {
   City,
   Database,
+  ServiceProvider,
   Driver,
   Order,
   PlatformSettings,
@@ -774,6 +775,57 @@ const seedOrders: Order[] = [
   },
 ];
 
+const serviceProviders: ServiceProvider[] = [
+  {
+    id: "provider_laundry_dakhla",
+    name: "Dakhla Laundry",
+    category: "laundry",
+    citySlug: "dakhla",
+    description: "Wash, dry and fold with same-day pickup in central Dakhla.",
+    phone: "+212 660 21 22 23",
+    address: "Avenue Al Walaa, Dakhla",
+    priceFrom: 40,
+    rating: 4.7,
+    reviews: 34,
+    active: true,
+    status: "approved",
+    accessCode: "WSL-LAUNDRY",
+    createdAt: new Date("2026-10-01T09:00:00Z").toISOString(),
+  },
+  {
+    id: "provider_atlas_clean",
+    name: "Atlas Clean",
+    category: "cleaning",
+    citySlug: "dakhla",
+    description: "Home and office cleaning teams with their own supplies.",
+    phone: "+212 660 31 32 33",
+    address: "Rue Ibn Sina, Dakhla",
+    priceFrom: 120,
+    rating: 4.8,
+    reviews: 21,
+    active: true,
+    status: "approved",
+    accessCode: "WSL-CLEAN",
+    createdAt: new Date("2026-10-02T09:00:00Z").toISOString(),
+  },
+  {
+    id: "provider_sahara_fix",
+    name: "Sahara Fix",
+    category: "plumbing",
+    citySlug: "dakhla",
+    description: "Plumbing, leaks and small electrical repairs.",
+    phone: "+212 660 41 42 43",
+    address: "Quartier Al Massira, Dakhla",
+    priceFrom: 90,
+    rating: 4.6,
+    reviews: 17,
+    active: true,
+    status: "approved",
+    accessCode: "WSL-FIX",
+    createdAt: new Date("2026-10-03T09:00:00Z").toISOString(),
+  },
+];
+
 export function createSeedDatabase(): Database {
   return {
     users,
@@ -786,5 +838,9 @@ export function createSeedDatabase(): Database {
     auditLogs: [],
     settings,
     promotions: DEFAULT_GROCERY_PROMOTIONS.map((promotion) => ({ ...promotion })),
+    serviceProviders: serviceProviders.map((provider) => ({ ...provider })),
+    serviceBookings: [],
+    businessAccounts: [],
+    businessOrders: [],
   };
 }

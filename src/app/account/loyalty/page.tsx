@@ -8,7 +8,8 @@ import {
   Star,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth";
-import { getCities, getLoyaltyOverview, getUserById } from "@/lib/db";
+import { getCities, getLoyaltyOverview, getOrders, getTaxiRides, getUserById } from "@/lib/db";
+import { customerAchievements } from "@/lib/achievements";
 import { getTranslator } from "@/lib/i18n-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -21,11 +22,14 @@ export const metadata = { title: "Wassl Club" };
 export default async function LoyaltyPage() {
   const session = await requireRole("customer");
   const { t } = await getTranslator();
-  const [cities, user, overview] = await Promise.all([
+  const [cities, user, overview, orders, rides] = await Promise.all([
     getCities(),
     getUserById(session.userId),
     getLoyaltyOverview(session.userId),
+    session.email ? getOrders({ customerEmail: session.email }) : Promise.resolve([]),
+    getTaxiRides({ customerId: session.userId, limit: 100 }),
   ]);
+  const achievements = customerAchievements(orders, rides, overview.account.lifetimePoints);
   const city =
     cities.find((entry) => entry.slug === user?.citySlug) ??
     cities.find((entry) => entry.slug === "dakhla") ??
@@ -164,6 +168,28 @@ export default async function LoyaltyPage() {
             </div>
           </section>
         </div>
+
+        <section className="mt-4">
+          <h2 className="text-[13px] font-semibold">{t("Achievements")}</h2>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {achievements.map((achievement) => (
+              <div
+                key={achievement.id}
+                className={`aero-tile rounded-[8px] border p-3 ${
+                  achievement.earned ? "border-brand/30 bg-brand-soft/30" : ""
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[12px] font-semibold">{t(achievement.title)}</span>
+                  <span className="text-[10px] text-muted tnum">{achievement.progress}</span>
+                </div>
+                <p className="mt-1 text-[10px] leading-4 text-muted">
+                  {t(achievement.description)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <div className="mt-4">
           <LoyaltyActions

@@ -29,6 +29,8 @@ export default async function AdminTaxiPage() {
           { href: "/admin/grocery", label: "Grocery" },
           { href: "/admin/taxi", label: "Taxi" },
           { href: "/admin/express", label: "Express" },
+          { href: "/admin/services", label: "Services" },
+          { href: "/admin/business", label: "Business" },
           { href: "/admin/messages", label: "Messages" },
         ]}
         accent="ink"
@@ -98,6 +100,11 @@ export default async function AdminTaxiPage() {
                       <td className="font-semibold">{money(ride.fare)}</td>
                       <td>
                         <span className="pill">{t(TAXI_STATUS_TEXT[ride.status])}</span>
+                        {ride.lostItem ? (
+                          <div className="mt-1 max-w-[160px] truncate text-[10px] text-danger">
+                            {t("Lost item")}: {ride.lostItem.description}
+                          </div>
+                        ) : null}
                       </td>
                       <td>
                         {ride.verificationCode ? (

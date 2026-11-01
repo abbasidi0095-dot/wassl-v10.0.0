@@ -57,6 +57,10 @@ import type {
   AccountStatus,
   AuditEntity,
   AuditEntry,
+  BusinessAccount,
+  BusinessAccountStatus,
+  BusinessOrder,
+  BusinessOrderStatus,
   ChatMessage,
   ChatThread,
   ChatThreadStatus,
@@ -73,6 +77,10 @@ import type {
   ParcelDelivery,
   ParcelSize,
   ParcelStatus,
+  ServiceBooking,
+  ServiceBookingStatus,
+  ServiceCategory,
+  ServiceProvider,
   OrderStatus,
   PlatformSettings,
   Product,
@@ -2903,6 +2911,12 @@ export type CreateTaxiRideInput = {
   pickupLng: number;
   dropoffLat: number;
   dropoffLng: number;
+  rideType?: "local" | "intercity" | "airport";
+  scheduledFor?: string;
+  stops?: Array<{ label: string; lat: number; lng: number }>;
+  passengerCount?: number;
+  luggage?: string;
+  notes?: string;
 };
 
 function assertCoordinate(lat: number, lng: number): void {
@@ -2956,12 +2970,27 @@ export async function createTaxiRide(
 ): Promise<TaxiRide> {
   assertCoordinate(input.pickupLat, input.pickupLng);
   assertCoordinate(input.dropoffLat, input.dropoffLng);
-  const distanceKm = haversineKm(
+  const stops = (input.stops ?? []).slice(0, 4).map((stop) => {
+    assertCoordinate(stop.lat, stop.lng);
+    return {
+      id: randomId("stop", 4),
+      label: stop.label.trim().slice(0, 80) || "Stop",
+      lat: stop.lat,
+      lng: stop.lng,
+    };
+  });
+  const path = [
     { lat: input.pickupLat, lng: input.pickupLng },
+    ...stops,
     { lat: input.dropoffLat, lng: input.dropoffLng },
-  );
+  ];
+  const distanceKm = path
+    .slice(1)
+    .reduce((sum, point, index) => sum + haversineKm(path[index], point), 0);
   if (distanceKm < 0.15) throw new Error("Pickup and drop-off are too close");
-  if (distanceKm > 150) throw new Error("This trip is too long for Wassl Taxi");
+  if (distanceKm > (input.rideType === "intercity" ? 700 : 150)) {
+    throw new Error("This trip is too long for Wassl Taxi");
+  }
 
   return mutate((db) => {
     const city = db.cities.find((candidate) => candidate.slug === input.citySlug);
@@ -2985,6 +3014,13 @@ export async function createTaxiRide(
       distanceKm: Math.round(distanceKm * 100) / 100,
       fare: estimateTaxiFare(distanceKm),
       status: "requested",
+      rideType: input.rideType ?? "local",
+      scheduledFor: input.scheduledFor,
+      stops: stops.length ? stops : undefined,
+      passengerCount: Math.max(1, Math.min(6, Math.round(input.passengerCount ?? 1))),
+      luggage: input.luggage?.trim().slice(0, 120),
+      notes: input.notes?.trim().slice(0, 240),
+      shareToken: randomId("x", 8),
       verificationCode: String(1000 + Math.floor(Math.random() * 9000)),
       handoverRequired: true,
       createdAt: now,
@@ -3039,6 +3075,61 @@ export async function getTaxiRides(filter?: {
   );
   filtered.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return filter?.limit ? filtered.slice(0, filter.limit) : filtered;
+}
+
+export async function getTaxiRideByShareToken(
+  token: string,
+): Promise<TaxiRide | undefined> {
+  return (await getDb()).taxiRides?.find((ride) => ride.shareToken === token);
+}
+
+export async function reportTaxiLostItem(
+  rideId: string,
+  actor: OrderActor,
+  input: { description: string; contact: string },
+): Promise<TaxiRide> {
+  return mutate((db) => {
+    const ride = (db.taxiRides ?? []).find((entry) => entry.id === rideId);
+    if (!ride) throw new Error("Ride not found");
+    if (actor.role !== "customer" || ride.customerId !== actor.id) {
+      throw new Error("You can only report an item from your own ride");
+    }
+    if (ride.status !== "completed") {
+      throw new Error("Lost items can be reported after the ride");
+    }
+    const description = input.description.trim().slice(0, 300);
+    const contact = input.contact.trim().slice(0, 120);
+    if (!description) throw new Error("Describe the lost item");
+    ride.lostItem = {
+      description,
+      contact,
+      status: "open",
+      createdAt: new Date().toISOString(),
+    };
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "taxi.lost_item",
+      entity: "taxi",
+      entityId: ride.id,
+      summary: `Lost item reported on ${ride.id}`,
+    });
+    return ride;
+  });
+}
+
+export async function resolveTaxiLostItem(
+  rideId: string,
+  actor: OrderActor,
+): Promise<TaxiRide> {
+  return mutate((db) => {
+    if (actor.role !== "admin") throw new Error("Operations access required");
+    const ride = (db.taxiRides ?? []).find((entry) => entry.id === rideId);
+    if (!ride?.lostItem) throw new Error("Lost item not found");
+    ride.lostItem.status = "resolved";
+    return ride;
+  });
 }
 
 export async function updateTaxiRideStatus(
@@ -4315,5 +4406,415 @@ export async function setLoyaltyBirthday(userId: string, birthday: string) {
     if (!user) throw new Error("Account not found");
     user.birthday = birthday;
     return { birthday };
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Local services                                                              */
+/* -------------------------------------------------------------------------- */
+
+export async function getServiceProviders(filter?: {
+  citySlug?: string;
+  includePending?: boolean;
+}): Promise<ServiceProvider[]> {
+  return (await getDb())
+    .serviceProviders?.filter(
+      (provider) =>
+        (filter?.includePending ? true : provider.status === "approved") &&
+        (filter?.citySlug ? provider.citySlug === filter.citySlug : true),
+    )
+    .sort((a, b) => Number(b.active) - Number(a.active) || b.rating - a.rating) ?? [];
+}
+
+export async function getServiceProvider(id: string): Promise<ServiceProvider | undefined> {
+  return (await getDb()).serviceProviders?.find((provider) => provider.id === id);
+}
+
+export async function getServiceProviderByCode(code: string): Promise<ServiceProvider | undefined> {
+  const normalized = code.trim().toUpperCase();
+  return (await getDb()).serviceProviders?.find(
+    (provider) => provider.accessCode.toUpperCase() === normalized,
+  );
+}
+
+export async function createServiceProvider(
+  input: Omit<ServiceProvider, "id" | "rating" | "reviews" | "createdAt">,
+  actor: OrderActor,
+): Promise<ServiceProvider> {
+  return mutate((db) => {
+    if (actor.role !== "admin") throw new Error("Operations access required");
+    const provider: ServiceProvider = {
+      ...input,
+      id: randomId("provider", 5),
+      rating: 0,
+      reviews: 0,
+      createdAt: new Date().toISOString(),
+    };
+    db.serviceProviders ??= [];
+    db.serviceProviders.push(provider);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "service.provider.create",
+      entity: "store",
+      entityId: provider.id,
+      summary: `Service provider ${provider.name}`,
+    });
+    return provider;
+  });
+}
+
+export async function updateServiceProviderStatus(
+  providerId: string,
+  status: ServiceProvider["status"],
+  actor: OrderActor,
+): Promise<ServiceProvider> {
+  return mutate((db) => {
+    if (actor.role !== "admin") throw new Error("Operations access required");
+    const provider = db.serviceProviders?.find((entry) => entry.id === providerId);
+    if (!provider) throw new Error("Provider not found");
+    provider.status = status;
+    provider.active = status === "approved";
+    return provider;
+  });
+}
+
+export async function createServiceBooking(
+  input: {
+    providerId: string;
+    service: string;
+    description: string;
+    address: string;
+    landmark: string;
+    date: string;
+    slot: string;
+  },
+  actor: OrderActor,
+): Promise<ServiceBooking> {
+  if (actor.role !== "customer" || !actor.id) {
+    throw new Error("Only customers can request a service");
+  }
+  const customerId = actor.id;
+  if (!input.description.trim() || !input.address.trim() || !input.date) {
+    throw new Error("Describe the job, address and date");
+  }
+  return mutate((db) => {
+    const provider = db.serviceProviders?.find(
+      (entry) => entry.id === input.providerId,
+    );
+    if (!provider || provider.status !== "approved") {
+      throw new Error("Provider is not available");
+    }
+    const user = db.users.find((entry) => entry.id === actor.id);
+    const now = new Date().toISOString();
+    const booking: ServiceBooking = {
+      id: randomId("booking", 5),
+      code: `SV-${randomId("x", 6).slice(2).toUpperCase()}`,
+      providerId: provider.id,
+      customerId,
+      customerName: user?.name || actor.name || "Customer",
+      customerPhone: user?.phone || db.settings.supportPhone,
+      citySlug: provider.citySlug,
+      service: input.service.trim().slice(0, 120),
+      description: input.description.trim().slice(0, 500),
+      address: input.address.trim(),
+      landmark: input.landmark.trim(),
+      date: input.date,
+      slot: input.slot,
+      status: "requested",
+      amount: provider.priceFrom,
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.serviceBookings ??= [];
+    db.serviceBookings.push(booking);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "service.booking.create",
+      entity: "order",
+      entityId: booking.id,
+      summary: `${booking.code}: ${provider.name} · ${booking.service}`,
+    });
+    return booking;
+  });
+}
+
+export async function getServiceBookings(filter?: {
+  customerId?: string;
+  providerId?: string;
+  citySlug?: string;
+  status?: ServiceBookingStatus;
+  limit?: number;
+}): Promise<ServiceBooking[]> {
+  const bookings = (await getDb()).serviceBookings ?? [];
+  return bookings
+    .filter(
+      (booking) =>
+        (!filter?.customerId || booking.customerId === filter.customerId) &&
+        (!filter?.providerId || booking.providerId === filter.providerId) &&
+        (!filter?.citySlug || booking.citySlug === filter.citySlug) &&
+        (!filter?.status || booking.status === filter.status),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, filter?.limit ?? 100);
+}
+
+export async function updateServiceBookingStatus(
+  bookingId: string,
+  next: ServiceBookingStatus,
+  actor: OrderActor,
+  options: { accessCode?: string } = {},
+): Promise<ServiceBooking> {
+  return mutate((db) => {
+    const booking = db.serviceBookings?.find((entry) => entry.id === bookingId);
+    if (!booking) throw new Error("Booking not found");
+    const provider = db.serviceProviders?.find((entry) => entry.id === booking.providerId);
+    if (!provider) throw new Error("Provider not found");
+
+    if (actor.role === "customer") {
+      if (booking.customerId !== actor.id) throw new Error("This is not your booking");
+      if (next !== "cancelled") throw new Error("Customers can only cancel a booking");
+    } else if (actor.role === "admin") {
+      // allowed
+    } else {
+      if (!options.accessCode || options.accessCode.toUpperCase() !== provider.accessCode) {
+        throw new Error("Provider access code is required");
+      }
+      if (!["confirmed", "completed"].includes(next)) {
+        throw new Error("Providers can confirm or complete a booking");
+      }
+    }
+    if (next === "confirmed" && booking.status !== "requested") {
+      throw new Error("Only requested bookings can be confirmed");
+    }
+    if (next === "completed" && booking.status !== "confirmed") {
+      throw new Error("Only confirmed bookings can be completed");
+    }
+    booking.status = next;
+    booking.updatedAt = new Date().toISOString();
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "service.booking.status",
+      entity: "order",
+      entityId: booking.id,
+      summary: `${booking.code}: ${next}`,
+    });
+    return booking;
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Wassl Business                                                              */
+/* -------------------------------------------------------------------------- */
+
+export async function getBusinessAccountForUser(
+  userId: string,
+): Promise<BusinessAccount | undefined> {
+  return (await getDb()).businessAccounts?.find((account) => account.ownerId === userId);
+}
+
+export async function getBusinessAccounts(filter?: {
+  status?: BusinessAccountStatus;
+}): Promise<BusinessAccount[]> {
+  return (await getDb()).businessAccounts
+    ?.filter((account) => (filter?.status ? account.status === filter.status : true))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt)) ?? [];
+}
+
+export async function applyBusinessAccount(
+  input: {
+    companyName: string;
+    contactName: string;
+    phone: string;
+    email: string;
+    citySlug: string;
+    category: string;
+  },
+  actor: OrderActor,
+): Promise<BusinessAccount> {
+  if (actor.role !== "customer" || !actor.id) {
+    throw new Error("Sign in as a customer to apply");
+  }
+  const ownerId = actor.id;
+  if (!input.companyName.trim() || !input.contactName.trim() || !input.phone.trim()) {
+    throw new Error("Company, contact and phone are required");
+  }
+  return mutate((db) => {
+    const existing = db.businessAccounts?.find((account) => account.ownerId === ownerId);
+    if (existing && existing.status !== "rejected") {
+      return existing;
+    }
+    const now = new Date().toISOString();
+    const account: BusinessAccount = {
+      id: randomId("business", 5),
+      ownerId,
+      companyName: input.companyName.trim(),
+      contactName: input.contactName.trim(),
+      phone: input.phone.trim(),
+      email: input.email.trim().toLowerCase(),
+      citySlug: input.citySlug,
+      category: input.category.trim(),
+      status: "pending",
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.businessAccounts ??= [];
+    db.businessAccounts.push(account);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "business.apply",
+      entity: "auth",
+      entityId: ownerId,
+      summary: `Business application: ${account.companyName}`,
+    });
+    return account;
+  });
+}
+
+export async function updateBusinessAccountStatus(
+  accountId: string,
+  status: BusinessAccountStatus,
+  actor: OrderActor,
+): Promise<BusinessAccount> {
+  return mutate((db) => {
+    if (actor.role !== "admin") throw new Error("Operations access required");
+    const account = db.businessAccounts?.find((entry) => entry.id === accountId);
+    if (!account) throw new Error("Business account not found");
+    account.status = status;
+    account.updatedAt = new Date().toISOString();
+    const user = db.users.find((entry) => entry.id === account.ownerId);
+    if (user) {
+      if (status === "approved") user.businessAccountId = account.id;
+      else if (user.businessAccountId === account.id) delete user.businessAccountId;
+    }
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "business.status",
+      entity: "auth",
+      entityId: account.ownerId,
+      summary: `${account.companyName}: ${status}`,
+    });
+    return account;
+  });
+}
+
+export function wholesalePrice(product: Product): number {
+  return Math.max(
+    1,
+    Math.round(product.businessPrice ?? product.price * 0.9),
+  );
+}
+
+export async function createBusinessOrder(
+  input: {
+    storeId: string;
+    items: Array<{ productId: string; qty: number }>;
+    deliveryDate: string;
+    notes?: string;
+  },
+  actor: OrderActor,
+): Promise<BusinessOrder> {
+  if (actor.role !== "customer" || !actor.id) {
+    throw new Error("Sign in as a business customer");
+  }
+  const customerId = actor.id;
+  return mutate((db) => {
+    const account = db.businessAccounts?.find(
+      (entry) => entry.ownerId === customerId && entry.status === "approved",
+    );
+    if (!account) throw new Error("An approved business account is required");
+    const store = db.stores.find((entry) => entry.id === input.storeId);
+    if (!store) throw new Error("Store not found");
+    const items = input.items
+      .map((line) => {
+        const product = db.products.find(
+          (entry) => entry.id === line.productId && entry.storeId === store.id,
+        );
+        if (!product || !product.available) return null;
+        const qty = Math.max(
+          product.businessMinQty ?? 1,
+          Math.min(999, Math.round(line.qty)),
+        );
+        return {
+          productId: product.id,
+          storeId: store.id,
+          name: product.name,
+          qty,
+          unitPrice: wholesalePrice(product),
+        };
+      })
+      .filter((line): line is NonNullable<typeof line> => Boolean(line));
+    if (!items.length) throw new Error("Choose at least one product");
+    const subtotal = items.reduce((sum, line) => sum + line.qty * line.unitPrice, 0);
+    const now = new Date().toISOString();
+    const order: BusinessOrder = {
+      id: randomId("border", 5),
+      code: `B2B-${randomId("x", 6).slice(2).toUpperCase()}`,
+      accountId: account.id,
+      customerId,
+      citySlug: store.citySlug,
+      storeId: store.id,
+      items,
+      subtotal,
+      deliveryDate: input.deliveryDate,
+      notes: input.notes?.trim().slice(0, 300),
+      status: "requested",
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.businessOrders ??= [];
+    db.businessOrders.unshift(order);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "business.order",
+      entity: "order",
+      entityId: order.id,
+      summary: `${order.code}: ${account.companyName} · ${order.subtotal} MAD`,
+    });
+    return order;
+  });
+}
+
+export async function getBusinessOrders(filter?: {
+  customerId?: string;
+  storeId?: string;
+  status?: BusinessOrderStatus;
+  limit?: number;
+}): Promise<BusinessOrder[]> {
+  return (await getDb()).businessOrders
+    ?.filter(
+      (order) =>
+        (!filter?.customerId || order.customerId === filter.customerId) &&
+        (!filter?.storeId || order.storeId === filter.storeId) &&
+        (!filter?.status || order.status === filter.status),
+    )
+    .slice(0, filter?.limit ?? 100) ?? [];
+}
+
+export async function updateBusinessOrderStatus(
+  orderId: string,
+  status: BusinessOrderStatus,
+  actor: OrderActor,
+): Promise<BusinessOrder> {
+  return mutate((db) => {
+    if (actor.role !== "admin") throw new Error("Operations access required");
+    const order = db.businessOrders?.find((entry) => entry.id === orderId);
+    if (!order) throw new Error("Business order not found");
+    order.status = status;
+    order.updatedAt = new Date().toISOString();
+    return order;
   });
 }

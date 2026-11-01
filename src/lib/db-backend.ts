@@ -81,6 +81,10 @@ function hydrate(db: Database): Database {
   db.chatThreads ??= [];
   db.chatMessages ??= [];
   db.parcels ??= [];
+  db.serviceProviders ??= [];
+  db.serviceBookings ??= [];
+  db.businessAccounts ??= [];
+  db.businessOrders ??= [];
 
   // Migrate the legacy scalar balance into an immutable, ledger-backed account.
   for (const user of db.users) {
@@ -117,11 +121,17 @@ function hydrate(db: Database): Database {
   // verticals and new verticals stay off until an operator enables them.
   for (const city of db.cities) {
     const defaults = defaultCityServices(city);
-    if ((city.servicesVersion ?? 1) < 2) {
-      // Express becomes a default live-city service in v11. Future operator
-      // changes are preserved because the migration only runs once.
-      city.services = { ...defaults, ...(city.services ?? {}), express: defaults.express };
-      city.servicesVersion = 2;
+    if ((city.servicesVersion ?? 1) < 4) {
+      // Express, local services and business become default live-city services
+      // in v11. Operator changes are preserved after this one-time migration.
+      city.services = {
+        ...defaults,
+        ...(city.services ?? {}),
+        express: defaults.express,
+        services: defaults.services,
+        business: defaults.business,
+      };
+      city.servicesVersion = 4;
     } else {
       city.services = { ...defaults, ...(city.services ?? {}) };
     }

@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.0.0-alpha.6** (1 November 2026).
+Current delivered baseline: **11.0.0** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -140,9 +140,19 @@ programme is complete.
 - Admin alerts for missing drivers, stalled orders, offline drivers, stalled
   parcels, low stock, refund backlog and cancellation spikes.
 
-Still missing from v11: local services marketplace, business/wholesale accounts,
-Taxi 2.0 scheduling/multi-stop/intercity, full merchant growth tools, and
-provider-side service bookings.
+### Services, Business and Taxi 2.0
+
+- Local services marketplace with seeded providers, booking requests, provider
+  access-code workspace and admin operations.
+- Business wholesale accounts, approval, wholesale catalog and bulk order
+  requests with admin confirmation.
+- Taxi 2.0: scheduled rides, intercity/airport requests, multiple stops,
+  passengers, luggage, notes, shareable live links and lost-and-found.
+- Merchant/admin insights and operational alerts.
+
+Remaining polish: taxi demand heatmaps and zone editor, provider self-service
+applications, merchant staff roles and campaign-builder UI. These are roadmap
+enhancements, not blocking the v11 core release.
 
 ### Supporting changes
 
@@ -159,7 +169,7 @@ provider-side service bookings.
 ## Verification
 
 - `npx tsc --noEmit` — clean.
-- `npm test` — 120 passed, 4 skipped.
+- `npm test` — 124 passed, 4 skipped.
 - `npm run e2e` — 22 passed.
 - `npm run build` — clean.
 - Manual checks at 1440px and 390px: no horizontal overflow on home or search.
@@ -185,11 +195,11 @@ provider-side service bookings.
 | Grocery 2.0 | Delivered (core) | Basket, split checkout, barcode, recurring lists, assistant, promotions and inventory intelligence delivered; merchant promotion builder and deeper forecasting remain |
 | Wassl Club | Partial | Ledger, tiers, earn/redeem, dashboard and admin adjustments delivered; referrals, birthday, reward codes, expiry and campaign controls remain |
 | Wassl AI | Partial | Customer support assistant with NVIDIA, real context, rate limits and human fallback; merchant/admin assistants remain |
-| Taxi 2.0 | Partial | Scheduled, multi-stop, saved places, lost-and-found, intercity, zones and heatmaps remain |
+| Taxi 2.0 | Delivered (core) | Scheduled, intercity, stops, share link and lost-and-found delivered; heatmaps/zone editor remain |
 | Wassl Express | Delivered | Booking, driver queue, handover codes, tracking and admin operations |
-| Local services marketplace | Not started | Provider and booking workflows |
-| Business / wholesale | Not started | B2B accounts and catalogue |
-| Merchant Growth 2.0 | Partial | Order board and basic analytics; staff, campaigns, capacity, forecasting |
+| Local services marketplace | Delivered (core) | Seeded providers, bookings, provider workspace and admin operations; self-service provider applications remain |
+| Business / wholesale | Delivered (core) | Applications, approval, wholesale catalog and bulk requests; invoicing/credit remain |
+| Merchant Growth 2.0 | Partial | Insights, inventory and promotions delivered; staff roles and campaign builder remain |
 | Driver Intelligence 2.0 | Partial | GPS, queue and wallet; heatmaps, break/emergency, incentives, batch |
 | Admin Intelligence 2.0 | Partial | Profit analytics, city service matrix and support inbox delivered; proactive alerts remain |
 | Advanced retention | Partial | Ratings, support and referrals/birthday delivered; achievements, reminders and abandoned cart remain |
