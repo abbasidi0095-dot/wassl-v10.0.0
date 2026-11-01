@@ -878,6 +878,8 @@ const fr: Record<string, string> = {
   "Enter the code sent to {phone} to finish signing in.": "Saisissez le code envoyé au {phone} pour terminer la connexion.",
   "Choose SMS or WhatsApp, then enter the code sent to {phone} to finish creating your account.": "Choisissez SMS ou WhatsApp, puis saisissez le code envoyé au {phone} pour terminer la création de votre compte.",
   "If you did not request this code, ignore the message. Nobody can open your account without it.": "Si vous n'avez pas demandé ce code, ignorez le message. Personne ne peut ouvrir votre compte sans lui.",
+  "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.": "Le test a été envoyé à {count} appareil(s). Si aucune bannière n'apparaît, vérifiez Réglages iOS → Notifications → Wassl et autorisez l'écran verrouillé, le centre de notifications et les bannières.",
+  "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "Aucun abonnement push pour le moment. Appuyez sur Activer les alertes, autorisez les notifications, puis réessayez. Sur iOS, vérifiez aussi Réglages → Notifications → Wassl.",
 };
 
 const es: Record<string, string> = {
@@ -1732,6 +1734,8 @@ const es: Record<string, string> = {
   "Enter the code sent to {phone} to finish signing in.": "Introduce el código enviado al {phone} para terminar de iniciar sesión.",
   "Choose SMS or WhatsApp, then enter the code sent to {phone} to finish creating your account.": "Elige SMS o WhatsApp y introduce el código enviado al {phone} para terminar de crear tu cuenta.",
   "If you did not request this code, ignore the message. Nobody can open your account without it.": "Si no solicitaste este código, ignora el mensaje. Nadie puede abrir tu cuenta sin él.",
+  "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.": "El servidor envió la prueba a {count} dispositivo(s). Si no aparece ningún aviso, revisa Ajustes de iOS → Notificaciones → Wassl y permite Pantalla bloqueada, Centro de notificaciones y Avisos.",
+  "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "Aún no hay suscripción push. Pulsa Activar alertas, permite las notificaciones y vuelve a probar. En iOS revisa también Ajustes → Notificaciones → Wassl.",
 };
 
 const ar: Record<string, string> = {
@@ -2583,6 +2587,8 @@ const ar: Record<string, string> = {
   "Enter the code sent to {phone} to finish signing in.": "أدخل الرمز المرسل إلى {phone} لإكمال تسجيل الدخول.",
   "Choose SMS or WhatsApp, then enter the code sent to {phone} to finish creating your account.": "اختر رسالة نصية أو واتساب ثم أدخل الرمز المرسل إلى {phone} لإكمال إنشاء حسابك.",
   "If you did not request this code, ignore the message. Nobody can open your account without it.": "إذا لم تطلب هذا الرمز، تجاهل الرسالة. لا يمكن لأحد فتح حسابك بدونها.",
+  "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.": "أرسل الخادم الاختبار إلى {count} جهاز. إذا لم يظهر إشعار، تحقق من إعدادات iOS → الإشعارات → وصل واسمح بشاشة القفل ومركز الإشعارات واللافتات.",
+  "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "لا يوجد اشتراك إشعارات بعد. اضغط تفعيل التنبيهات واسمح بالإشعارات ثم أعد الاختبار. على iOS تحقق أيضاً من الإعدادات → الإشعارات → وصل.",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

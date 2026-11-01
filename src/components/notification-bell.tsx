@@ -197,6 +197,23 @@ export function NotificationBell() {
                 {t("Allow notifications in your browser settings to receive alerts.")}
               </p>
             ) : null}
+            {tested !== null ? (
+              <p
+                className={cn(
+                  "border-t border-line px-4 py-2 text-[11px] leading-4",
+                  tested > 0 ? "text-muted" : "text-danger",
+                )}
+              >
+                {tested > 0
+                  ? t(
+                      "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.",
+                      { count: tested },
+                    )
+                  : t(
+                      "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.",
+                    )}
+              </p>
+            ) : null}
           </div>
         </>
       ) : null}

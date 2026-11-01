@@ -29,6 +29,15 @@ and dark themes.
 
 ## Release history
 
+### 11.7.0 — 1 November 2026 — push test diagnostics
+- Restored VAPID keys on production; the public-key endpoint was returning null,
+  so browsers never created a push subscription.
+- The test action now ensures the device subscription exists before calling the
+  server, and reports delivered count or a clear no-subscription message.
+- The test no longer adds a fake in-app notification, so it cannot be confused
+  with a system alert.
+- Bumped the service-worker cache version.
+
 ### 11.6.5 — 1 November 2026 — profile city copy
 - The account empty-state button now says **Browse {city}** and links to the
   customer's city instead of always Dakhla.

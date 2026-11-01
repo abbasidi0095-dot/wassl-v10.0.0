@@ -252,12 +252,17 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
     setRides([]);
   }, [role]);
 
-  const subscribePush = useCallback(async () => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+  const subscribePush = useCallback(async (): Promise<boolean> => {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      return false;
+    }
     const registration = await navigator.serviceWorker.register("/sw.js");
     const keyResponse = await fetch("/api/push/public-key", { cache: "no-store" });
     const keyData = (await keyResponse.json()) as { publicKey?: string | null };
-    if (!keyData.publicKey) return;
+    if (!keyData.publicKey) {
+      console.error("[push] VAPID public key is not configured on the server");
+      return false;
+    }
     const existing = await registration.pushManager.getSubscription();
     const subscription =
       existing ??
@@ -265,7 +270,7 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) as unknown as BufferSource,
       }));
-    await fetch("/api/push/subscribe", {
+    const saved = await fetch("/api/push/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -273,7 +278,12 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
         locale: document.documentElement.lang,
       }),
     });
+    if (!saved.ok) {
+      console.error("[push] subscription could not be saved", saved.status);
+      return false;
+    }
     setPushState("subscribed");
+    return true;
   }, []);
 
   const enablePush = useCallback(async () => {
@@ -286,7 +296,10 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
       setPushState(permission === "denied" ? "denied" : "default");
       return;
     }
-    await subscribePush();
+    await subscribePush().catch((error) => {
+      console.error("[push] subscribe failed", error);
+      return false;
+    });
   }, [subscribePush]);
 
   // If permission was already granted, silently attach this device.
@@ -296,16 +309,19 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
   }, [pushState, subscribePush]);
 
   const sendTest = useCallback(async () => {
+    // A user can grant notification permission after the first page load. Make
+    // sure this device has a saved subscription before asking the server to
+    // deliver the test.
+    if (Notification.permission === "granted") {
+      await subscribePush().catch((error) => {
+        console.error("[push] test subscription failed", error);
+        return false;
+      });
+    }
     const response = await fetch("/api/push/test", { method: "POST" });
     const data = (await response.json().catch(() => ({}))) as { sent?: number };
-    pushNotification({
-      title: t("Notifications are on"),
-      body: t("You will get live updates for orders and taxi rides."),
-      url: "/",
-      kind: "system",
-    });
     return data.sent ?? 0;
-  }, [pushNotification, t]);
+  }, [subscribePush]);
 
   const markAllRead = useCallback(() => {
     setNotifications((current) => {
