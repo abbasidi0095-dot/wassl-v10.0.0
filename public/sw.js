@@ -1,10 +1,32 @@
-/* Wassl service worker — Web Push for order and taxi updates. */
+/* Wassl service worker — Web Push and v11 cache refresh. */
+const WASSL_SW_VERSION = "wassl-v11-2026-11-01";
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(),
+      caches
+        .keys()
+        .then((keys) =>
+          Promise.all(
+            keys
+              .filter((key) => key.startsWith("wassl-") && key !== WASSL_SW_VERSION)
+              .map((key) => caches.delete(key)),
+          ),
+        ),
+    ]).then(() =>
+      self.clients
+        .matchAll({ type: "window", includeUncontrolled: true })
+        .then((clients) =>
+          clients.forEach((client) =>
+            client.postMessage({ type: "WASSL_SW_UPDATED", version: WASSL_SW_VERSION }),
+          ),
+        ),
+    ),
+  );
 });
 
 self.addEventListener("push", (event) => {

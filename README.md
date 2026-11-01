@@ -29,6 +29,16 @@ and dark themes.
 
 ## Release history
 
+### 11.0.1 — 1 November 2026 — launch splash and cache refresh
+- Added the branded **Wassl launch splash** on first app open per session:
+  animated route monogram, saffron destination node, Latin/Arabic wordmark,
+  progress line and skip control.
+- Splash respects `prefers-reduced-motion`, disappears after the intro and does
+  not reappear on internal navigation.
+- Added iOS PWA startup images and bumped the service-worker cache version so
+  installed PWAs pick up the v11 identity and UI.
+- Playwright now runs with reduced motion so the splash never blocks tests.
+
 ### 11.0.0 — 1 November 2026 — the super-app release
 - **Wassl Express** parcel delivery: booking, sizes, pricing, pickup and
   delivery codes, driver queue, tracking, cash settlement and admin operations.

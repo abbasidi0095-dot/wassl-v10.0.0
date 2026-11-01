@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.0.0** (1 November 2026).
+Current delivered baseline: **11.0.1** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -153,6 +153,13 @@ programme is complete.
 Remaining polish: taxi demand heatmaps and zone editor, provider self-service
 applications, merchant staff roles and campaign-builder UI. These are roadmap
 enhancements, not blocking the v11 core release.
+
+### Launch splash
+
+- Branded first-open splash with animated monogram, saffron node, wordmark,
+  progress line and skip.
+- Once per session; reduced-motion and returning-session guard.
+- iOS PWA startup images and service-worker cache refresh.
 
 ### Supporting changes
 

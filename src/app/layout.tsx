@@ -5,6 +5,7 @@ import { LiveActivityProvider } from "@/components/live-activity-provider";
 import { OngoingTracker } from "@/components/ongoing-tracker";
 import { NativeShell } from "@/components/native-shell";
 import { BrandProvider } from "@/components/brand-provider";
+import { SplashIntro } from "@/components/splash-intro";
 import { dirFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getSettings } from "@/lib/db";
@@ -36,6 +37,14 @@ export const metadata: Metadata = {
     capable: true,
     title: "Wassl",
     statusBarStyle: "default",
+    startupImage: [
+      { url: "/splash/iphone-750x1334.png", media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" },
+      { url: "/splash/iphone-1125x2436.png", media: "(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" },
+      { url: "/splash/iphone-1170x2532.png", media: "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" },
+      { url: "/splash/iphone-1284x2778.png", media: "(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" },
+      { url: "/splash/iphone-1242x2688.png", media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" },
+      { url: "/splash/ipad-2048x2732.png", media: "(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" },
+    ],
   },
   openGraph: {
     title: "Wassl — local delivery for Southern Morocco",
@@ -75,7 +84,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");var seen=sessionStorage.getItem("wassl_splash_v11");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(seen==="1"||reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}}catch(e){}})();`,
           }}
         />
         <link
@@ -106,6 +115,7 @@ export default async function RootLayout({
           }}
         >
         <LocaleProvider initialLocale={locale}>
+          <SplashIntro />
           <LiveActivityProvider>
             <CartProvider>
               <NativeShell />

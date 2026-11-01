@@ -19,6 +19,7 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: origin,
+    reducedMotion: "reduce",
     trace: "retain-on-failure",
     launchOptions: executablePath ? { executablePath } : undefined,
   },

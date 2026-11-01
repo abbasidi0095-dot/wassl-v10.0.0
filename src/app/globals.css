@@ -1176,3 +1176,118 @@ html.dark .maplibregl-ctrl-group button span {
     var(--surface);
   box-shadow: var(--glass-shadow);
 }
+
+/* ------------------------------------------------------------------ */
+/* Wassl v11 launch splash                                             */
+/* ------------------------------------------------------------------ */
+
+html.wassl-splashing,
+html.wassl-splashing body {
+  overflow: hidden;
+}
+
+html.wassl-splash-skip .wassl-splash {
+  display: none;
+}
+
+.wassl-splash {
+  animation: wassl-splash-in 260ms ease-out both;
+}
+
+.wassl-splash-leaving {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 360ms ease, visibility 360ms ease;
+}
+
+.wassl-splash-route {
+  animation: wassl-route-draw 900ms cubic-bezier(0.65, 0, 0.35, 1) 80ms both;
+}
+
+.wassl-splash-origin {
+  animation: wassl-splash-pop 280ms ease-out 60ms both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wassl-splash-node {
+  animation: wassl-splash-pop 360ms ease-out 760ms both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wassl-splash-word {
+  animation: wassl-splash-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) 720ms both;
+}
+
+.wassl-splash-tag {
+  animation: wassl-splash-rise 460ms ease-out 900ms both;
+}
+
+.wassl-splash-line span {
+  animation: wassl-splash-progress 1100ms ease-in-out 500ms both;
+}
+
+@keyframes wassl-route-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes wassl-splash-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wassl-splash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wassl-splash-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes wassl-splash-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wassl-splash,
+  .wassl-splash-route,
+  .wassl-splash-origin,
+  .wassl-splash-node,
+  .wassl-splash-word,
+  .wassl-splash-tag,
+  .wassl-splash-line span {
+    animation: none;
+  }
+  .wassl-splash-route {
+    stroke-dashoffset: 0;
+  }
+}
