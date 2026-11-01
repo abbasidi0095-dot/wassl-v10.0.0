@@ -47,7 +47,7 @@ function initials(name: string) {
 
 export default async function AccountPage() {
   const session = await requireRole("customer");
-  const { t } = await getTranslator();
+  const { t, locale } = await getTranslator();
   const [cities, user, orders] = await Promise.all([
     getCities(),
     getUserById(session.userId),
@@ -67,6 +67,11 @@ export default async function AccountPage() {
     cities.find((candidate) => candidate.slug === sorted[0]?.citySlug) ||
     cities.find((candidate) => candidate.slug === "dakhla");
   const verified = user ? isEmailVerified(user) : true;
+  const cityLabel = cityForHeader
+    ? locale === "ar"
+      ? cityForHeader.nameAr
+      : cityForHeader.name
+    : "Dakhla";
   const firstName = session.name.split(" ")[0];
 
   const quickLinks = [
@@ -238,8 +243,11 @@ export default async function AccountPage() {
                     )}
                   </p>
                   <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    <Link href="/city/dakhla" className="btn btn-primary btn-sm">
-                      {t("Browse Dakhla")}
+                    <Link
+                      href={`/city/${cityForHeader?.slug ?? "dakhla"}`}
+                      className="btn btn-primary btn-sm"
+                    >
+                      {t("Browse {city}", { city: cityLabel })}
                       <ArrowRight size={13} className="rtl:-scale-x-100" />
                     </Link>
                     <Link href="/grocery" className="btn btn-ghost btn-sm">
@@ -321,7 +329,7 @@ export default async function AccountPage() {
                     <MapPin size={14} className="mt-0.5 shrink-0 text-brand" />
                     <div className="min-w-0">
                       <dt className="text-[11px] text-muted">{t("City")}</dt>
-                      <dd className="font-medium">{city?.name || "Dakhla"}</dd>
+                      <dd className="font-medium">{cityLabel}</dd>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">

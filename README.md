@@ -29,6 +29,11 @@ and dark themes.
 
 ## Release history
 
+### 11.6.5 — 1 November 2026 — profile city copy
+- The account empty-state button now says **Browse {city}** and links to the
+  customer's city instead of always Dakhla.
+- The profile city row uses the same account city.
+
 ### 11.6.4 — 1 November 2026 — keep the chosen city on store links
 - Opening a store from another city no longer changes the default city; only
   the city switcher and city pages do.
