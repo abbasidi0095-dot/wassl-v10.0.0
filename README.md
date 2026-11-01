@@ -29,6 +29,12 @@ and dark themes.
 
 ## Release history
 
+### 11.7.1 — 1 November 2026 — iOS push reset and delayed test
+- The test replaces a stale push subscription once and retries.
+- Added a **10s** test so the phone can be locked before checking Notification
+  Center.
+- The test still never creates a fake in-app item.
+
 ### 11.7.0 — 1 November 2026 — push test diagnostics
 - Restored VAPID keys on production; the public-key endpoint was returning null,
   so browsers never created a push subscription.

@@ -49,7 +49,7 @@ type LiveActivityValue = {
   markAllRead: () => void;
   clearNotifications: () => void;
   enablePush: () => Promise<void>;
-  sendTest: () => Promise<number>;
+  sendTest: (delaySeconds?: number) => Promise<number>;
 };
 
 const LiveActivityContext = createContext<LiveActivityValue | null>(null);
@@ -286,6 +286,21 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
     return true;
   }, []);
 
+  const resetPushSubscription = useCallback(async (): Promise<boolean> => {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+    const registration = await navigator.serviceWorker.getRegistration();
+    const existing = await registration?.pushManager.getSubscription();
+    if (existing) {
+      await fetch("/api/push/subscribe", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: existing.endpoint }),
+      }).catch(() => undefined);
+      await existing.unsubscribe().catch(() => undefined);
+    }
+    return subscribePush();
+  }, [subscribePush]);
+
   const enablePush = useCallback(async () => {
     if (!("Notification" in window) || !("serviceWorker" in navigator)) {
       setPushState("unsupported");
@@ -308,20 +323,52 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
     void subscribePush().catch(() => undefined);
   }, [pushState, subscribePush]);
 
-  const sendTest = useCallback(async () => {
-    // A user can grant notification permission after the first page load. Make
-    // sure this device has a saved subscription before asking the server to
-    // deliver the test.
-    if (Notification.permission === "granted") {
-      await subscribePush().catch((error) => {
-        console.error("[push] test subscription failed", error);
-        return false;
-      });
-    }
-    const response = await fetch("/api/push/test", { method: "POST" });
-    const data = (await response.json().catch(() => ({}))) as { sent?: number };
-    return data.sent ?? 0;
-  }, [subscribePush]);
+  const sendTest = useCallback(
+    async (delaySeconds = 0) => {
+      // A user can grant notification permission after the first page load.
+      // Make sure this device has a saved subscription before asking the server
+      // to deliver the test.
+      const canNotify =
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted";
+      if (canNotify) {
+        await subscribePush().catch((error) => {
+          console.error("[push] test subscription failed", error);
+          return false;
+        });
+      }
+
+      async function requestTest() {
+        const response = await fetch("/api/push/test", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ delaySeconds }),
+        });
+        const data = (await response.json().catch(() => ({}))) as {
+          sent?: number;
+        };
+        return data.sent ?? 0;
+      }
+
+      let sent = await requestTest();
+
+      // A subscription created with an older VAPID key is silently unusable.
+      // Replace it once and retry the immediate test.
+      if (
+        sent === 0 &&
+        delaySeconds === 0 &&
+        canNotify
+      ) {
+        const reset = await resetPushSubscription().catch((error) => {
+          console.error("[push] reset failed", error);
+          return false;
+        });
+        if (reset) sent = await requestTest();
+      }
+      return sent;
+    },
+    [resetPushSubscription, subscribePush],
+  );
 
   const markAllRead = useCallback(() => {
     setNotifications((current) => {

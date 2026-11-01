@@ -880,6 +880,8 @@ const fr: Record<string, string> = {
   "If you did not request this code, ignore the message. Nobody can open your account without it.": "Si vous n'avez pas demandé ce code, ignorez le message. Personne ne peut ouvrir votre compte sans lui.",
   "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.": "Le test a été envoyé à {count} appareil(s). Si aucune bannière n'apparaît, vérifiez Réglages iOS → Notifications → Wassl et autorisez l'écran verrouillé, le centre de notifications et les bannières.",
   "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "Aucun abonnement push pour le moment. Appuyez sur Activer les alertes, autorisez les notifications, puis réessayez. Sur iOS, vérifiez aussi Réglages → Notifications → Wassl.",
+  "Send the test after 10 seconds so you can lock the phone": "Envoyer le test dans 10 secondes pour pouvoir verrouiller le téléphone",
+  "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.": "Test programmé. Verrouillez votre téléphone et vérifiez le centre de notifications dans 10 secondes.",
 };
 
 const es: Record<string, string> = {
@@ -1736,6 +1738,8 @@ const es: Record<string, string> = {
   "If you did not request this code, ignore the message. Nobody can open your account without it.": "Si no solicitaste este código, ignora el mensaje. Nadie puede abrir tu cuenta sin él.",
   "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.": "El servidor envió la prueba a {count} dispositivo(s). Si no aparece ningún aviso, revisa Ajustes de iOS → Notificaciones → Wassl y permite Pantalla bloqueada, Centro de notificaciones y Avisos.",
   "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "Aún no hay suscripción push. Pulsa Activar alertas, permite las notificaciones y vuelve a probar. En iOS revisa también Ajustes → Notificaciones → Wassl.",
+  "Send the test after 10 seconds so you can lock the phone": "Enviar la prueba en 10 segundos para poder bloquear el teléfono",
+  "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.": "Prueba programada. Bloquea el teléfono y revisa el centro de notificaciones en 10 segundos.",
 };
 
 const ar: Record<string, string> = {
@@ -2589,6 +2593,8 @@ const ar: Record<string, string> = {
   "If you did not request this code, ignore the message. Nobody can open your account without it.": "إذا لم تطلب هذا الرمز، تجاهل الرسالة. لا يمكن لأحد فتح حسابك بدونها.",
   "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.": "أرسل الخادم الاختبار إلى {count} جهاز. إذا لم يظهر إشعار، تحقق من إعدادات iOS → الإشعارات → وصل واسمح بشاشة القفل ومركز الإشعارات واللافتات.",
   "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "لا يوجد اشتراك إشعارات بعد. اضغط تفعيل التنبيهات واسمح بالإشعارات ثم أعد الاختبار. على iOS تحقق أيضاً من الإعدادات → الإشعارات → وصل.",
+  "Send the test after 10 seconds so you can lock the phone": "أرسل الاختبار بعد 10 ثوانٍ حتى تتمكن من قفل الهاتف",
+  "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.": "تم جدولة الاختبار. اقفل هاتفك وتحقق من مركز الإشعارات بعد 10 ثوانٍ.",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

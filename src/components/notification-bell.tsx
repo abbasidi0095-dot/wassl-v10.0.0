@@ -30,6 +30,7 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [tested, setTested] = useState<number | null>(null);
+  const [scheduled, setScheduled] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -46,11 +47,14 @@ export function NotificationBell() {
     }
   }
 
-  async function test() {
+  async function test(delaySeconds = 0) {
     setBusy(true);
+    setTested(null);
+    setScheduled(delaySeconds > 0);
     try {
-      setTested(await sendTest());
+      setTested(await sendTest(delaySeconds));
     } finally {
+      setScheduled(false);
       setBusy(false);
     }
   }
@@ -160,13 +164,24 @@ export function NotificationBell() {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={test}
+                  onClick={() => void test(0)}
                   disabled={busy}
                   className="btn btn-ghost btn-sm"
                   title={t("Send a test notification")}
                 >
                   <Send size={13} />
                   {tested === null ? t("Test") : `${tested}`}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void test(10)}
+                  disabled={busy}
+                  className="btn btn-ghost btn-sm px-2"
+                  title={t(
+                    "Send the test after 10 seconds so you can lock the phone",
+                  )}
+                >
+                  10s
                 </button>
                 <button
                   type="button"
@@ -195,6 +210,13 @@ export function NotificationBell() {
             {pushState === "denied" ? (
               <p className="border-t border-line px-4 py-2 text-[11px] font-bold text-muted">
                 {t("Allow notifications in your browser settings to receive alerts.")}
+              </p>
+            ) : null}
+            {scheduled ? (
+              <p className="border-t border-line px-4 py-2 text-[11px] leading-4 text-brand">
+                {t(
+                  "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.",
+                )}
               </p>
             ) : null}
             {tested !== null ? (
