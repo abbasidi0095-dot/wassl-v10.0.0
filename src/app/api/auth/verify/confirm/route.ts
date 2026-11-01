@@ -10,6 +10,7 @@ import { homeForRole } from "@/lib/auth-config";
 import { failureMessage } from "@/lib/email-verification";
 import { createPhoneTicket, maskPhone, normalizeMoroccanPhone } from "@/lib/phone";
 import { availablePhoneChannels, phoneVerificationRequired } from "@/lib/otp-config";
+import { CITY_COOKIE, CITY_COOKIE_OPTIONS } from "@/lib/city-cookie";
 import type { Session } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
         email: user.email,
         ticket: createPhoneTicket(user.email),
       });
-      return NextResponse.json({
+      const response = NextResponse.json({
         ok: true,
         verified: "email",
         needsPhone: true,
@@ -76,6 +77,10 @@ export async function POST(request: Request) {
         channels: availablePhoneChannels(),
         redirect: `/verify-phone?${params.toString()}`,
       });
+      if (user.citySlug) {
+        response.cookies.set(CITY_COOKIE, user.citySlug, CITY_COOKIE_OPTIONS);
+      }
+      return response;
     }
   }
 
@@ -97,6 +102,9 @@ export async function POST(request: Request) {
     needsApproval: status === "pending",
     redirect: status === "pending" ? "/pending" : homeForRole(user.role),
   });
+  if (user.citySlug) {
+    response.cookies.set(CITY_COOKIE, user.citySlug, CITY_COOKIE_OPTIONS);
+  }
   response.cookies.set(
     SESSION_COOKIE,
     createSessionToken(session),

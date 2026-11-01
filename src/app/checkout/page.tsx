@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCities, getUserById } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { getSession } from "@/lib/auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -13,10 +14,11 @@ export default async function CheckoutPage() {
   const [cities, session] = await Promise.all([getCities(), getSession()]);
   const customer =
     session?.role === "customer" ? await getUserById(session.userId) : undefined;
+  const currentCity = await getPreferredCity(cities);
 
   return (
     <>
-      <SiteHeader cities={cities} currentCity={cities.find((city) => city.slug === "dakhla")} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl">
         <PageHeader
           label="Checkout"

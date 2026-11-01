@@ -12,6 +12,7 @@ import {
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities, getDrivers, getProducts, getStores } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { groceryAvailability, grocerySettings } from "@/lib/grocery";
 import { getTranslator } from "@/lib/i18n-server";
 import { storePhoto } from "@/lib/store-images";
@@ -34,7 +35,10 @@ export default async function GroceryPage({
     getStores(),
     getDrivers(),
   ]);
-  const groceryStores = stores.filter((store) => store.category === "grocery");
+  const currentCity = await getPreferredCity(cities);
+  const groceryStores = stores.filter(
+    (store) => store.category === "grocery" && store.citySlug === currentCity.slug,
+  );
   const catalogues = await Promise.all(
     groceryStores.map(async (store) => ({
       store,
@@ -68,7 +72,7 @@ export default async function GroceryPage({
 
   return (
     <>
-      <SiteHeader cities={cities} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main>
         <section className="container-wassl">
           <div className="grid gap-7 border-b border-line py-6 sm:py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-12 lg:py-12">

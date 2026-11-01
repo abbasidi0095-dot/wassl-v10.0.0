@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getCities } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { Logo } from "@/components/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -18,6 +19,7 @@ export async function SignupShell({
   defaultKind?: "delivery" | "taxi" | "both";
 }) {
   const [cities, { t }] = await Promise.all([getCities(), getTranslator()]);
+  const preferredCity = await getPreferredCity(cities);
   const copy =
     mode === "merchant"
       ? {
@@ -101,6 +103,7 @@ export async function SignupShell({
           <SignupForm
             initialRole={mode}
             initialKind={defaultKind}
+            defaultCitySlug={preferredCity.slug}
             lockedRole
             cities={cities.map((city) => ({
               slug: city.slug,

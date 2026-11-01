@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities, getCity } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { SearchExperience } from "./search-experience";
 
 export const dynamic = "force-dynamic";
@@ -13,9 +14,11 @@ export default async function SearchPage({
 }) {
   const params = await searchParams;
   const cities = await getCities();
-  const citySlug = params.city && cities.some((city) => city.slug === params.city)
-    ? params.city
-    : "dakhla";
+  const preferred = await getPreferredCity(cities);
+  const citySlug =
+    params.city && cities.some((city) => city.slug === params.city)
+      ? params.city
+      : preferred.slug;
   const currentCity = (await getCity(citySlug)) ?? cities[0];
 
   return (

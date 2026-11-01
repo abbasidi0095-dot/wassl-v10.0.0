@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { StoreCard } from "@/components/store-card";
 import { ProductTile } from "@/components/product-icon";
 import { getCities, getCity, getProducts, getStores } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { getTranslator } from "@/lib/i18n-server";
 import { money } from "@/lib/utils";
 
@@ -22,8 +23,7 @@ export default async function PharmacyPage({
   const stores = await getStores();
   const requested =
     (params.city ? await getCity(params.city) : undefined) ??
-    (await getCity("dakhla")) ??
-    cities[0];
+    (await getPreferredCity(cities));
   const pharmacies = stores.filter((store) => store.category === "pharmacy");
   const local = pharmacies.filter((store) => store.citySlug === requested.slug);
   const available = local.length ? local : pharmacies;

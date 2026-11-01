@@ -10,6 +10,7 @@ import { sendVerificationEmail } from "@/lib/email";
 import { isTestMode } from "@/lib/email-verification";
 import { hashPassword } from "@/lib/security";
 import { normalizeMoroccanPhone } from "@/lib/phone";
+import { CITY_COOKIE, CITY_COOKIE_OPTIONS } from "@/lib/city-cookie";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -173,7 +174,7 @@ export async function POST(request: Request) {
   }
 
   const status = effectiveAccountStatus(user);
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       ok: true,
       needsVerification: true,
@@ -190,4 +191,8 @@ export async function POST(request: Request) {
     },
     { status: 201 },
   );
+  if (city?.slug) {
+    response.cookies.set(CITY_COOKIE, city.slug, CITY_COOKIE_OPTIONS);
+  }
+  return response;
 }

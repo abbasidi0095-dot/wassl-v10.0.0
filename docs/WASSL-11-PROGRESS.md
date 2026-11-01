@@ -162,6 +162,12 @@ enhancements, not blocking the v11 core release.
 - Reduced-motion skip remains.
 - iOS PWA startup images and service-worker cache refresh.
 
+### Account city default
+
+- Signup city is persisted in a cookie and used across the app.
+- Header and city/store pages update the preference.
+- Home, grocery, pharmacy, search and taxi no longer default to Dakhla.
+
 ### Manual mobile fallback
 
 - Admin → Accounts can mark a mobile verified after checking it with the customer.

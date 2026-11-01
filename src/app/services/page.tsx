@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { getCities, getCity, getServiceBookings, getServiceProviders } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { cityServiceEnabled } from "@/lib/city-services";
 import { getTranslator } from "@/lib/i18n-server";
 import { SiteHeader } from "@/components/site-header";
@@ -15,11 +16,11 @@ export default async function ServicesPage() {
   const session = await requireRole("customer");
   const { t } = await getTranslator();
   const cities = await getCities();
-  const dakhla = (await getCity("dakhla")) ?? cities[0];
-  if (!cityServiceEnabled(dakhla, "services")) {
+  const currentCity = await getPreferredCity(cities);
+  if (!cityServiceEnabled(currentCity, "services")) {
     return (
       <>
-        <SiteHeader cities={cities} currentCity={dakhla} />
+        <SiteHeader cities={cities} currentCity={currentCity} />
         <main className="container-wassl py-16 text-center">
           <h1 className="display text-4xl">{t("Local services are not active here yet.")}</h1>
           <p className="mx-auto mt-3 max-w-md text-[13px] text-muted">
@@ -34,13 +35,13 @@ export default async function ServicesPage() {
     );
   }
   const [providers, bookings] = await Promise.all([
-    getServiceProviders({ citySlug: dakhla.slug }),
+    getServiceProviders({ citySlug: currentCity.slug }),
     getServiceBookings({ customerId: session.userId, limit: 50 }),
   ]);
 
   return (
     <>
-      <SiteHeader cities={cities} currentCity={dakhla} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main>
         <section className="container-wassl border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
           <div className="flex flex-wrap items-end justify-between gap-4">

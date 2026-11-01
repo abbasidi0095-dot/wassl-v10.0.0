@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { CitiesExplorer } from "./cities-explorer";
 
 export const dynamic = "force-dynamic";
@@ -8,9 +9,10 @@ export const metadata = { title: "All Moroccan cities" };
 
 export default async function CitiesPage() {
   const cities = await getCities();
+  const currentCity = await getPreferredCity(cities);
   return (
     <>
-      <SiteHeader cities={cities} currentCity={cities.find((city) => city.slug === "dakhla")} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl pt-8 lg:pt-12">
         <div className="max-w-3xl">
           <div className="eyebrow">Coverage directory</div>

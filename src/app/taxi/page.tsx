@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getCities, getTaxiRides } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { getTranslator } from "@/lib/i18n-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -15,6 +16,7 @@ export default async function TaxiPage() {
   const { t } = await getTranslator();
 
   const cities = await getCities();
+  const currentCity = await getPreferredCity(cities);
   const rides = await getTaxiRides({ customerId: session.userId, limit: 10 });
   const activeRide = rides.find(
     (ride) => !["completed", "cancelled"].includes(ride.status),
@@ -22,7 +24,7 @@ export default async function TaxiPage() {
 
   return (
     <>
-      <SiteHeader cities={cities} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl pb-16">
         <div className="border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -47,7 +49,7 @@ export default async function TaxiPage() {
         <div className="mt-6">
           <TaxiRequest
             cities={cities}
-            defaultCitySlug={cities.find((city) => city.slug === "dakhla")?.slug || cities[0]?.slug || "dakhla"}
+            defaultCitySlug={currentCity.slug}
             activeRide={activeRide ?? null}
             history={rides.filter((ride) => ["completed", "cancelled"].includes(ride.status)).slice(0, 4)}
           />

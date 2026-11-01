@@ -3,10 +3,10 @@ import {
   getBusinessAccountForUser,
   getBusinessOrders,
   getCities,
-  getCity,
   getProducts,
   getStores,
 } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { getTranslator } from "@/lib/i18n-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -19,7 +19,7 @@ export default async function BusinessPage() {
   const session = await requireRole("customer");
   const { t } = await getTranslator();
   const cities = await getCities();
-  const dakhla = (await getCity("dakhla")) ?? cities[0];
+  const currentCity = await getPreferredCity(cities);
   const stores = (await getStores()).filter((store) => store.category === "grocery");
   const catalog = await Promise.all(
     stores.map(async (store) => ({ store, products: await getProducts(store.id) })),
@@ -31,7 +31,7 @@ export default async function BusinessPage() {
 
   return (
     <>
-      <SiteHeader cities={cities} currentCity={dakhla} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl py-8 lg:py-12">
         <div className="mb-6 max-w-2xl">
           <div className="eyebrow">{t("Wassl Business")}</div>
@@ -49,7 +49,7 @@ export default async function BusinessPage() {
           account={account ?? null}
           catalog={catalog}
           initialOrders={orders}
-          defaultCity={dakhla.slug}
+          defaultCity={currentCity.slug}
         />
       </main>
       <SiteFooter />

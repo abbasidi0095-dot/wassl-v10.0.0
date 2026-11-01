@@ -47,11 +47,13 @@ type CityOption = { slug: string; name: string; priority: boolean };
 export function SignupForm({
   initialRole,
   initialKind = "delivery",
+  defaultCitySlug,
   lockedRole = false,
   cities,
 }: {
   initialRole: Role;
   initialKind?: "delivery" | "taxi" | "both";
+  defaultCitySlug?: string;
   lockedRole?: boolean;
   cities: CityOption[];
 }) {
@@ -62,7 +64,7 @@ export function SignupForm({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [citySlug, setCitySlug] = useState("dakhla");
+  const [citySlug, setCitySlug] = useState(defaultCitySlug || "dakhla");
   const [storeName, setStoreName] = useState("");
   const [vehicle, setVehicle] = useState(
     initialKind === "taxi" ? "Dacia Logan" : "Motorbike",

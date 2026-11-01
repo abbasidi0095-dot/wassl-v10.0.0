@@ -9,6 +9,7 @@ import { sendVerificationEmail } from "@/lib/email";
 import { failureMessage, isTestMode } from "@/lib/email-verification";
 import { verifyPassword } from "@/lib/security";
 import { createPhoneTicket, maskPhone, normalizeMoroccanPhone } from "@/lib/phone";
+import { CITY_COOKIE, CITY_COOKIE_OPTIONS } from "@/lib/city-cookie";
 import { availablePhoneChannels, phoneVerificationRequired } from "@/lib/otp-config";
 import { createSessionToken } from "@/lib/security";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
@@ -44,6 +45,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const citySlug = user.citySlug;
+  function withCity(response: NextResponse) {
+    if (citySlug) {
+      response.cookies.set(CITY_COOKIE, citySlug, CITY_COOKIE_OPTIONS);
+    }
+    return response;
+  }
+
   const status = effectiveAccountStatus(user);
   if (status === "rejected") {
     return NextResponse.json(
@@ -76,19 +85,21 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({
-      ok: true,
-      needsVerification: true,
-      email: user.email,
-      redirect: `/verify-email?email=${encodeURIComponent(user.email)}&next=login${
-        delivered ? "" : `&cooldown=${cooldown}`
-      }${
-        !delivered && cooldown === 0 ? "&warning=1" : ""
-      }`,
-      ...(verification.ok && isTestMode()
-        ? { devCode: verification.code }
-        : {}),
-    });
+    return withCity(
+      NextResponse.json({
+        ok: true,
+        needsVerification: true,
+        email: user.email,
+        redirect: `/verify-email?email=${encodeURIComponent(user.email)}&next=login${
+          delivered ? "" : `&cooldown=${cooldown}`
+        }${
+          !delivered && cooldown === 0 ? "&warning=1" : ""
+        }`,
+        ...(verification.ok && isTestMode()
+          ? { devCode: verification.code }
+          : {}),
+      }),
+    );
   }
 
   /*
@@ -105,15 +116,17 @@ export async function POST(request: Request) {
         next: "login",
         ticket: createPhoneTicket(user.email),
       });
-      return NextResponse.json({
-        ok: true,
-        needsVerification: true,
-        needsPhone: true,
-        email: user.email,
-        maskedPhone: maskPhone(phone),
-        channels: availablePhoneChannels(),
-        redirect: `/verify-phone?${params.toString()}`,
-      });
+      return withCity(
+        NextResponse.json({
+          ok: true,
+          needsVerification: true,
+          needsPhone: true,
+          email: user.email,
+          maskedPhone: maskPhone(phone),
+          channels: availablePhoneChannels(),
+          redirect: `/verify-phone?${params.toString()}`,
+        }),
+      );
     }
   }
 
@@ -128,14 +141,16 @@ export async function POST(request: Request) {
   };
   const token = createSessionToken(session);
 
-  const response = NextResponse.json({
-    ok: true,
-    role: user.role,
-    name: user.name,
-    status,
-    needsApproval: status === "pending",
-    redirect: status === "pending" ? "/pending" : homeForRole(user.role),
-  });
+  const response = withCity(
+    NextResponse.json({
+      ok: true,
+      role: user.role,
+      name: user.name,
+      status,
+      needsApproval: status === "pending",
+      redirect: status === "pending" ? "/pending" : homeForRole(user.role),
+    }),
+  );
   response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(request));
   return response;
 }

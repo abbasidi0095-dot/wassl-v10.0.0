@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities, getProducts, getStores, getUserById } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { getSession } from "@/lib/auth";
 import { getTranslator } from "@/lib/i18n-server";
 import { FavoritesView } from "./favorites-view";
@@ -20,6 +21,7 @@ export default async function GroceryFavoritesPage() {
     getStores(),
     getTranslator(),
   ]);
+  const currentCity = await getPreferredCity(cities);
   const grocery = stores.filter((store) => store.category === "grocery");
   const products = (await Promise.all(grocery.map((store) => getProducts(store.id)))).flat();
   const favorites = (user?.favorites ?? [])
@@ -29,7 +31,7 @@ export default async function GroceryFavoritesPage() {
 
   return (
     <>
-      <SiteHeader cities={cities} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl py-8">
         <div className="max-w-2xl">
           <div className="eyebrow">{t("Wassl Grocery")}</div>

@@ -10,6 +10,7 @@ import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { homeForRole } from "@/lib/auth-config";
 import { failureMessage } from "@/lib/email-verification";
 import { verifyPhoneTicket } from "@/lib/phone";
+import { CITY_COOKIE, CITY_COOKIE_OPTIONS } from "@/lib/city-cookie";
 import type { Session } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -81,6 +82,9 @@ export async function POST(request: Request) {
     needsApproval: status === "pending",
     redirect: status === "pending" ? "/pending" : homeForRole(user.role),
   });
+  if (user.citySlug) {
+    response.cookies.set(CITY_COOKIE, user.citySlug, CITY_COOKIE_OPTIONS);
+  }
   response.cookies.set(
     SESSION_COOKIE,
     createSessionToken(session),

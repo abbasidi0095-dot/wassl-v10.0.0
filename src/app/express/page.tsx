@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getCities, getCity, getParcels, getUserById } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { cityServiceEnabled } from "@/lib/city-services";
 import { getTranslator } from "@/lib/i18n-server";
 import { SiteHeader } from "@/components/site-header";
@@ -16,11 +17,11 @@ export default async function ExpressPage() {
   if (!session) redirect("/login?next=express");
   const { t } = await getTranslator();
   const cities = await getCities();
-  const dakhla = (await getCity("dakhla")) ?? cities[0];
-  if (!cityServiceEnabled(dakhla, "express")) {
+  const currentCity = await getPreferredCity(cities);
+  if (!cityServiceEnabled(currentCity, "express")) {
     return (
       <>
-        <SiteHeader cities={cities} currentCity={dakhla} />
+        <SiteHeader cities={cities} currentCity={currentCity} />
         <main className="container-wassl py-16 text-center">
           <h1 className="display text-4xl">{t("Express is not active in this city yet.")}</h1>
           <p className="mx-auto mt-3 max-w-md text-[13px] text-muted">
@@ -39,7 +40,7 @@ export default async function ExpressPage() {
 
   return (
     <>
-      <SiteHeader cities={cities} currentCity={dakhla} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main>
         <section className="container-wassl border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -65,7 +66,7 @@ export default async function ExpressPage() {
         <section className="container-wassl mt-6 pb-16">
           <ExpressBooking
             cities={cities}
-            defaultCity={dakhla.slug}
+            defaultCity={currentCity.slug}
             initialParcels={parcels}
             initialName={user?.name || session.name}
             initialPhone={user?.phone || ""}

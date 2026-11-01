@@ -129,6 +129,30 @@ test("a dock tab opens the next page at the top", async ({ page }) => {
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 });
 
+test("the chosen city becomes the default across the app", async ({ page }) => {
+  await page.goto("/");
+  await page.context().addCookies([
+    { name: "wassl.city", value: "laayoune", url: page.url() },
+  ]);
+  await page.reload();
+  await expect(page.getByText("Now delivering in Laayoune").first()).toBeVisible();
+  await expect(
+    page.locator('select[aria-label="Choose city"]').first(),
+  ).toHaveValue("laayoune");
+  await expect(page.getByText("Open now in Laayoune")).toBeVisible();
+
+  await page
+    .locator('select[aria-label="Choose city"]')
+    .first()
+    .selectOption("boujdour");
+  await expect(page).toHaveURL(/\/city\/boujdour$/);
+  await page.goto("/");
+  await expect(page.getByText("Now delivering in Boujdour").first()).toBeVisible();
+  await expect(
+    page.locator('select[aria-label="Choose city"]').first(),
+  ).toHaveValue("boujdour");
+});
+
 test("pharmacy lists licensed partners and over-the-counter products", async ({
   page,
 }) => {

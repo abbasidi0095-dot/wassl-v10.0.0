@@ -1,4 +1,5 @@
 import { getCities } from "@/lib/db";
+import { getPreferredCity } from "@/lib/city-preference";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PageHeader } from "@/components/page-header";
@@ -10,9 +11,10 @@ export const metadata = { title: "My orders" };
 
 export default async function OrdersPage() {
   const [cities, { t }] = await Promise.all([getCities(), getTranslator()]);
+  const currentCity = await getPreferredCity(cities);
   return (
     <>
-      <SiteHeader cities={cities} currentCity={cities.find((city) => city.slug === "dakhla")} />
+      <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl">
         <PageHeader
           label={t("Order history")}

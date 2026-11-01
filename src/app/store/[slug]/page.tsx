@@ -79,7 +79,7 @@ export default async function StorePage({
     );
     return (
       <>
-        <SiteHeader cities={cities} currentCity={city} />
+          <SiteHeader cities={cities} currentCity={city} />
         <main className="container-wassl py-6">
           <div className="mb-3 flex justify-end">
             <StartChatButton

@@ -28,6 +28,7 @@ import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { useI18n } from "./locale-provider";
 import { useCart } from "./cart-provider";
+import { CITY_COOKIE } from "@/lib/city-cookie";
 
 type AccountInfo = {
   name: string;
@@ -84,6 +85,11 @@ export function SiteHeader({
   const others = cities.filter((city) => !city.priority);
   const selected = currentCity?.slug || "dakhla";
 
+  function selectCity(slug: string) {
+    document.cookie = `${CITY_COOKIE}=${encodeURIComponent(slug)}; path=/; max-age=31536000; samesite=lax`;
+    router.push(`/city/${slug}`);
+  }
+
   const cityOptions = (
     <>
       <optgroup label={t("Southern Morocco")}>
@@ -136,7 +142,7 @@ export function SiteHeader({
               />
               <select
                 value={selected}
-                onChange={(event) => router.push(`/city/${event.target.value}`)}
+                onChange={(event) => selectCity(event.target.value)}
                 className="h-9 max-w-[190px] appearance-none rounded-[6px] border border-line bg-transparent ps-8 pe-7 text-[13px] font-medium text-ink outline-none transition-colors hover:border-line-strong focus:border-brand"
                 aria-label={t("Choose city")}
               >
@@ -230,9 +236,7 @@ export function SiteHeader({
                 />
                 <select
                   value={selected}
-                  onChange={(event) =>
-                    router.push(`/city/${event.target.value}`)
-                  }
+                  onChange={(event) => selectCity(event.target.value)}
                   className="input appearance-none ps-9"
                   aria-label={t("Choose city")}
                 >

@@ -63,6 +63,7 @@ export default async function AccountPage() {
   const delivered = sorted.filter((order) => order.status === "delivered");
   const city = cities.find((candidate) => candidate.slug === user?.citySlug);
   const cityForHeader =
+    city ||
     cities.find((candidate) => candidate.slug === sorted[0]?.citySlug) ||
     cities.find((candidate) => candidate.slug === "dakhla");
   const verified = user ? isEmailVerified(user) : true;

@@ -17,13 +17,13 @@ import { StoreCard } from "@/components/store-card";
 import { getSession } from "@/lib/auth";
 import {
   getCities,
-  getCity,
   getOrderViews,
   getStores,
   getTaxiRides,
   getUserById,
 } from "@/lib/db";
 import { getOpenState } from "@/lib/hours";
+import { getPreferredCity } from "@/lib/city-preference";
 import { getTranslator } from "@/lib/i18n-server";
 import { money } from "@/lib/utils";
 
@@ -43,10 +43,10 @@ export default async function HomePage() {
   const { t, locale } = await getTranslator();
   const session = await getSession();
   const cities = await getCities();
-  const dakhla = (await getCity("dakhla")) ?? cities[0];
-  const cityLabel = locale === "ar" ? dakhla.nameAr : dakhla.name;
+  const city = await getPreferredCity(cities);
+  const cityLabel = locale === "ar" ? city.nameAr : city.name;
   const stores = await getStores();
-  const localStores = stores.filter((store) => store.citySlug === dakhla.slug);
+  const localStores = stores.filter((store) => store.citySlug === city.slug);
   const localPharmacies = localStores.filter(
     (store) => store.category === "pharmacy",
   );
@@ -80,7 +80,7 @@ export default async function HomePage() {
 
   const launcher = [
     {
-      href: `/city/${dakhla.slug}`,
+      href: `/city/${city.slug}`,
       label: t("Food to go"),
       note: t("Restaurants, cafés and delivery"),
       detail: t("{count} open now", { count: openNow }),
@@ -94,7 +94,7 @@ export default async function HomePage() {
       icon: ShoppingBasket,
     },
     {
-      href: `/pharmacy?city=${dakhla.slug}`,
+      href: `/pharmacy?city=${city.slug}`,
       label: t("Pharmacy"),
       note: t("Health, baby and personal care"),
       detail: localPharmacies.length
@@ -115,9 +115,9 @@ export default async function HomePage() {
 
   return (
     <>
-      <SiteHeader cities={cities} currentCity={dakhla} />
+      <SiteHeader cities={cities} currentCity={city} />
       <PromoTicker
-        citySlug={dakhla.slug}
+        citySlug={city.slug}
         cityName={cityLabel}
         pharmacyLive={localPharmacies.length > 0}
         pharmacyCity={
@@ -161,7 +161,7 @@ export default async function HomePage() {
               aria-label={t("Search Wassl")}
               className="h-10 min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted"
             />
-            <input type="hidden" name="city" value={dakhla.slug} />
+            <input type="hidden" name="city" value={city.slug} />
             <button type="submit" className="btn btn-primary h-10 shrink-0 px-4">
               {t("Search")}
             </button>
@@ -282,7 +282,7 @@ export default async function HomePage() {
               ))}
             </div>
             <Link
-              href={`/city/${dakhla.slug}`}
+              href={`/city/${city.slug}`}
               className="btn btn-ghost mt-3 h-11 w-full justify-center"
             >
               {t("See all restaurants and cafés")} <ArrowRight size={13} />

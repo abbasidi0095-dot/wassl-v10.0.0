@@ -29,6 +29,17 @@ and dark themes.
 
 ## Release history
 
+### 11.6.4 — 1 November 2026 — keep the chosen city on store links
+- Opening a store from another city no longer changes the default city; only
+  the city switcher and city pages do.
+
+### 11.6.3 — 1 November 2026 — account city becomes the default
+- The city chosen at signup is stored in `wassl.city` and used by the home feed,
+  grocery, pharmacy, search, taxi and the app headers.
+- The header city switcher updates the preference for future visits.
+- Visiting a city or store page also updates the preference.
+- Existing users fall back to their account city, then Dakhla.
+
 ### 11.6.2 — 1 November 2026 — manual mobile fallback
 - Admin → Accounts can mark a customer's Moroccan mobile verified when SMS and
   WhatsApp are unavailable. The action is audited.

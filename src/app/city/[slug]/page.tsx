@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, MapPin, Sprout } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
+import { CityPreferenceSync } from "@/components/city-preference-sync";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
 import { MapView } from "@/components/map-view";
@@ -48,6 +49,7 @@ export default async function CityPage({
 
   return (
     <>
+      <CityPreferenceSync slug={city.slug} />
       <SiteHeader cities={cities} currentCity={city} />
       <main>
         <section className="container-wassl">
