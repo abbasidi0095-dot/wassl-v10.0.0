@@ -115,7 +115,7 @@ export function PromoTicker({
           <span className="promo-ticker__code rounded-[3px] bg-signal px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.06em] text-[#1c1305]">
             {item.code}
           </span>
-          <span className="text-[11px] font-medium text-on-dark/85">
+          <span className="text-[11px] font-medium text-[#FFF7EA]/85">
             {t(item.label)}
           </span>
           {done ? (
@@ -123,7 +123,7 @@ export function PromoTicker({
           ) : (
             <Copy
               size={10}
-              className="text-on-dark/45 transition-colors group-hover:text-on-dark"
+              className="text-[#FFF7EA]/45 transition-colors group-hover:text-[#FFF7EA]"
             />
           )}
         </button>
@@ -132,7 +132,7 @@ export function PromoTicker({
     return (
       <span
         key={`${duplicate ? "b" : "a"}-${item.id}`}
-        className="inline-flex shrink-0 items-center gap-1.5 text-[11px] text-on-dark/80"
+        className="inline-flex shrink-0 items-center gap-1.5 text-[11px] text-[#FFF7EA]/80"
       >
         <Sparkles size={11} className="text-signal" />
         {item.text}
@@ -142,7 +142,7 @@ export function PromoTicker({
 
   return (
     <section
-      className="promo-ticker relative border-b border-white/10 bg-ink text-on-dark"
+      className="promo-ticker relative border-b border-white/10 bg-[#0B1226] text-[#FFF7EA]"
       aria-label={t("Offers and news")}
     >
       <div className="promo-ticker__track py-2">
@@ -157,7 +157,7 @@ export function PromoTicker({
                 {entry(item, duplicate)}
                 {index < items.length - 1 ? (
                   <span
-                    className="mx-5 inline-block h-1 w-1 rounded-full bg-on-dark/25 align-middle"
+                    className="mx-5 inline-block h-1 w-1 rounded-full bg-[#FFF7EA]/25 align-middle"
                     aria-hidden="true"
                   />
                 ) : null}

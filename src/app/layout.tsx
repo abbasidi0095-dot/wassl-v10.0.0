@@ -69,7 +69,7 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#153F37",
+  themeColor: "#2447E0",
 };
 
 export default async function RootLayout({
@@ -118,7 +118,7 @@ export default async function RootLayout({
             brandNameAr: settings.brandNameAr,
             logoImage: settings.logoImage,
             primaryColor: settings.primaryColor,
-            accentColor: settings.accentColor ?? "#955b0b",
+            accentColor: settings.accentColor ?? "#8c3a00",
             supportPhone: settings.supportPhone,
             themePreset: settings.themePreset,
           }}

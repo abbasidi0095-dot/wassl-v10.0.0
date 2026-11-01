@@ -49,7 +49,7 @@ export function Logo({
       <span
         className={`grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-[5px] ${
           logoImage
-            ? "bg-[#f7f4ec]"
+            ? "bg-[#fffcf6]"
             : light
               ? "bg-white/10 text-on-dark"
               : "bg-brand text-on-dark"

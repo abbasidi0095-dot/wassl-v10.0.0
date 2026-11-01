@@ -106,55 +106,55 @@ function otpEmailHtml(code: string, name?: string): string {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Your Wassl verification code</title>
   </head>
-  <body style="margin:0;padding:0;background:#f0ede6;">
+  <body style="margin:0;padding:0;background:#f7f2e8;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
       Your Wassl code is ${code}. It expires in 10 minutes.
     </div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f0ede6;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f2e8;">
       <tr>
         <td align="center" style="padding:32px 16px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#faf9f6;border:1px solid #dcd3c4;border-radius:12px;overflow:hidden;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fffcf6;border:1px solid #e2d8c6;border-radius:12px;overflow:hidden;">
             <tr>
               <td style="padding:28px 32px 0 32px;">
-                <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;letter-spacing:-0.04em;color:#0c1a17;">
-                  Wassl<span style="color:#955b0b;">.</span>
+                <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;letter-spacing:-0.04em;color:#101a33;">
+                  Wassl<span style="color:#8c3a00;">.</span>
                 </div>
-                <div style="margin-top:4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;color:#5c6a64;">
+                <div style="margin-top:4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;color:#5a6478;">
                   Southern Morocco delivery
                 </div>
               </td>
             </tr>
             <tr>
               <td style="padding:28px 32px 0 32px;">
-                <h1 style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:26px;line-height:1.2;letter-spacing:-0.03em;color:#0c1a17;">
+                <h1 style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:26px;line-height:1.2;letter-spacing:-0.03em;color:#101a33;">
                   Verify your email
                 </h1>
-                <p style="margin:12px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#5c6a64;">
+                <p style="margin:12px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#5a6478;">
                   ${greeting} use the code below to finish setting up your Wassl account.
                 </p>
               </td>
             </tr>
             <tr>
               <td style="padding:24px 32px 0 32px;">
-                <div style="background:#ffffff;border:1px solid #dcd3c4;border-radius:8px;padding:20px 12px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:38px;line-height:1;letter-spacing:0.28em;font-weight:700;color:#0c1a17;">
+                <div style="background:#ffffff;border:1px solid #e2d8c6;border-radius:8px;padding:20px 12px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:38px;line-height:1;letter-spacing:0.28em;font-weight:700;color:#101a33;">
                   ${code}
                 </div>
-                <p style="margin:12px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;color:#5c6a64;text-align:center;">
-                  This code expires in <strong style="color:#0c1a17;">10 minutes</strong>.
+                <p style="margin:12px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;color:#5a6478;text-align:center;">
+                  This code expires in <strong style="color:#101a33;">10 minutes</strong>.
                 </p>
               </td>
             </tr>
             <tr>
               <td style="padding:24px 32px 28px 32px;">
-                <div style="height:2px;width:36px;background:#955b0b;"></div>
-                <p style="margin:14px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#5c6a64;">
+                <div style="height:2px;width:36px;background:#8c3a00;"></div>
+                <p style="margin:14px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#5a6478;">
                   If you did not create a Wassl account, ignore this email. Nobody can sign in
                   without this code, and it can only be used once.
                 </p>
               </td>
             </tr>
             <tr>
-              <td style="padding:16px 32px;background:#f0ede6;border-top:1px solid #dcd3c4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5c6a64;">
+              <td style="padding:16px 32px;background:#f7f2e8;border-top:1px solid #e2d8c6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5a6478;">
                 Wassl · الداخلة · العيون · بوجدور · السمارة · طرفاية<br />
                 Cash on delivery across Southern Morocco.
               </td>
@@ -233,15 +233,15 @@ export async function notifyOrderStatusChange(
   const title = statusLabels[order.status] || `Order status: ${order.status}`;
   const subject = `[${order.code}] ${title} · Wassl`;
   const html = `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#faf9f6;color:#0c1a17;border-radius:12px">
-      <h2 style="color:#0b4a45;margin-bottom:8px">Wassl</h2>
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#fffcf6;color:#101a33;border-radius:12px">
+      <h2 style="color:#2447e0;margin-bottom:8px">Wassl</h2>
       <h3 style="margin-top:0">${escapeHtml(title)}</h3>
-      <p style="font-size:14px;color:#5c6a64">
+      <p style="font-size:14px;color:#5a6478">
         <strong>Order:</strong> ${escapeHtml(order.code)}<br/>
         <strong>Store:</strong> ${escapeHtml(order.store?.name || "Store")}<br/>
         <strong>Total:</strong> ${order.total} MAD (Cash on Delivery)
       </p>
-      <p style="font-size:13px;color:#5c6a64;margin-top:20px">
+      <p style="font-size:13px;color:#5a6478;margin-top:20px">
         Track your delivery live on the Wassl app.
       </p>
     </div>

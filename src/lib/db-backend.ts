@@ -64,14 +64,18 @@ function hydrate(db: Database): Database {
   db.taxiRides ??= [];
   if (
     db.settings.primaryColor === "#0f6e6e" ||
-    db.settings.primaryColor === "#0b4a45"
+    db.settings.primaryColor === "#0b4a45" ||
+    db.settings.primaryColor === "#153f37"
   ) {
-    db.settings.primaryColor = "#153f37";
+    db.settings.primaryColor = "#2447e0";
   }
-  if (db.settings.accentColor === "#955b0b") {
-    db.settings.accentColor = "#e6a23a";
+  if (
+    db.settings.accentColor === "#955b0b" ||
+    db.settings.accentColor === "#e6a23a"
+  ) {
+    db.settings.accentColor = "#ff8a3d";
   }
-  db.settings.accentColor ??= "#e6a23a";
+  db.settings.accentColor ??= "#ff8a3d";
   db.settings.themePreset ??= "coastal";
   db.settings.defaultTheme ??= "system";
   db.promotions ??= DEFAULT_GROCERY_PROMOTIONS.map((promotion) => ({ ...promotion }));

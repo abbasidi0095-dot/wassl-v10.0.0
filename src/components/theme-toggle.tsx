@@ -9,7 +9,7 @@ const STORAGE_KEY = "wassl.theme";
 /** Keep the native status bar and PWA theme colour in sync with the page. */
 function syncShell(dark: boolean) {
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", dark ? "#0b1512" : "#153F37");
+  if (meta) meta.setAttribute("content", dark ? "#070c18" : "#2447e0");
 
   if (typeof window === "undefined") return;
   void import("@capacitor/core")
@@ -17,7 +17,7 @@ function syncShell(dark: boolean) {
       if (!Capacitor.isNativePlatform()) return;
       const { StatusBar, Style } = await import("@capacitor/status-bar");
       await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark }).catch(() => {});
-      await StatusBar.setBackgroundColor({ color: dark ? "#0b1512" : "#f4f0e6" }).catch(
+      await StatusBar.setBackgroundColor({ color: dark ? "#070c18" : "#f7f2e8" }).catch(
         () => {},
       );
     })

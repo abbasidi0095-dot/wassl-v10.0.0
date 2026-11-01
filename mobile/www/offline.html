@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0f6e6e" />
+    <meta name="theme-color" content="#2447e0" />
     <title>Wassl — connection lost</title>
     <style>
       :root {
         color-scheme: light;
-        --ink: #14211f;
-        --cream: #f7f3eb;
-        --teal: #0f6e6e;
-        --saffron: #e8a33d;
+        --ink: #101a33;
+        --cream: #f7f2e8;
+        --teal: #2447e0;
+        --saffron: #ff8a3d;
       }
       * { box-sizing: border-box; }
       body {
@@ -21,8 +21,8 @@
         place-items: center;
         padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
         background:
-          radial-gradient(circle at 8% -10%, rgba(232, 163, 61, 0.18), transparent 30rem),
-          radial-gradient(circle at 100% 2%, rgba(15, 110, 110, 0.14), transparent 34rem),
+          radial-gradient(circle at 8% -10%, rgba(255, 138, 61, 0.18), transparent 30rem),
+          radial-gradient(circle at 100% 2%, rgba(36, 71, 224, 0.14), transparent 34rem),
           var(--cream);
         color: var(--ink);
         font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -32,27 +32,27 @@
       .logo {
         width: 84px; height: 84px; margin: 0 auto 22px; border-radius: 24px;
         background: var(--teal); display: grid; place-items: center;
-        box-shadow: 0 22px 44px -20px rgba(15, 60, 58, 0.55);
+        box-shadow: 0 22px 44px -20px rgba(24, 47, 168, 0.45);
       }
       h1 { font-size: 1.6rem; letter-spacing: -0.04em; margin: 0 0 8px; }
-      p { margin: 0 0 22px; font-size: 0.9rem; line-height: 1.6; color: rgba(20, 33, 31, 0.55); }
+      p { margin: 0 0 22px; font-size: 0.9rem; line-height: 1.6; color: rgba(16, 26, 51, 0.58); }
       button {
         width: 100%; min-height: 52px; border: 0; border-radius: 16px;
         background: var(--ink); color: #fff; font: inherit; font-weight: 800;
         font-size: 0.9rem; cursor: pointer;
       }
       button:active { transform: scale(0.99); }
-      .hint { margin-top: 16px; font-size: 0.72rem; color: rgba(20, 33, 31, 0.4); }
+      .hint { margin-top: 16px; font-size: 0.72rem; color: rgba(16, 26, 51, 0.45); }
     </style>
   </head>
   <body>
     <main class="card">
       <div class="logo" aria-hidden="true">
         <svg viewBox="0 0 512 512" width="56" height="56" role="img" aria-label="Wassl">
-          <path d="M104 356c44-78 78-78 116-23 36 52 69 48 97-9 19-40 42-55 63-63" fill="none" stroke="#f7f3eb" stroke-width="30" stroke-linecap="round" stroke-dasharray="6 34" />
-          <circle cx="104" cy="356" r="34" fill="#e8a33d" />
-          <path d="M322 106c38 0 68 30 68 67 0 52-68 113-68 113s-67-61-67-113c0-37 30-67 67-67Z" fill="#f7f3eb" />
-          <circle cx="322" cy="171" r="23" fill="#0f6e6e" />
+          <path d="M104 356c44-78 78-78 116-23 36 52 69 48 97-9 19-40 42-55 63-63" fill="none" stroke="#fff7ea" stroke-width="30" stroke-linecap="round" stroke-dasharray="6 34" />
+          <circle cx="104" cy="356" r="34" fill="#ff8a3d" />
+          <path d="M322 106c38 0 68 30 68 67 0 52-68 113-68 113s-67-61-67-113c0-37 30-67 67-67Z" fill="#fff7ea" />
+          <circle cx="322" cy="171" r="23" fill="#2447e0" />
         </svg>
       </div>
       <h1>You’re offline</h1>

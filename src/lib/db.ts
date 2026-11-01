@@ -750,7 +750,7 @@ export async function approveUser(input: {
         landmark: city?.name || "Dakhla",
         lat: city?.lat ?? 23.6848,
         lng: city?.lng ?? -15.958,
-        accent: "#0f6e6e",
+        accent: "#2447e0",
         rating: 0,
         reviews: 0,
         prepTime: 30,
@@ -2046,7 +2046,7 @@ export async function createStore(
         typeof input.lat === "number" && Number.isFinite(input.lat) ? input.lat : city.lat,
       lng:
         typeof input.lng === "number" && Number.isFinite(input.lng) ? input.lng : city.lng,
-      accent: input.accent || "#0f6e6e",
+      accent: input.accent || "#2447e0",
       image: input.image?.trim() || undefined,
       rating: 0,
       reviews: 0,

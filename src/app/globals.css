@@ -115,21 +115,21 @@
 
 :root {
   color-scheme: light;
-  --paper: #f4f0e6;
-  --surface: #fbf8f1;
-  --surface-2: #eae2d3;
-  --ink: #153f37;
-  --on-ink: #f4f0e6;
-  --muted: #5b6a63;
-  --line: #d9d0bf;
-  --line-strong: #c4b8a4;
-  --brand: var(--brand-custom, #153f37);
-  --brand-deep: var(--brand-deep-custom, #0e2c26);
-  --brand-soft: var(--brand-soft-custom, #dfe8e2);
-  --brand-ink: var(--brand-ink-custom, #f4f0e6);
-  --signal: var(--signal-custom, #e6a23a);
-  --signal-ink: var(--signal-ink-custom, #8a5a11);
-  --signal-soft: var(--signal-soft-custom, #f3e2c4);
+  --paper: #f7f2e8;
+  --surface: #fffcf6;
+  --surface-2: #ede5d6;
+  --ink: #101a33;
+  --on-ink: #fbf7ee;
+  --muted: #5a6478;
+  --line: #e2d8c6;
+  --line-strong: #cbbb9d;
+  --brand: var(--brand-custom, #2447e0);
+  --brand-deep: var(--brand-deep-custom, #182fa8);
+  --brand-soft: var(--brand-soft-custom, #e4e9ff);
+  --brand-ink: var(--brand-ink-custom, #fff9ef);
+  --signal: var(--signal-custom, #ff8a3d);
+  --signal-ink: var(--signal-ink-custom, #8c3a00);
+  --signal-soft: var(--signal-soft-custom, #ffe7d5);
   --danger: #a63a22;
   --danger-soft: #f6e2db;
   --success: #1e6b4f;
@@ -181,82 +181,82 @@
 /* Complete theme palettes. Brand and accent still come from the admin
    settings; these tokens finish the paper, surface, ink and line system. */
 html[data-theme="aero"] {
-  --paper: #eef5f6;
-  --surface: #f8fcfc;
-  --surface-2: #dfeaed;
-  --ink: #0e3b45;
-  --on-ink: #f2fbfc;
-  --muted: #526b73;
-  --line: #cbdde1;
-  --line-strong: #b3cdd3;
+  --paper: #edf5f8;
+  --surface: #f8fcfe;
+  --surface-2: #ddebf1;
+  --ink: #0b2333;
+  --on-ink: #f4fbfe;
+  --muted: #4f6775;
+  --line: #c9dde6;
+  --line-strong: #adc8d4;
 }
 html[data-theme="midnight"] {
-  --paper: #eef0f7;
-  --surface: #f9f9fd;
-  --surface-2: #e0e2ee;
-  --ink: #1b2a4a;
-  --on-ink: #f3f5ff;
-  --muted: #58627a;
-  --line: #d2d5e2;
-  --line-strong: #b9bed1;
+  --paper: #eef1f9;
+  --surface: #fafbff;
+  --surface-2: #dfe4f2;
+  --ink: #151f3b;
+  --on-ink: #f5f7ff;
+  --muted: #566079;
+  --line: #d0d6e5;
+  --line-strong: #b5bdd2;
 }
 html[data-theme="sand"] {
-  --paper: #f6efe3;
-  --surface: #fcf8ef;
-  --surface-2: #eadfce;
-  --ink: #4b3424;
-  --on-ink: #fff8ed;
-  --muted: #6c5b4b;
-  --line: #ddd0bd;
-  --line-strong: #c9b79e;
+  --paper: #f7efe2;
+  --surface: #fdf8ef;
+  --surface-2: #ede0cc;
+  --ink: #3b2a1c;
+  --on-ink: #fff9ef;
+  --muted: #6e5b49;
+  --line: #dfd0ba;
+  --line-strong: #c9b599;
 }
 html.dark[data-theme="aero"] {
-  --paper: #081418;
-  --surface: #0e1f24;
-  --surface-2: #142a30;
-  --ink: #e4f3f5;
-  --on-ink: #081418;
-  --muted: #91aab1;
-  --line: #1d363d;
-  --line-strong: #2a4a53;
+  --paper: #061418;
+  --surface: #0b2026;
+  --surface-2: #122b33;
+  --ink: #e3f4f8;
+  --on-ink: #061418;
+  --muted: #8faab3;
+  --line: #1b353e;
+  --line-strong: #284852;
 }
 html.dark[data-theme="midnight"] {
-  --paper: #070b18;
-  --surface: #0d1426;
-  --surface-2: #141d33;
-  --ink: #e8ebff;
-  --on-ink: #070b18;
-  --muted: #98a0be;
-  --line: #1d2842;
-  --line-strong: #2b3a5c;
+  --paper: #060a16;
+  --surface: #0c1122;
+  --surface-2: #131a30;
+  --ink: #e7ebff;
+  --on-ink: #060a16;
+  --muted: #98a1c0;
+  --line: #1c2540;
+  --line-strong: #2a3658;
 }
 html.dark[data-theme="sand"] {
-  --paper: #17110c;
-  --surface: #211810;
-  --surface-2: #2c2117;
+  --paper: #150f09;
+  --surface: #1f160e;
+  --surface-2: #2a1f14;
   --ink: #f5e9d8;
-  --on-ink: #17110c;
+  --on-ink: #150f09;
   --muted: #b6a48d;
-  --line: #3c2e21;
-  --line-strong: #554231;
+  --line: #3b2e20;
+  --line-strong: #54402e;
 }
 
 html.dark {
   color-scheme: dark;
-  --paper: #0b1512;
-  --surface: #101d18;
-  --surface-2: #17261f;
-  --ink: #e9f0e6;
-  --on-ink: #0a1211;
-  --muted: #94a59e;
-  --line: #243430;
-  --line-strong: #33473f;
-  --brand: var(--brand-custom-dark, #6fd8c9);
-  --brand-deep: var(--brand-deep-custom-dark, #a7ece2);
-  --brand-soft: var(--brand-soft-custom-dark, #122c28);
-  --brand-ink: var(--brand-ink-custom-dark, #06201d);
-  --signal: var(--signal-custom-dark, #e9ae55);
-  --signal-ink: var(--signal-ink-custom-dark, #f2c47c);
+  --paper: #070c18;
+  --surface: #0d1526;
+  --surface-2: #152035;
+  --ink: #e8edf9;
+  --on-ink: #070c18;
+  --muted: #95a2bc;
+  --line: #1f2c46;
+  --line-strong: #30405f;
+  --brand: var(--brand-custom-dark, #a3b2f2);
+  --brand-deep: var(--brand-deep-custom-dark, #c2ccff);
+  --brand-soft: var(--brand-soft-custom-dark, #131f3d);
+  --brand-ink: var(--brand-ink-custom-dark, #07122e);
+  --signal: var(--signal-custom-dark, #ffb47d);
+  --signal-ink: var(--signal-ink-custom-dark, #ffc9a6);
   --signal-soft: var(--signal-soft-custom-dark, #2a2114);
   --danger: #f08a72;
   --danger-soft: #2d1712;
@@ -514,9 +514,9 @@ html[dir="rtl"] .tnum {
   /* The ink field needs a lighter accent stop than the page surface. Scoping
      the Tailwind bridge keeps `text-on-dark` cream here in dark mode, where the
      global token flips to near-black. */
-  --color-on-dark: #f7f4ec;
-  --signal: var(--signal-on-dark, #e9ae55);
-  --signal-ink: var(--signal-on-dark, #f2c47c);
+  --color-on-dark: #fbf7ee;
+  --signal: var(--signal-on-dark, #ffb47d);
+  --signal-ink: var(--signal-on-dark, #ffc9a6);
 }
 
 .field-ink .text-saffron {
@@ -530,12 +530,12 @@ html.dark .field-ink .text-saffron {
 html.dark .field-ink {
   /* Keep the feature band dark in both themes. The default dark "on-ink" token
      is near-black, so scope a cream foreground to the band's descendants. */
-  background: #07120f;
-  color: #f7f4ec;
+  background: #070c18;
+  color: #fbf7ee;
   border-color: var(--line);
-  --on-ink: #f7f4ec;
-  --signal: var(--signal-on-dark, #e9ae55);
-  --signal-ink: var(--signal-on-dark, #f2c47c);
+  --on-ink: #fbf7ee;
+  --signal: var(--signal-on-dark, #ffb47d);
+  --signal-ink: var(--signal-on-dark, #ffc9a6);
 }
 
 .panel-quiet {
@@ -1309,17 +1309,17 @@ html.wassl-splash-skip .wassl-splash {
 }
 .promo-ticker::before {
   inset-inline-start: 0;
-  background: linear-gradient(to right, var(--ink), transparent);
+  background: linear-gradient(to right, #0b1226, transparent);
 }
 .promo-ticker::after {
   inset-inline-end: 0;
-  background: linear-gradient(to left, var(--ink), transparent);
+  background: linear-gradient(to left, #0b1226, transparent);
 }
 [dir="rtl"] .promo-ticker::before {
-  background: linear-gradient(to left, var(--ink), transparent);
+  background: linear-gradient(to left, #0b1226, transparent);
 }
 [dir="rtl"] .promo-ticker::after {
-  background: linear-gradient(to right, var(--ink), transparent);
+  background: linear-gradient(to right, #0b1226, transparent);
 }
 .promo-ticker__track {
   display: flex;

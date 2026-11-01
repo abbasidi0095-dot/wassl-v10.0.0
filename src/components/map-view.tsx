@@ -210,7 +210,7 @@ export function MapView({
         type: "line",
         source: sourceId,
         paint: {
-          "line-color": "#0f6e6e",
+          "line-color": "#2447e0",
           "line-width": 4,
           "line-opacity": 0.72,
           "line-dasharray": [1.2, 1.4],

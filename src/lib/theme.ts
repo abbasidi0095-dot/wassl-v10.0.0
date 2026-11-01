@@ -13,35 +13,35 @@ export const THEME_PRESETS: {
   {
     id: "coastal",
     label: "Coastal",
-    primary: "#153f37",
-    accent: "#e6a23a",
-    note: "Atlantic ink, limestone and saffron",
+    primary: "#2447e0",
+    accent: "#ff8a3d",
+    note: "Cobalt, limestone and tangerine",
   },
   {
     id: "aero",
     label: "Aero",
-    primary: "#0e5a66",
-    accent: "#2fb3c6",
-    note: "Sea glass and signal cyan",
+    primary: "#0e7490",
+    accent: "#f59e0b",
+    note: "Ice blue and citrus light",
   },
   {
     id: "midnight",
     label: "Midnight",
-    primary: "#1b2a4a",
-    accent: "#e6a23a",
-    note: "Atlantic night with warm gold",
+    primary: "#3949c8",
+    accent: "#ffb020",
+    note: "Indigo night with warm gold",
   },
   {
     id: "sand",
     label: "Sand",
-    primary: "#7a4b2a",
-    accent: "#c07a3a",
-    note: "Earth, clay and dune light",
+    primary: "#9a4b2e",
+    accent: "#e0a03a",
+    note: "Clay, dune and desert light",
   },
 ];
 
-const DEFAULT_PRIMARY = "#153f37";
-const DEFAULT_ACCENT = "#e6a23a";
+const DEFAULT_PRIMARY = "#2447e0";
+const DEFAULT_ACCENT = "#ff8a3d";
 
 function normalizeHex(value: string | undefined, fallback: string): string {
   if (!value) return fallback;
@@ -99,7 +99,7 @@ function luminance(hex: string): number {
 export function themeStyle(settings: PlatformSettings): CSSProperties {
   const primary = normalizeHex(settings.primaryColor, DEFAULT_PRIMARY);
   const accent = normalizeHex(settings.accentColor, DEFAULT_ACCENT);
-  const brandInk = luminance(primary) > 0.52 ? "#06201d" : "#f7f4ec";
+  const brandInk = luminance(primary) > 0.52 ? "#070c18" : "#fff9ef";
 
   return {
     "--brand-custom": primary,
@@ -108,14 +108,14 @@ export function themeStyle(settings: PlatformSettings): CSSProperties {
     "--brand-ink-custom": brandInk,
     "--brand-custom-dark": mix(primary, "#ffffff", 0.58),
     "--brand-deep-custom-dark": mix(primary, "#ffffff", 0.72),
-    "--brand-soft-custom-dark": mix(primary, "#0a1211", 0.82),
-    "--brand-ink-custom-dark": "#06201d",
+    "--brand-soft-custom-dark": mix(primary, "#0b0f1c", 0.82),
+    "--brand-ink-custom-dark": "#07122e",
     "--signal-custom": accent,
     "--signal-ink-custom": mix(accent, "#000000", 0.45),
     "--signal-soft-custom": mix(accent, "#ffffff", 0.82),
     "--signal-custom-dark": mix(accent, "#ffffff", 0.28),
     "--signal-ink-custom-dark": mix(accent, "#ffffff", 0.48),
-    "--signal-soft-custom-dark": mix(accent, "#0a1211", 0.8),
+    "--signal-soft-custom-dark": mix(accent, "#0b0f1c", 0.8),
     "--signal-on-dark": mix(accent, "#ffffff", 0.45),
   } as CSSProperties;
 }

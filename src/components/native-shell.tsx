@@ -41,7 +41,7 @@ export function NativeShell() {
       const dark = document.documentElement.classList.contains("dark");
       void SplashScreen.hide().catch(() => {});
       void StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark }).catch(() => {});
-      void StatusBar.setBackgroundColor({ color: dark ? "#0b1512" : "#f4f0e6" }).catch(
+      void StatusBar.setBackgroundColor({ color: dark ? "#070c18" : "#f7f2e8" }).catch(
         () => {},
       );
 

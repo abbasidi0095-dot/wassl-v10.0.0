@@ -161,7 +161,7 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
                   particleCount: 130,
                   spread: 75,
                   origin: { y: 0.82 },
-                  colors: ["#0f6e6e", "#e8a33d", "#e85d3f", "#f7f3eb"],
+                  colors: ["#2447e0", "#ff8a3d", "#ff5d73", "#f7f2e8"],
                 }),
               );
             }
@@ -183,7 +183,7 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
                   particleCount: 130,
                   spread: 75,
                   origin: { y: 0.82 },
-                  colors: ["#0f6e6e", "#e8a33d", "#e85d3f", "#f7f3eb"],
+                  colors: ["#2447e0", "#ff8a3d", "#ff5d73", "#f7f2e8"],
                 }),
               );
             }

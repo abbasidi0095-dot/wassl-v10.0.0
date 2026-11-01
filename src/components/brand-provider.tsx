@@ -16,8 +16,8 @@ export type BrandValue = {
 const defaultBrand: BrandValue = {
   brandName: BRAND.name,
   brandNameAr: BRAND.nameAr,
-  primaryColor: "#0b4a45",
-  accentColor: "#955b0b",
+  primaryColor: "#2447e0",
+  accentColor: "#8c3a00",
   supportPhone: BRAND.supportPhone,
 };
 

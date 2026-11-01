@@ -29,6 +29,18 @@ and dark themes.
 
 ## Release history
 
+### 11.3.1 — 1 November 2026 — palette fallback polish
+- Aligned the dark-mode signal fallbacks with the new tangerine so themed
+  surfaces stay consistent before admin colours load.
+
+### 11.3.0 — 1 November 2026 — cobalt and tangerine palette
+- New signature palette: **Wassl Blue `#2447E0`**, **Night Ink `#101A33`**,
+  **Limestone `#F7F2E8`** and **Signal Tangerine `#FF8A3D`**.
+- Every theme preset, dark mode, splash, app icon, iOS launch image, offline
+  screen, OTP email, map route and celebration colour was recoloured.
+- Existing installs migrate the previous green and saffron settings once.
+- Added a WCAG AA palette check to the brand tests.
+
 ### 11.2.2 — 1 November 2026 — tabs open at the top
 - Fixed client-side navigation keeping the previous page's scroll position.
 - Every dock tab, menu link and in-app route now opens at the top; browser
@@ -82,7 +94,7 @@ and dark themes.
 
 ### 11.0.1 — 1 November 2026 — launch splash and cache refresh
 - Added the branded **Wassl launch splash** on first app open per session:
-  animated route monogram, saffron destination node, Latin/Arabic wordmark,
+  animated route monogram, tangerine destination node, Latin/Arabic wordmark,
   progress line and skip control.
 - Splash respects `prefers-reduced-motion`, disappears after the intro and does
   not reappear on internal navigation.
@@ -135,8 +147,8 @@ and dark themes.
 - Replaced the brand with the original **Wassl 11 monogram**, Latin and Arabic
   wordmarks, transparent/reversed/monochrome variants, favicon and app icons.
 - Added four complete theme palettes (Coastal, Aero, Midnight, Sand) on semantic
-  tokens, with WCAG AA contrast. Signature palette: Atlantic Ink `#153F37`,
-  Limestone `#F4F0E6`, Signal Saffron `#E6A23A`.
+  tokens, with WCAG AA contrast. Signature palette: Wassl Blue `#2447E0`,
+  Night Ink `#101A33`, Limestone `#F7F2E8`, Signal Tangerine `#FF8A3D`.
 - Regenerated PWA icons, Capacitor app icons, splash screens and native status
   bar colours. Brand documentation is in `docs/BRAND-11.md`.
 - Added 7 unit tests and 3 Playwright cases for chat, ratings and brand assets.
@@ -346,7 +358,7 @@ and dark themes.
 
 ### 10.1.0 — 31 October 2026 — "Coastal Manifest" redesign
 - New art direction and design system: Bricolage Grotesque + Instrument Sans +
-  IBM Plex Sans Arabic (self-hosted), limestone paper, Atlantic ink, one saffron
+  IBM Plex Sans Arabic (self-hosted), limestone paper, cobalt ink, one tangerine
   signal, tone-based surfaces, 6/10/16px radii, no glass or gradient washes.
 - Rebuilt customer surfaces: home, grocery hall, store and menu, cart, unified
   checkout, orders, live tracking, taxi, account, favourites, lists and auth.
@@ -713,7 +725,7 @@ staff out.
 
 Wassl uses the **Coastal Manifest** design language: an Atlantic port authority's
 wayfinding system crossed with a well-set market manifest. Warm limestone paper,
-deep green ink, one saffron signal, real photography, tabular figures and
+deep cobalt and night ink, one tangerine signal, real photography, tabular figures and
 deliberate white space.
 
 - Full tokens, type scale, component anatomy and accessibility rules:

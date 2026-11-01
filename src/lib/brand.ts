@@ -1,10 +1,11 @@
 export const BRAND_COLORS = {
-  atlanticInk: "#153F37",
-  limestone: "#F4F0E6",
-  signalSaffron: "#E6A23A",
-  deepInk: "#0E2C26",
-  mutedInk: "#5B6A63",
-  line: "#D9D0BF",
+  wasslBlue: "#2447E0",
+  limestone: "#F7F2E8",
+  signalTangerine: "#FF8A3D",
+  deepBlue: "#182FA8",
+  nightInk: "#101A33",
+  mutedInk: "#5A6478",
+  line: "#E2D8C6",
 } as const;
 
 export const BRAND = {

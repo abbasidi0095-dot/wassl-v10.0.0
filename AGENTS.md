@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.2.2** (1 November 2026; tabs open at the top)
+- Release: **11.3.1** (1 November 2026; cobalt and tangerine palette)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,17 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.3.1 — palette fallback polish
+- Dark-mode signal fallbacks now use the new tangerine.
+
+### 11.3.0 — cobalt and tangerine palette
+- Default palette is Wassl Blue `#2447E0`, Night Ink `#101A33`, Limestone
+  `#F7F2E8`, Signal Tangerine `#FF8A3D`.
+- All four presets, dark mode, splash, icons, launch images, offline page,
+  email, map route and confetti were recoloured.
+- `hydrate()` migrates the old green/saffron settings once.
+- `tests/brand.test.ts` now checks WCAG AA for key text pairs.
 
 ### 11.2.2 — tabs open at the top
 - `ScrollToTop` resets window scroll on pathname changes (Next 16 kept the

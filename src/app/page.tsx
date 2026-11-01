@@ -243,7 +243,7 @@ export default async function HomePage() {
                 href={item.href}
                 className="aero-tile group flex min-h-[124px] flex-col justify-between rounded-[12px] border p-3.5 transition-colors hover:border-line-strong sm:min-h-[142px] lg:min-h-[132px]"
               >
-                <span className="grid h-10 w-10 place-items-center rounded-[8px] bg-surface-2 text-brand">
+                <span className="grid h-10 w-10 place-items-center rounded-[8px] bg-brand-soft text-brand">
                   <item.icon size={19} strokeWidth={1.7} />
                 </span>
                 <span className="mt-4 block">
@@ -259,7 +259,7 @@ export default async function HomePage() {
                   <span className="mt-0.5 block text-[11px] leading-4 text-muted">
                     {item.note}
                   </span>
-                  <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.05em] text-muted/80">
+                  <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.05em] text-muted">
                     {item.detail}
                   </span>
                 </span>

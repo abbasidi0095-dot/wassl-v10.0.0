@@ -74,7 +74,7 @@ export function SplashIntro() {
 
   return (
     <div
-      className={`wassl-splash fixed inset-0 z-[200] grid place-items-center bg-[#153F37] px-6 text-[#F4F0E6] ${
+      className={`wassl-splash fixed inset-0 z-[200] grid place-items-center bg-[#0B1226] px-6 text-[#FFF7EA] ${
         leaving ? "wassl-splash-leaving" : ""
       }`}
       role="status"
@@ -90,7 +90,7 @@ export function SplashIntro() {
           <path
             d="M9 18.5 21.5 47 32 28.5 42.5 47 55 18.5"
             pathLength={1}
-            stroke="#F4F0E6"
+            stroke="#FFF7EA"
             strokeWidth="6.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -98,12 +98,12 @@ export function SplashIntro() {
             strokeDashoffset="1"
             className="wassl-splash-route"
           />
-          <circle cx="9" cy="18.5" r="2.2" fill="#F4F0E6" className="wassl-splash-origin" />
+          <circle cx="9" cy="18.5" r="2.2" fill="#FFF7EA" className="wassl-splash-origin" />
           <circle
             cx="55"
             cy="18.5"
             r="4.6"
-            stroke="#E6A23A"
+            stroke="#FF8A3D"
             strokeWidth="2.6"
             className="wassl-splash-node"
           />
@@ -111,7 +111,7 @@ export function SplashIntro() {
             cx="55"
             cy="18.5"
             r="1.5"
-            fill="#E6A23A"
+            fill="#FF8A3D"
             className="wassl-splash-node"
           />
         </svg>
@@ -120,23 +120,23 @@ export function SplashIntro() {
           <span className="font-display text-[42px] font-semibold leading-none tracking-[-0.045em]">
             Wassl
           </span>
-          <span className="arabic text-[22px] font-medium leading-none text-[#F4F0E6]/70">
+          <span className="arabic text-[22px] font-medium leading-none text-[#FFF7EA]/70">
             وصّل
           </span>
         </div>
-        <p className="wassl-splash-tag mt-4 text-[10px] font-medium uppercase tracking-[0.22em] text-[#F4F0E6]/45">
+        <p className="wassl-splash-tag mt-4 text-[10px] font-medium uppercase tracking-[0.22em] text-[#FFF7EA]/45">
           {t("From the store to your door")}
         </p>
 
-        <div className="wassl-splash-line mt-8 h-px w-full overflow-hidden bg-[#F4F0E6]/15">
-          <span className="block h-full w-full origin-left bg-[#E6A23A]" />
+        <div className="wassl-splash-line mt-8 h-px w-full overflow-hidden bg-[#FFF7EA]/15">
+          <span className="block h-full w-full origin-left bg-[#FF8A3D]" />
         </div>
       </div>
 
       <button
         type="button"
         onClick={skip}
-        className="absolute bottom-[calc(22px+env(safe-area-inset-bottom))] end-5 rounded-full border border-[#F4F0E6]/20 px-3 py-1.5 text-[10px] font-medium text-[#F4F0E6]/55 transition-colors hover:text-[#F4F0E6]"
+        className="absolute bottom-[calc(22px+env(safe-area-inset-bottom))] end-5 rounded-full border border-[#FFF7EA]/20 px-3 py-1.5 text-[10px] font-medium text-[#FFF7EA]/55 transition-colors hover:text-[#FFF7EA]"
       >
         {t("Skip")}
       </button>

@@ -154,7 +154,7 @@ Without credentials the app still works; push registration simply stays idle.
 - Native splash screen and generated app icons
   (`assets/` → `npx capacitor-assets generate`).
 - Branded offline page with retry (bundled, shown by `server.errorPath`).
-- Status bar styled to the cream/teal palette.
+- Status bar styled to the cream/cobalt palette.
 - Offline banner while the connection drops.
 - Deep links and Android hardware back-button handling.
 - Light haptic feedback on add-to-cart.

@@ -15,7 +15,7 @@ const config: CapacitorConfig = {
   appId: "ma.wassl.app",
   appName: "Wassl",
   webDir: "mobile/www",
-  backgroundColor: "#F4F0E6",
+  backgroundColor: "#F7F2E8",
   server: {
     url: serverUrl,
     cleartext: process.env.CAPACITOR_CLEARTEXT === "1",
@@ -25,10 +25,10 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: false,
-    backgroundColor: "#F4F0E6",
+    backgroundColor: "#F7F2E8",
   },
   ios: {
-    backgroundColor: "#F4F0E6",
+    backgroundColor: "#F7F2E8",
     contentInset: "never",
     limitsNavigationsToAppBoundDomains: false,
   },
@@ -36,7 +36,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 1200,
       launchAutoHide: true,
-      backgroundColor: "#F4F0E6",
+      backgroundColor: "#0B1226",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
       splashFullScreen: true,
@@ -44,7 +44,7 @@ const config: CapacitorConfig = {
     },
     StatusBar: {
       style: "DARK",
-      backgroundColor: "#F4F0E6",
+      backgroundColor: "#F7F2E8",
       overlaysWebView: false,
     },
     PushNotifications: {

@@ -27,7 +27,7 @@ export async function resizeImage(
   const context = canvas.getContext("2d");
   if (!context) return dataUrl;
   if (options.fit === "contain") {
-    context.fillStyle = "#f7f4ec";
+    context.fillStyle = "#fffcf6";
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
   const scale =

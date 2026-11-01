@@ -10,8 +10,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
-  "background_color": "#F4F0E6",
-  "theme_color": "#153F37",
+  "background_color": "#F7F2E8",
+  "theme_color": "#2447E0",
   "categories": ["food", "shopping", "lifestyle"],
   "icons": [
     { "src": "/icon-48.png", "sizes": "48x48", "type": "image/png", "purpose": "any" },

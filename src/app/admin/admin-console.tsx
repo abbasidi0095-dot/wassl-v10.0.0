@@ -1771,7 +1771,7 @@ export function AdminConsole({
                   <div className="flex items-center gap-2 rounded-[6px] border border-line bg-surface p-1.5">
                     <input
                       type="color"
-                      value={settings.accentColor ?? "#955b0b"}
+                      value={settings.accentColor ?? "#8c3a00"}
                       onChange={(event) =>
                         setSettings({
                           ...settings,
@@ -1783,7 +1783,7 @@ export function AdminConsole({
                       aria-label="Accent colour"
                     />
                     <span className="text-[11px] font-medium uppercase text-muted">
-                      {settings.accentColor ?? "#955b0b"}
+                      {settings.accentColor ?? "#8c3a00"}
                     </span>
                   </div>
                 </label>
