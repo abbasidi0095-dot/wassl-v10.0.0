@@ -29,6 +29,11 @@ and dark themes.
 
 ## Release history
 
+### 11.2.2 — 1 November 2026 — tabs open at the top
+- Fixed client-side navigation keeping the previous page's scroll position.
+- Every dock tab, menu link and in-app route now opens at the top; browser
+  back/forward still restores the previous position.
+
 ### 11.2.1 — 1 November 2026 — ticker edge fade
 - Softened the promo ticker edges so moving text fades instead of clipping hard.
 - Verified the ticker, launcher and pharmacy page in light, dark and Arabic RTL.

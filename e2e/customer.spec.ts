@@ -116,6 +116,18 @@ test("home is a simple launcher with services and open stores", async ({
   await expect(page.locator(".tabbar a").nth(1)).toContainText("Food");
 });
 
+test("a dock tab opens the next page at the top", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(400);
+
+  await page.locator(".tabbar a").filter({ hasText: "Grocery" }).click();
+  await expect(page).toHaveURL(/\/grocery$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});
+
 test("pharmacy lists licensed partners and over-the-counter products", async ({
   page,
 }) => {

@@ -6,6 +6,7 @@ import { OngoingTracker } from "@/components/ongoing-tracker";
 import { NativeShell } from "@/components/native-shell";
 import { BrandProvider } from "@/components/brand-provider";
 import { SplashIntro } from "@/components/splash-intro";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { PwaUpdater } from "@/components/pwa-updater";
 import { FloatingCart } from "@/components/floating-cart";
 import { dirFor } from "@/lib/i18n";
@@ -124,6 +125,7 @@ export default async function RootLayout({
         >
         <LocaleProvider initialLocale={locale}>
           <SplashIntro />
+          <ScrollToTop />
           <LiveActivityProvider>
             <CartProvider>
               <NativeShell />

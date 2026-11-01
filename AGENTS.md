@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.2.1** (1 November 2026; pharmacy, promo ticker and focused launcher)
+- Release: **11.2.2** (1 November 2026; tabs open at the top)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,12 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.2.2 — tabs open at the top
+- `ScrollToTop` resets window scroll on pathname changes (Next 16 kept the
+  previous position), with a second reset on iOS focus settle.
+- Browser back/forward is left to native scroll restoration.
+- Regression test: scroll to the bottom, tap Grocery, expect `scrollY === 0`.
 
 ### 11.2.1 — ticker edge fade
 - Ticker edges fade into the strip in light, dark and RTL.
