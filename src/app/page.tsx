@@ -1,31 +1,28 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Building2,
   CarTaxiFront,
   Headphones,
   MessageCircle,
-  Package,
+  Pill,
   ReceiptText,
   Search,
   ShoppingBasket,
   Sparkles,
   UtensilsCrossed,
-  Wrench,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
+import { PromoTicker } from "@/components/promo-ticker";
 import { StoreCard } from "@/components/store-card";
 import { getSession } from "@/lib/auth";
 import {
   getCities,
   getCity,
   getOrderViews,
-  getParcels,
   getStores,
   getTaxiRides,
   getUserById,
 } from "@/lib/db";
-import { cityServices } from "@/lib/city-services";
 import { getOpenState } from "@/lib/hours";
 import { getTranslator } from "@/lib/i18n-server";
 import { money } from "@/lib/utils";
@@ -50,8 +47,14 @@ export default async function HomePage() {
   const cityLabel = locale === "ar" ? dakhla.nameAr : dakhla.name;
   const stores = await getStores();
   const localStores = stores.filter((store) => store.citySlug === dakhla.slug);
-  const services = cityServices(dakhla);
-  const [user, orders, rides, parcels] = await Promise.all([
+  const localPharmacies = localStores.filter(
+    (store) => store.category === "pharmacy",
+  );
+  const pharmacyPartner = stores.find((store) => store.category === "pharmacy");
+  const pharmacyPartnerCity = cities.find(
+    (city) => city.slug === pharmacyPartner?.citySlug,
+  );
+  const [user, orders, rides] = await Promise.all([
     session ? getUserById(session.userId) : Promise.resolve(undefined),
     session?.email
       ? getOrderViews({ customerEmail: session.email })
@@ -59,16 +62,10 @@ export default async function HomePage() {
     session?.role === "customer"
       ? getTaxiRides({ customerId: session.userId, limit: 5 })
       : Promise.resolve([]),
-    session?.role === "customer"
-      ? getParcels({ customerId: session.userId, limit: 5 })
-      : Promise.resolve([]),
   ]);
   const activeOrders = orders.filter((order) => ORDER_ACTIVE.has(order.status)).slice(0, 2);
   const activeRides = rides.filter(
     (ride) => !["completed", "cancelled"].includes(ride.status),
-  ).slice(0, 1);
-  const activeParcels = parcels.filter(
-    (parcel) => !["delivered", "cancelled"].includes(parcel.status),
   ).slice(0, 1);
   const openNow = localStores.filter((store) => getOpenState(store).open).length;
   const picks = localStores
@@ -84,19 +81,28 @@ export default async function HomePage() {
   const launcher = [
     {
       href: `/city/${dakhla.slug}`,
-      label: t("Delivery"),
-      note: t("Restaurants and cafés"),
+      label: t("Food to go"),
+      note: t("Restaurants, cafés and delivery"),
       detail: t("{count} open now", { count: openNow }),
       icon: UtensilsCrossed,
-      enabled: services.restaurant,
     },
     {
       href: "/grocery",
       label: t("Grocery"),
       note: t("Supermarkets and essentials"),
-      detail: t("24/7 where staffed"),
+      detail: t("Delivery or pickup"),
       icon: ShoppingBasket,
-      enabled: services.grocery,
+    },
+    {
+      href: `/pharmacy?city=${dakhla.slug}`,
+      label: t("Pharmacy"),
+      note: t("Health, baby and personal care"),
+      detail: localPharmacies.length
+        ? localPharmacies.length === 1
+          ? t("1 partner online")
+          : t("{count} partners online", { count: localPharmacies.length })
+        : t("Licensed partners"),
+      icon: Pill,
     },
     {
       href: "/taxi",
@@ -104,37 +110,24 @@ export default async function HomePage() {
       note: t("Cash fare, live route"),
       detail: t("Local and intercity"),
       icon: CarTaxiFront,
-      enabled: services.taxi,
     },
-    {
-      href: "/express",
-      label: t("Express"),
-      note: t("Parcels and documents"),
-      detail: t("Pickup and delivery codes"),
-      icon: Package,
-      enabled: services.express,
-    },
-    {
-      href: "/services",
-      label: t("Services"),
-      note: t("Laundry, cleaning, repairs"),
-      detail: t("Approved local providers"),
-      icon: Wrench,
-      enabled: services.services,
-    },
-    {
-      href: "/business",
-      label: t("Business"),
-      note: t("Wholesale and bulk"),
-      detail: t("For shops, cafés and offices"),
-      icon: Building2,
-      enabled: services.business,
-    },
-  ].filter((item) => item.enabled);
+  ];
 
   return (
     <>
       <SiteHeader cities={cities} currentCity={dakhla} />
+      <PromoTicker
+        citySlug={dakhla.slug}
+        cityName={cityLabel}
+        pharmacyLive={localPharmacies.length > 0}
+        pharmacyCity={
+          pharmacyPartnerCity
+            ? locale === "ar"
+              ? pharmacyPartnerCity.nameAr
+              : pharmacyPartnerCity.name
+            : ""
+        }
+      />
       <main className="container-wassl pb-[112px] pt-5 md:pb-12">
         <section>
           <div className="flex flex-wrap items-end justify-between gap-3">
@@ -146,7 +139,7 @@ export default async function HomePage() {
                 {name ? t("Salam, {name}.", { name }) : t("What do you need today?")}
               </h1>
               <p className="mt-2 max-w-[48ch] text-[13px] leading-6 text-muted">
-                {t("One app for food, groceries, rides, parcels and local services.")}
+                {t("One app for food, groceries, pharmacy and rides.")}
               </p>
             </div>
             <div className="hidden text-end sm:block">
@@ -187,7 +180,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {activeOrders.length || activeRides.length || activeParcels.length ? (
+        {activeOrders.length || activeRides.length ? (
           <section className="mt-5">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
               {t("In progress")}
@@ -233,26 +226,6 @@ export default async function HomePage() {
                   <ArrowRight size={13} className="text-muted" />
                 </Link>
               ))}
-              {activeParcels.map((parcel) => (
-                <Link
-                  key={parcel.id}
-                  href={`/express/${parcel.id}`}
-                  className="aero-tile flex items-center gap-3 rounded-[10px] border p-3"
-                >
-                  <span className="grid h-9 w-9 place-items-center rounded-[6px] bg-brand-soft text-brand">
-                    <Package size={15} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12px] font-semibold">
-                      {parcel.code} · {parcel.dropoffLabel}
-                    </span>
-                    <span className="block text-[10px] text-muted">
-                      {t(parcel.status.replace("_", " "))} · {money(parcel.fare)}
-                    </span>
-                  </span>
-                  <ArrowRight size={13} className="text-muted" />
-                </Link>
-              ))}
             </div>
           </section>
         ) : null}
@@ -262,21 +235,20 @@ export default async function HomePage() {
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
               {t("Services")}
             </h2>
-            <span className="text-[10px] text-muted">{launcher.length}</span>
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-2.5 sm:grid-cols-3 xl:grid-cols-6">
+          <div className="mt-2 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
             {launcher.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="aero-tile group flex min-h-[124px] flex-col justify-between rounded-[12px] border p-3.5 transition-colors hover:border-line-strong sm:min-h-[142px] xl:min-h-[132px]"
+                className="aero-tile group flex min-h-[124px] flex-col justify-between rounded-[12px] border p-3.5 transition-colors hover:border-line-strong sm:min-h-[142px] lg:min-h-[132px]"
               >
                 <span className="grid h-10 w-10 place-items-center rounded-[8px] bg-surface-2 text-brand">
                   <item.icon size={19} strokeWidth={1.7} />
                 </span>
                 <span className="mt-4 block">
                   <span className="flex items-center justify-between gap-2">
-                    <span className="font-display text-[19px] font-semibold tracking-[-0.03em]">
+                    <span className="font-display text-[17px] font-semibold tracking-[-0.03em] min-[380px]:text-[19px]">
                       {item.label}
                     </span>
                     <ArrowRight
@@ -298,22 +270,23 @@ export default async function HomePage() {
 
         {picks.length ? (
           <section className="mt-7">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <h2 className="headline">{t("Open now in {city}", { city: cityLabel })}</h2>
-                <p className="mt-1 text-[11px] text-muted">
-                  {t("Top-rated kitchens delivering today.")}
-                </p>
-              </div>
-              <Link href={`/city/${dakhla.slug}`} className="btn btn-ghost btn-sm">
-                {t("See all")} <ArrowRight size={12} />
-              </Link>
+            <div>
+              <h2 className="headline">{t("Open now in {city}", { city: cityLabel })}</h2>
+              <p className="mt-1 text-[11px] text-muted">
+                {t("Top-rated kitchens delivering today.")}
+              </p>
             </div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {picks.map((store) => (
                 <StoreCard key={store.id} store={store} />
               ))}
             </div>
+            <Link
+              href={`/city/${dakhla.slug}`}
+              className="btn btn-ghost mt-3 h-11 w-full justify-center"
+            >
+              {t("See all restaurants and cafés")} <ArrowRight size={13} />
+            </Link>
           </section>
         ) : null}
 

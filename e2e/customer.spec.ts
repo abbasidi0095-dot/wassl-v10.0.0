@@ -106,10 +106,31 @@ test("home is a simple launcher with services and open stores", async ({
     page.getByRole("heading", { name: /What do you need today|Salam,/ }),
   ).toBeVisible();
   await expect(page.getByPlaceholder("Search food, groceries, rides…")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Delivery/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Food to go/ }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: /Grocery/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Pharmacy/ }).first()).toBeVisible();
+  await expect(page.locator(".promo-ticker")).toBeVisible();
+  await expect(page.getByRole("link", { name: /See all restaurants and cafés/ })).toBeVisible();
   await expect(page.getByText("Open now in Dakhla")).toBeVisible();
   await expect(page.locator(".tabbar a")).toHaveCount(5);
+  await expect(page.locator(".tabbar a").nth(1)).toContainText("Food");
+});
+
+test("pharmacy lists licensed partners and over-the-counter products", async ({
+  page,
+}) => {
+  await page.goto("/pharmacy?city=dakhla");
+  await expect(
+    page.getByRole("heading", { name: "Pharmacy, at your door." }),
+  ).toBeVisible();
+  await expect(page.getByText("No pharmacy partner in Dakhla yet.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Pharmacies in Laayoune" }),
+  ).toBeVisible();
+  await expect(page.getByText("Pharmacie Al Wafa").first()).toBeVisible();
+  await expect(
+    page.getByText(/Prescription medicines are not sold on Wassl/),
+  ).toBeVisible();
 });
 
 test("barcode lookup adds a real product to the multi-store basket", async ({

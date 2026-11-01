@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.1.0** (1 November 2026).
+Current delivered baseline: **11.2.1** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -161,6 +161,14 @@ enhancements, not blocking the v11 core release.
 - Runs on every full app launch/reload; internal navigation is splash-free.
 - Reduced-motion skip remains.
 - iOS PWA startup images and service-worker cache refresh.
+
+### Pharmacy, promo ticker and focused launcher
+
+- Four launcher services: Food to go, Grocery, Pharmacy and Taxi.
+- Express, Services and Business are no longer in customer navigation.
+- New `/pharmacy` route with partners, stock and OTC guidance.
+- Home promo/news ticker with copyable codes and reduced-motion fallback.
+- "See all restaurants and cafés" moved below the cards.
 
 ### Simple launcher home
 

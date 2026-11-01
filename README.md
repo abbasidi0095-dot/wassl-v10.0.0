@@ -29,6 +29,22 @@ and dark themes.
 
 ## Release history
 
+### 11.2.1 — 1 November 2026 — ticker edge fade
+- Softened the promo ticker edges so moving text fades instead of clipping hard.
+- Verified the ticker, launcher and pharmacy page in light, dark and Arabic RTL.
+
+### 11.2.0 — 1 November 2026 — pharmacy, promo ticker and a focused launcher
+- Launcher services are now **Food to go**, **Grocery**, **Pharmacy** and
+  **Taxi**. Express, Services and Business were removed from the customer
+  launcher and menu (their admin operations remain).
+- New **Pharmacy** page lists licensed partners, live stock and over-the-counter
+  products. Availability is stated honestly when a city has no partner yet.
+- Home has a moving **promo and news ticker** with copyable codes. It pauses on
+  hover/focus and becomes a static scroll row for reduced-motion users.
+- "See all restaurants and cafés" now sits below the store cards as a full-width
+  button instead of in the section header.
+- Bottom dock: Home, Food, Grocery, Pharmacy, Account.
+
 ### 11.1.0 — 1 November 2026 — simple launcher home
 - Home is now a launcher: greeting, one search field, quick links, in-progress
   jobs, six service tiles and open-now picks. The long editorial sections are

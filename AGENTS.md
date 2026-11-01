@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.1.0** (1 November 2026; simple launcher home)
+- Release: **11.2.1** (1 November 2026; pharmacy, promo ticker and focused launcher)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,19 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.2.1 — ticker edge fade
+- Ticker edges fade into the strip in light, dark and RTL.
+
+### 11.2.0 — pharmacy, promo ticker and focused launcher
+- Launcher: Food to go, Grocery, Pharmacy, Taxi. Express, Services and Business
+  removed from customer navigation; their admin/merchant operations remain.
+- `/pharmacy` page: licensed partners, live stock, OTC products and an honest
+  no-partner-yet state.
+- `PromoTicker` on home: promo codes (copyable), city news and service news.
+  Pauses on hover/focus; static and scrollable for reduced motion.
+- "See all restaurants and cafés" moved below the store grid.
+- Dock: Home, Food, Grocery, Pharmacy, Account.
 
 ### 11.1.0 — simple launcher home
 - `src/app/page.tsx` reduced from 879 to ~270 lines: search, quick links,

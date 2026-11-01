@@ -4,21 +4,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Building2,
   CarTaxiFront,
   ChevronDown,
   House,
   LayoutDashboard,
   MapPin,
   Menu,
-  Package,
+  Pill,
   ReceiptText,
   Search,
   ShoppingBag,
   ShoppingBasket,
   Store,
   UserRound,
-  Wrench,
+  UtensilsCrossed,
   X,
 } from "lucide-react";
 import type { City } from "@/lib/types";
@@ -29,7 +28,6 @@ import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { useI18n } from "./locale-provider";
 import { useCart } from "./cart-provider";
-import { cityServices } from "@/lib/city-services";
 
 type AccountInfo = {
   name: string;
@@ -85,16 +83,6 @@ export function SiteHeader({
   const southern = cities.filter((city) => city.priority);
   const others = cities.filter((city) => !city.priority);
   const selected = currentCity?.slug || "dakhla";
-  const services = currentCity
-    ? cityServices(currentCity)
-    : {
-        restaurant: true,
-        grocery: true,
-        taxi: true,
-        express: false,
-        services: false,
-        business: false,
-      };
 
   const cityOptions = (
     <>
@@ -117,13 +105,9 @@ export function SiteHeader({
 
   const mobileNav = [
     { href: "/", label: t("Home"), icon: House },
-    ...(services.grocery
-      ? [{ href: "/grocery", label: t("Grocery"), icon: ShoppingBasket }]
-      : []),
-    ...(services.taxi
-      ? [{ href: "/taxi", label: t("Taxi"), icon: CarTaxiFront }]
-      : []),
-    { href: "/orders", label: t("Orders"), icon: ReceiptText },
+    { href: `/city/${selected}`, label: t("Food"), icon: UtensilsCrossed },
+    { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
+    { href: "/pharmacy", label: t("Pharmacy"), icon: Pill },
     {
       href: account ? accountHref(account) : "/login",
       label: account
@@ -259,20 +243,12 @@ export function SiteHeader({
                 { href: `/search?city=${selected}`, label: t("Search"), icon: Search },
                 {
                   href: currentCity ? `/city/${currentCity.slug}` : "/",
-                  label: t("Stores"),
-                  icon: Store,
+                  label: t("Food to go"),
+                  icon: UtensilsCrossed,
                 },
                 { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
+                { href: "/pharmacy", label: t("Pharmacy"), icon: Pill },
                 { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
-                ...(services.express
-                  ? [{ href: "/express", label: t("Express"), icon: Package }]
-                  : []),
-                ...(services.services
-                  ? [{ href: "/services", label: t("Services"), icon: Wrench }]
-                  : []),
-                ...(services.business
-                  ? [{ href: "/business", label: t("Business"), icon: Building2 }]
-                  : []),
                 { href: "/orders", label: t("My orders"), icon: ReceiptText },
                 ...(account
                   ? [
