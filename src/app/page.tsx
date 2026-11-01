@@ -20,7 +20,19 @@ import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
 import { StoreCard } from "@/components/store-card";
 import { MapView } from "@/components/map-view";
-import { dashboardStats, getCities, getPriorityCities, getStores } from "@/lib/db";
+import { HomeFeedSection } from "@/components/home-feed";
+import {
+  dashboardStats,
+  getCities,
+  getOrders,
+  getPopularProducts,
+  getPriorityCities,
+  getStores,
+  getUserById,
+} from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { buildHomeFeed } from "@/lib/personalization";
+import { cityServices } from "@/lib/city-services";
 import { getOpenState } from "@/lib/hours";
 import { getTranslator } from "@/lib/i18n-server";
 import { storePhoto } from "@/lib/store-images";
@@ -30,14 +42,17 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const { t, locale } = await getTranslator();
-  const [cities, priority, stores, stats] = await Promise.all([
+  const session = await getSession();
+  const [cities, priority, stores, stats, popularProducts] = await Promise.all([
     getCities(),
     getPriorityCities(),
     getStores(),
     dashboardStats(),
+    getPopularProducts("dakhla", 8),
   ]);
   const dakhla = cities.find((city) => city.slug === "dakhla") || priority[0];
   const cityLabel = locale === "ar" ? dakhla.nameAr : dakhla.name;
+  const enabledServices = cityServices(dakhla);
   const groceryStores = stores.filter((store) => store.category === "grocery");
   const featuredGrocery =
     groceryStores.find((store) => store.slug === "sahara-market") ?? groceryStores[0];
@@ -53,6 +68,20 @@ export default async function HomePage() {
   const localRestaurants = restaurants.filter(
     (store) => store.citySlug === dakhla.slug,
   );
+  const [user, orders] = await Promise.all([
+    session ? getUserById(session.userId) : Promise.resolve(undefined),
+    session?.email
+      ? getOrders({ customerEmail: session.email })
+      : Promise.resolve([]),
+  ]);
+  const homeFeed = buildHomeFeed({
+    citySlug: dakhla.slug,
+    stores,
+    popularProducts,
+    orders,
+    favouriteProductIds: user?.favorites ?? [],
+    limit: 6,
+  });
   const topRestaurants = [
     ...(localRestaurants.length >= 3 ? localRestaurants : restaurants),
   ]
@@ -71,6 +100,7 @@ export default async function HomePage() {
       note: t("Supermarkets, 24/7 where staffed"),
       icon: ShoppingBasket,
       count: groceryStores.length,
+      enabled: enabledServices.grocery,
     },
     {
       href: `/city/${dakhla.slug}`,
@@ -78,6 +108,7 @@ export default async function HomePage() {
       note: t("Local kitchens and cafés"),
       icon: UtensilsCrossed,
       count: stores.filter((store) => store.category === "restaurant").length,
+      enabled: enabledServices.restaurant,
     },
     {
       href: `/city/${dakhla.slug}`,
@@ -85,6 +116,7 @@ export default async function HomePage() {
       note: t("Essentials, late hours"),
       icon: Pill,
       count: stores.filter((store) => store.category === "pharmacy").length,
+      enabled: enabledServices.restaurant,
     },
     {
       href: "/taxi",
@@ -92,6 +124,7 @@ export default async function HomePage() {
       note: t("Cash fare, live route"),
       icon: CarTaxiFront,
       count: null,
+      enabled: enabledServices.taxi,
     },
   ];
 
@@ -100,6 +133,7 @@ export default async function HomePage() {
       <SiteHeader cities={cities} currentCity={dakhla} />
       <main>
         {/* Restaurants first: three real listings before anything else. */}
+        {enabledServices.restaurant ? (
         <section className="container-wassl pt-8 lg:pt-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -132,9 +166,10 @@ export default async function HomePage() {
             ))}
           </div>
         </section>
+        ) : null}
 
         {/* Grocery feature on an ink field. */}
-        {featuredGrocery ? (
+        {featuredGrocery && enabledServices.grocery ? (
           <section className="field-ink mt-16 border-y border-line lg:mt-24">
             <div className="container-wassl grid gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 lg:py-16">
               <div>
@@ -260,6 +295,7 @@ export default async function HomePage() {
         ) : null}
 
         {/* Taxi: real photography plus a moving route, before the service index. */}
+        {enabledServices.taxi ? (
         <section className="container-wassl mt-16 lg:mt-24">
           <div className="overflow-hidden rounded-[16px] border border-line bg-surface">
             <div className="grid lg:grid-cols-[1.02fr_0.98fr]">
@@ -351,6 +387,7 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        ) : null}
 
         {/* All services, after the two lead offerings. */}
         <section className="container-wassl mt-12 lg:mt-16">
@@ -363,7 +400,7 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="mt-4 grid grid-cols-2 border-s border-t border-line lg:grid-cols-4">
-            {doors.map((door) => (
+            {doors.filter((door) => door.enabled).map((door) => (
               <Link
                 key={door.label}
                 href={door.href}
@@ -547,6 +584,12 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        <HomeFeedSection
+          feed={homeFeed}
+          cityLabel={cityLabel}
+          citySlug={dakhla.slug}
+        />
+
         {/* Brand close: the old intro now sits after every service. */}
         <section className="mt-16 border-t border-line lg:mt-24">
         <div className="container-wassl grid gap-10 pb-12 pt-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:gap-14 lg:pb-16 lg:pt-16">

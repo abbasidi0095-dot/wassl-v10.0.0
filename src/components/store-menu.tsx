@@ -14,9 +14,11 @@ import { useLiveActivity } from "./live-activity-provider";
 export function StoreMenu({
   store,
   products,
+  initialProductId,
 }: {
   store: Store;
   products: Product[];
+  initialProductId?: string;
 }) {
   const categories = useMemo(
     () => Array.from(new Set(products.map((product) => product.category))),
@@ -24,7 +26,9 @@ export function StoreMenu({
   );
   const [active, setActive] = useState(categories[0] || "");
   const [query, setQuery] = useState("");
-  const [sheet, setSheet] = useState<Product | null>(null);
+  const [sheet, setSheet] = useState<Product | null>(
+    () => products.find((product) => product.id === initialProductId) ?? null,
+  );
   const { addItem, count, items, storeId } = useCart();
   const { t } = useI18n();
   const { activeOrders, activeRides } = useLiveActivity();

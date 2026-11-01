@@ -14,7 +14,12 @@ import { GroceryBrowser } from "./grocery-browser";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Grocery" };
 
-export default async function GroceryPage() {
+export default async function GroceryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; filter?: string }>;
+}) {
+  const params = await searchParams;
   const { t } = await getTranslator();
   const [cities, stores, drivers] = await Promise.all([
     getCities(),
@@ -202,7 +207,19 @@ export default async function GroceryPage() {
               <h2 className="headline">{t("Shop by store")}</h2>
             </div>
             <div className="mt-4">
-              <GroceryBrowser items={items} />
+              <GroceryBrowser
+                items={items}
+                initialQuery={(params.q ?? "").slice(0, 80)}
+                initialFilter={
+                  params.filter === "open" ||
+                  params.filter === "delivery" ||
+                  params.filter === "pickup" ||
+                  params.filter === "express" ||
+                  params.filter === "all"
+                    ? params.filter
+                    : "all"
+                }
+              />
             </div>
           </div>
         </section>

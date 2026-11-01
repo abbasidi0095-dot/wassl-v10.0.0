@@ -11,6 +11,7 @@ import {
   MapPin,
   Menu,
   ReceiptText,
+  Search,
   ShoppingBag,
   ShoppingBasket,
   Store,
@@ -25,6 +26,7 @@ import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { useI18n } from "./locale-provider";
 import { useCart } from "./cart-provider";
+import { cityServices } from "@/lib/city-services";
 
 type AccountInfo = {
   name: string;
@@ -80,6 +82,16 @@ export function SiteHeader({
   const southern = cities.filter((city) => city.priority);
   const others = cities.filter((city) => !city.priority);
   const selected = currentCity?.slug || "dakhla";
+  const services = currentCity
+    ? cityServices(currentCity)
+    : {
+        restaurant: true,
+        grocery: true,
+        taxi: true,
+        express: false,
+        services: false,
+        business: false,
+      };
 
   const nav = [
     {
@@ -87,8 +99,13 @@ export function SiteHeader({
       label: t("Discover"),
       active: pathname.startsWith("/city/"),
     },
-    { href: "/grocery", label: t("Grocery"), active: pathname === "/grocery" },
-    { href: "/taxi", label: t("Taxi"), active: pathname.startsWith("/taxi") },
+    { href: `/search?city=${selected}`, label: t("Search"), active: pathname.startsWith("/search") },
+    ...(services.grocery
+      ? [{ href: "/grocery", label: t("Grocery"), active: pathname === "/grocery" }]
+      : []),
+    ...(services.taxi
+      ? [{ href: "/taxi", label: t("Taxi"), active: pathname.startsWith("/taxi") }]
+      : []),
     {
       href: "/orders",
       label: t("My orders"),
@@ -127,8 +144,12 @@ export function SiteHeader({
       label: t("Stores"),
       icon: Store,
     },
-    { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
-    { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
+    ...(services.grocery
+      ? [{ href: "/grocery", label: t("Grocery"), icon: ShoppingBasket }]
+      : []),
+    ...(services.taxi
+      ? [{ href: "/taxi", label: t("Taxi"), icon: CarTaxiFront }]
+      : []),
     { href: "/orders", label: t("Orders"), icon: ReceiptText },
     {
       href: account ? accountHref(account) : "/login",
@@ -184,6 +205,14 @@ export function SiteHeader({
                 className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-muted"
               />
             </label>
+
+            <Link
+              href={`/search?city=${selected}`}
+              className={cn(iconButton, "relative")}
+              aria-label={t("Search Wassl")}
+            >
+              <Search size={18} />
+            </Link>
 
             <LanguageSwitcher compact className="md:hidden" />
             <div className="hidden md:block">
@@ -257,6 +286,7 @@ export function SiteHeader({
               </label>
               {[
                 { href: "/", label: t("Home"), icon: House },
+                { href: `/search?city=${selected}`, label: t("Search"), icon: Search },
                 {
                   href: currentCity ? `/city/${currentCity.slug}` : "/",
                   label: t("Stores"),
@@ -308,7 +338,8 @@ export function SiteHeader({
       </header>
 
       <nav
-        className="tabbar fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-40 grid grid-cols-6 overflow-hidden rounded-[18px] border border-line/80 md:hidden"
+        className="tabbar fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-40 grid overflow-hidden rounded-[18px] border border-line/80 md:hidden"
+        style={{ gridTemplateColumns: `repeat(${mobileNav.length}, minmax(0, 1fr))` }}
         aria-label="Sections"
       >
         {mobileNav.map((item) => (

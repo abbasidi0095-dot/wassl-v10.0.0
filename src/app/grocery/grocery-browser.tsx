@@ -18,10 +18,18 @@ type Item = {
 
 type Filter = "all" | "open" | "delivery" | "pickup" | "express";
 
-export function GroceryBrowser({ items }: { items: Item[] }) {
+export function GroceryBrowser({
+  items,
+  initialQuery = "",
+  initialFilter = "all",
+}: {
+  items: Item[];
+  initialQuery?: string;
+  initialFilter?: Filter;
+}) {
   const { t } = useI18n();
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState(initialQuery);
+  const [filter, setFilter] = useState<Filter>(initialFilter);
   const [sort, setSort] = useState<"rating" | "name">("rating");
 
   const visible = useMemo(() => {

@@ -8,6 +8,15 @@ export type AccountStatus = "active" | "pending" | "rejected";
 
 export type CityStatus = "live" | "soon";
 
+/** Independently activatable services inside one city. */
+export type CityService =
+  | "restaurant"
+  | "grocery"
+  | "taxi"
+  | "express"
+  | "services"
+  | "business";
+
 export interface City {
   id: string;
   slug: string;
@@ -20,6 +29,8 @@ export interface City {
   priority: boolean;
   active: boolean;
   launchStatus: CityStatus;
+  /** Per-service activation. Missing keys fall back to safe defaults. */
+  services?: Partial<Record<CityService, boolean>>;
 }
 
 export interface User {

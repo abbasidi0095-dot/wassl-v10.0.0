@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **10.8.0** (31 October 2026; grocery back office)
+- Release: **11.0.0-alpha.2** (1 November 2026; unified search, home feed and city service activation)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,32 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.0-alpha.2 — service-level city activation
+- `City.services` stores independent flags for restaurant, grocery, taxi,
+  express, services and business. `src/lib/city-services.ts` supplies defaults,
+  merge and sanitisation helpers.
+- `updateCity()` and `/api/admin/cities` accept a partial service patch.
+- Admin Cities has a per-city Services dialog. Home doors, header/mobile
+  navigation and search service results honour the flags.
+- Existing live cities default to restaurant/grocery/taxi on; the new verticals
+  default off until an operator enables them.
+- Added `tests/city-services.test.ts` and an admin Playwright case.
+
+### 11.0.0-alpha.1 — unified search and personalized home
+- `src/lib/search.ts` scores real stores, products, aisle categories, enabled
+  services and delivery options with Latin/Arabic normalization and bounded
+  Levenshtein typo tolerance.
+- `/api/search` and `/search` add grouped results, recent searches, suggestions
+  and city filtering. The header exposes search on desktop and mobile.
+- `src/lib/personalization.ts` builds a deterministic home feed from the
+  customer's recent orders, favourites, popular in-stock products, opening
+  hours and Casablanca time of day.
+- Store product deep links (`/store/[slug]?product=…`) open the product sheet;
+  city and grocery pages accept query/category/filter parameters.
+- Added `tests/search.test.ts`, `tests/personalization.test.ts` and two
+  Playwright cases. This is Phase 1A only; the 11.0 roadmap continues in
+  `docs/WASSL-11-PROGRESS.md`.
 
 ### 10.8.0 — grocery back office
 - Admin **Stores** tab filters partners into Restaurants, Grocery and Other;

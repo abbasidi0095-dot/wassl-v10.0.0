@@ -21,6 +21,7 @@ import {
 import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
 import { casablancaNow } from "./hours";
+import { sanitizeCityServices } from "./city-services";
 import {
   BOOTSTRAP_ADMIN_EMAIL,
   BOOTSTRAP_ADMIN_PASSWORD,
@@ -870,6 +871,42 @@ export async function getStore(slugOrId: string): Promise<Store | undefined> {
 
 export async function getProducts(storeId: string): Promise<Product[]> {
   return (await getDb()).products.filter((product) => product.storeId === storeId);
+}
+
+/** Popular, in-stock grocery products used by discovery rails. */
+export async function getPopularProducts(
+  citySlug?: string,
+  limit = 8,
+): Promise<Array<{ product: Product; store: Store }>> {
+  const db = await getDb();
+  const stores = new Map(
+    db.stores
+      .filter(
+        (store) =>
+          store.category === "grocery" &&
+          (!citySlug || store.citySlug === citySlug),
+      )
+      .map((store) => [store.id, store]),
+  );
+  return db.products
+    .filter((product) => {
+      if (!stores.has(product.storeId) || !product.available) return false;
+      if (product.variants?.length) {
+        return product.variants.some((variant) => variant.stock > 0);
+      }
+      return (product.stock ?? 1) > 0;
+    })
+    .sort(
+      (a, b) =>
+        Number(Boolean(b.popular)) - Number(Boolean(a.popular)) ||
+        (b.stock ?? 0) - (a.stock ?? 0) ||
+        a.name.localeCompare(b.name),
+    )
+    .slice(0, Math.max(1, Math.min(limit, 20)))
+    .map((product) => ({
+      product,
+      store: stores.get(product.storeId)!,
+    }));
 }
 
 export async function getDrivers(citySlug?: string): Promise<Driver[]> {
@@ -3107,14 +3144,19 @@ export async function updateProductDetails(
 
 export async function updateCity(
   cityId: string,
-  patch: Partial<Pick<City, "launchStatus" | "active">>,
+  patch: Partial<Pick<City, "launchStatus" | "active" | "services">>,
   actor: OrderActor,
 ): Promise<City> {
   return mutate((db) => {
     const city = db.cities.find((item) => item.id === cityId);
     if (!city) throw new Error("City not found");
+    const beforeServices = JSON.stringify(city.services ?? {});
     const before = `${city.launchStatus}/${city.active}`;
-    Object.assign(city, patch);
+    const { services, ...rest } = patch;
+    Object.assign(city, rest);
+    if (services) {
+      city.services = { ...city.services, ...sanitizeCityServices(services) };
+    }
     recordAudit(db, {
       actorRole: actor.role,
       actorId: actor.id,
@@ -3125,6 +3167,13 @@ export async function updateCity(
       summary: `${city.name}: ${before} → ${city.launchStatus}/${city.active}`,
       before,
       after: `${city.launchStatus}/${city.active}`,
+      metadata:
+        services !== undefined
+          ? {
+              beforeServices,
+              afterServices: JSON.stringify(city.services ?? {}),
+            }
+          : undefined,
     });
     publish({ type: "settings" });
     return city;

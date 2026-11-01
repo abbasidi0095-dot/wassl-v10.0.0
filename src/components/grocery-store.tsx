@@ -38,6 +38,7 @@ export function GroceryStore({
   loyaltyPoints,
   favorites: initialFavorites,
   signedIn,
+  initialProductId,
 }: {
   store: Store;
   photo: string;
@@ -47,6 +48,7 @@ export function GroceryStore({
   loyaltyPoints: number;
   favorites: string[];
   signedIn: boolean;
+  initialProductId?: string;
 }) {
   const router = useRouter();
   const { t } = useI18n();
@@ -56,7 +58,9 @@ export function GroceryStore({
   const [sort, setSort] = useState<"popular" | "price-asc" | "price-desc" | "name">(
     "popular",
   );
-  const [sheet, setSheet] = useState<Product | null>(null);
+  const [sheet, setSheet] = useState<Product | null>(
+    () => products.find((product) => product.id === initialProductId) ?? null,
+  );
   const [favorites, setFavorites] = useState<string[]>(initialFavorites);
   const [toast, setToast] = useState("");
   const [onlyAvailable, setOnlyAvailable] = useState(false);

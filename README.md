@@ -29,6 +29,29 @@ and dark themes.
 
 ## Release history
 
+### 11.0.0-alpha.2 — 1 November 2026 — service-level city activation
+- Cities now carry independent activation for restaurants, grocery, taxi,
+  Express, local services and business. Turning one service off never disables
+  the others.
+- Admin Cities gains a per-city **Services** dialog. The home service rail,
+  header navigation, mobile dock and search service results respect the flags.
+- Existing live cities keep restaurants, grocery and taxi enabled by default;
+  Express, local services and business stay off until an operator enables them.
+- Added city-service unit tests and an admin end-to-end test.
+
+### 11.0.0-alpha.1 — 1 November 2026 — unified search and personalized home
+- Added a real global search API and `/search` experience across stores,
+  products, categories, services and delivery options. Results come only from
+  persisted Wassl data, with recent searches, suggestions and typo tolerance.
+- Added a deterministic “For you” home feed built from recent orders, favourites,
+  popular products, opening hours and time of day. No external AI provider is
+  required.
+- Search results deep-link into a storefront product sheet; city and grocery
+  pages accept query/category/filter parameters.
+- Added 8 unit tests and 2 Playwright tests for search, product links and the
+  home feed. This is the first milestone of the 11.0 programme, not the full
+  super-app expansion.
+
 ### 10.8.0 — 31 October 2026 — grocery back office
 - Admin **Stores** now separates **Restaurants**, **Grocery** and **Other**
   partners, with a view-specific **Add grocery** action and one-click delete.
@@ -466,6 +489,10 @@ staff out.
 - Product options/modifiers priced on the server, not trusted from the client
 - COD checkout: name, phone, address, landmark, notes, ASAP or scheduled slot,
   map pin picker, saved-address chips, promo codes
+- Unified search across stores, products, categories, services and delivery
+  options, with recent searches, suggestions and typo tolerance
+- Deterministic “For you” recommendations from orders, favourites, stock and
+  opening hours
 - Live tracking: SSE updates, timeline, driver card, call/WhatsApp, ETA fallback
 - Receipt, cash status, order history, one-click reorder (with modifiers)
 - Wassl Taxi: map-based pickup/drop-off, distance and fare estimate, cash ride,
@@ -728,12 +755,12 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 72 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 85 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three
   concurrent writers, rollback, durable audit trail)
-- Playwright suite (10 tests) covers password sign-in, new-account review and admin
+- Playwright suite (13 tests) covers password sign-in, new-account review and admin
   approval against the production build
 - API flow tested against a production build: create order with modifiers and a
   promo → server repriced options and discount → merchant accept/prepare/ready →

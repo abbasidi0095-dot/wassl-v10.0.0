@@ -30,13 +30,17 @@ const SORTS: { value: Sort; label: string }[] = [
 export function StoreBrowser({
   stores,
   initialLimit,
+  initialQuery = "",
+  initialCategory = "all",
 }: {
   stores: StoreType[];
   initialLimit?: number;
+  initialQuery?: string;
+  initialCategory?: string;
 }) {
   const { t } = useI18n();
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
+  const [query, setQuery] = useState(initialQuery);
+  const [category, setCategory] = useState(initialCategory);
   const [tag, setTag] = useState("all");
   const [sort, setSort] = useState<Sort>("recommended");
   const [openOnly, setOpenOnly] = useState(false);

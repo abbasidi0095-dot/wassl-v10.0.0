@@ -48,10 +48,13 @@ export async function generateMetadata({
 
 export default async function StorePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ product?: string }>;
 }) {
   const { slug } = await params;
+  const { product: productParam } = await searchParams;
   const store = await getStore(slug);
   if (!store) notFound();
   const city = await getCity(store.citySlug);
@@ -83,6 +86,7 @@ export default async function StorePage({
             loyaltyPoints={user?.loyaltyPoints ?? 0}
             favorites={user?.favorites ?? []}
             signedIn={Boolean(session)}
+            initialProductId={productParam}
           />
         </main>
         <SiteFooter />
@@ -93,6 +97,9 @@ export default async function StorePage({
   const openState = getOpenState(store);
   const hasRating = store.rating > 0 && store.reviews > 0;
   const tags = [...new Set([...(store.dietaryTags ?? []), ...(store.tags ?? [])])];
+  const initialProduct = productParam
+    ? products.find((product) => product.id === productParam)
+    : undefined;
 
   return (
     <>
@@ -203,7 +210,11 @@ export default async function StorePage({
         <section className="container-wassl mt-6 grid gap-8 lg:grid-cols-[1fr_300px] lg:items-start">
           <div className="min-w-0">
             {store.isOpen ? (
-              <StoreMenu store={store} products={products} />
+              <StoreMenu
+                store={store}
+                products={products}
+                initialProductId={initialProduct?.id}
+              />
             ) : (
               <div className="border-y border-line py-16 text-center">
                 <Clock3 size={22} className="mx-auto text-muted" />

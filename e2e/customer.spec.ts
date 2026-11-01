@@ -78,3 +78,28 @@ test("grocery pickup reserves stock and returns a pickup code", async ({
   await expect(page.getByText("Pickup code")).toBeVisible();
   await expect(page.getByLabel(/Pickup code: \d{4}/)).toBeVisible();
 });
+
+test("global search tolerates a typo and links into a product", async ({
+  page,
+}) => {
+  await page.goto("/search?q=dakhla%20gril");
+  const storeLink = page.getByRole("link", { name: /Dakhla Grill/ }).first();
+  await expect(storeLink).toBeVisible();
+  await storeLink.click();
+  await expect(page).toHaveURL(/\/store\/dakhla-grill/);
+
+  await page.goto("/search?q=water");
+  const productLink = page
+    .getByRole("link", { name: /Water 6 x 1\.5L/ })
+    .first();
+  await expect(productLink).toBeVisible();
+  await productLink.click();
+  await expect(page).toHaveURL(/\/store\/sahara-market\?product=/);
+  await expect(page.getByRole("dialog")).toBeVisible();
+});
+
+test("home surfaces a deterministic For you feed", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("For you", { exact: true })).toBeVisible();
+  await expect(page.getByText("Popular in Dakhla")).toBeVisible();
+});

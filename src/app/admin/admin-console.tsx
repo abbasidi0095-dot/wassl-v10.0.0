@@ -44,12 +44,14 @@ import { AccountProvisionModal, resizePhoto } from "./account-provision-modal";
 import { AdminMenuModal } from "./admin-menu-modal";
 import { THEME_PRESETS } from "@/lib/theme";
 import { resizeImage } from "@/lib/image-client";
+import { CITY_SERVICES, cityServices } from "@/lib/city-services";
 import { computeAnalytics } from "@/lib/analytics";
 import type { AdminUserView, OrderView } from "@/lib/db";
 import { storePhoto } from "@/lib/store-images";
 import type {
   AuditEntry,
   City,
+  CityService,
   Driver,
   OrderStatus,
   PlatformSettings,
@@ -165,6 +167,7 @@ export function AdminConsole({
   const [storeFormOpen, setStoreFormOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
   const [storeView, setStoreView] = useState<"restaurant" | "grocery" | "other">("restaurant");
+  const [cityServicesFor, setCityServicesFor] = useState<City | null>(null);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [provision, setProvision] = useState<{
     role: "driver" | "merchant";
@@ -407,6 +410,32 @@ export function AdminConsole({
         );
         setToast(`${city.name} is now ${next === "live" ? "live" : "coming soon"}`);
       }
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function saveCityServices(
+    city: City,
+    services: Partial<Record<CityService, boolean>>,
+  ) {
+    setBusy(city.id);
+    try {
+      const response = await fetch("/api/admin/cities", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cityId: city.id, services }),
+      });
+      const data = (await response.json()) as { city?: City; error?: string };
+      if (!response.ok || !data.city) {
+        setToast(data.error || "Could not update city services");
+        return;
+      }
+      setCities((current) =>
+        current.map((item) => (item.id === city.id ? data.city! : item)),
+      );
+      setCityServicesFor(null);
+      setToast(`${city.name} services updated`);
     } finally {
       setBusy("");
     }
@@ -796,6 +825,15 @@ export function AdminConsole({
           busy={busy === editingDriver.id}
           onClose={() => setEditingDriver(null)}
           onSave={(patch) => saveDriver(editingDriver, patch)}
+        />
+      ) : null}
+
+      {cityServicesFor ? (
+        <CityServicesModal
+          city={cityServicesFor}
+          busy={busy === cityServicesFor.id}
+          onClose={() => setCityServicesFor(null)}
+          onSave={(services) => saveCityServices(cityServicesFor, services)}
         />
       ) : null}
 
@@ -1328,14 +1366,23 @@ export function AdminConsole({
                         </span>
                       </td>
                       <td className="text-end">
-                        <button
-                          type="button"
-                          onClick={() => toggleCity(city)}
-                          disabled={busy === city.id}
-                          className="btn btn-ghost btn-sm"
-                        >
-                          {city.launchStatus === "live" ? "Set soon" : "Go live"}
-                        </button>
+                        <div className="flex justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setCityServicesFor(city)}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            Services
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleCity(city)}
+                            disabled={busy === city.id}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            {city.launchStatus === "live" ? "Set soon" : "Go live"}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -2735,5 +2782,108 @@ function AdminOrderCard({
         )}
       </div>
     </article>
+  );
+}
+
+
+function CityServicesModal({
+  city,
+  busy,
+  onClose,
+  onSave,
+}: {
+  city: City;
+  busy: boolean;
+  onClose: () => void;
+  onSave: (services: Partial<Record<CityService, boolean>>) => void;
+}) {
+  const [draft, setDraft] = useState(() => cityServices(city));
+  return (
+    <div
+      className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-ink/55 p-4"
+      role="presentation"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Services in ${city.name}`}
+        className="my-6 w-full max-w-lg rounded-[12px] bg-surface p-5 shadow-[var(--shadow-float)]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em]">
+              {city.name} services
+            </h2>
+            <p className="mt-1 text-[11px] leading-5 text-muted">
+              Enable each service only when supply and operations are ready.
+              Turning one off never disables the others.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-ink"
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="mt-4 divide-y divide-line border-y border-line">
+          {CITY_SERVICES.map((service) => (
+            <label
+              key={service.id}
+              className="flex cursor-pointer items-center gap-3 py-3"
+            >
+              <input
+                type="checkbox"
+                checked={draft[service.id]}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    [service.id]: event.target.checked,
+                  }))
+                }
+                className="h-4 w-4 accent-teal"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] font-semibold">
+                  {service.label}
+                </span>
+                <span className="block text-[11px] text-muted">
+                  {service.description}
+                </span>
+              </span>
+              <span
+                className={`rounded-[2px] px-1.5 py-0.5 text-[9px] font-semibold uppercase ${
+                  draft[service.id]
+                    ? "bg-success-soft text-success"
+                    : "bg-surface-2 text-muted"
+                }`}
+              >
+                {draft[service.id] ? "On" : "Off"}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        <div className="mt-5 flex gap-2">
+          <button type="button" onClick={onClose} className="btn btn-ghost flex-1">
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onSave(draft)}
+            className="btn btn-primary flex-1"
+          >
+            {busy ? <Loader2 size={14} className="animate-spin" /> : null}
+            {busy ? "Saving…" : "Save services"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

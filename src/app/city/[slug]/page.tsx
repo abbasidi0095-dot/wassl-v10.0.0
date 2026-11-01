@@ -27,10 +27,13 @@ export async function generateMetadata({
 
 export default async function CityPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ q?: string; category?: string }>;
 }) {
   const { slug } = await params;
+  const filters = await searchParams;
   const city = await getCity(slug);
   if (!city) notFound();
   const cities = await getCities();
@@ -128,7 +131,18 @@ export default async function CityPage({
 
         <section className="container-wassl mt-10 lg:mt-14" id="stores">
           {stores.length ? (
-            <StoreBrowser stores={stores} />
+            <StoreBrowser
+              stores={stores}
+              initialQuery={(filters.q ?? "").slice(0, 80)}
+              initialCategory={
+                filters.category &&
+                ["restaurant", "grocery", "pharmacy", "cafe", "gifts", "all"].includes(
+                  filters.category,
+                )
+                  ? filters.category
+                  : "all"
+              }
+            />
           ) : (
             <div className="border-y border-line py-16 text-center">
               <Sprout size={22} className="mx-auto text-brand" />

@@ -257,3 +257,33 @@ test("an admin approves a new account so it can enter its workspace", async ({
   await page.request.post("/api/auth/logout");
   await loginViaUi(page, email, password, "/merchant");
 });
+
+test("admin enables a service per city without disabling the others", async ({
+  page,
+}) => {
+  await loginViaUi(page, ADMIN_EMAIL, ADMIN_PASSWORD, "/admin");
+
+  const patched = await page.request.patch("/api/admin/cities", {
+    data: { cityId: "city_039", services: { express: true } },
+  });
+  expect(patched.ok()).toBeTruthy();
+  const patchedBody = (await patched.json()) as {
+    city: { services: Record<string, boolean> };
+  };
+  expect(patchedBody.city.services.express).toBe(true);
+  expect(patchedBody.city.services.grocery).toBe(true);
+
+  await page.goto("/admin");
+  await page.getByRole("button", { name: "Cities" }).click();
+  const row = page.locator("tr").filter({ hasText: "Dakhla" }).first();
+  await row.getByRole("button", { name: "Services" }).click();
+  const dialog = page.getByRole("dialog", { name: /Services in Dakhla/ });
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.locator("label").filter({ hasText: "Express" }).locator("input"),
+  ).toBeChecked();
+  await expect(
+    dialog.locator("label").filter({ hasText: "Grocery" }).locator("input"),
+  ).toBeChecked();
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+});

@@ -4,6 +4,7 @@ import type { Database } from "./types";
 import { createSeedDatabase, groceryExtra } from "./seed";
 import { GROCERY_PRESETS } from "./grocery-presets";
 import { defaultGrocerySettings } from "./grocery";
+import { defaultCityServices } from "./city-services";
 
 /**
  * Persistence backends.
@@ -61,6 +62,12 @@ function hydrate(db: Database): Database {
   db.settings.accentColor ??= "#955b0b";
   db.settings.themePreset ??= "coastal";
   db.settings.defaultTheme ??= "system";
+
+  // City services are additive: existing cities keep their current three
+  // verticals and new verticals stay off until an operator enables them.
+  for (const city of db.cities) {
+    city.services = { ...defaultCityServices(city), ...(city.services ?? {}) };
+  }
 
   // Give existing records a handover code once. The code is persisted on the
   // next mutation; until then the in-memory view is still consistent.
