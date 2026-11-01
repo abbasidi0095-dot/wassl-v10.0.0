@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.1** (1 November 2026; launch splash and cache refresh)
+- Release: **11.0.2** (1 November 2026; splash on every launch)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,11 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.2 — splash on every launch
+- Removed the sessionStorage guard; splash runs on every full load/reload.
+- Internal navigation remains splash-free.
+- Reduced-motion skip preserved.
 
 ### 11.0.1 — launch splash and cache refresh
 - `src/components/splash-intro.tsx` and splash CSS: first-open-per-session

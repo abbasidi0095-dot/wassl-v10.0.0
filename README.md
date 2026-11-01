@@ -29,6 +29,12 @@ and dark themes.
 
 ## Release history
 
+### 11.0.2 — 1 November 2026 — splash on every launch
+- The Wassl splash now runs on **every full app launch or reload**, not once per
+  browser session.
+- Internal client-side navigation still does not replay the splash.
+- Reduced-motion users still skip it automatically.
+
 ### 11.0.1 — 1 November 2026 — launch splash and cache refresh
 - Added the branded **Wassl launch splash** on first app open per session:
   animated route monogram, saffron destination node, Latin/Arabic wordmark,

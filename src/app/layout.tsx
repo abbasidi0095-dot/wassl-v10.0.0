@@ -84,7 +84,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");var seen=sessionStorage.getItem("wassl_splash_v11");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(seen==="1"||reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}}catch(e){}})();`,
           }}
         />
         <link

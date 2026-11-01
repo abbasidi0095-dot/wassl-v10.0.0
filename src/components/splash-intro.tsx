@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "./locale-provider";
 
-const SPLASH_KEY = "wassl_splash_v11";
 const HOLD_MS = 1450;
 const EXIT_MS = 380;
 
@@ -14,21 +13,10 @@ export function SplashIntro() {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let seen = false;
-    try {
-      seen = window.sessionStorage.getItem(SPLASH_KEY) === "1";
-    } catch {
-      seen = false;
-    }
-    if (seen || reduce) {
+    if (reduce) {
       setVisible(false);
       document.documentElement.classList.remove("wassl-splashing");
       return;
-    }
-    try {
-      window.sessionStorage.setItem(SPLASH_KEY, "1");
-    } catch {
-      // Private mode: still show the intro for this load.
     }
     const hold = window.setTimeout(() => setLeaving(true), HOLD_MS);
     const finish = window.setTimeout(() => {
