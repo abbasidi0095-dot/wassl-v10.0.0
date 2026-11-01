@@ -10,6 +10,7 @@ import {
 } from "./auth-config";
 import { hashPassword } from "./security";
 import { GROCERY_PRESETS } from "./grocery-presets";
+import { DEFAULT_GROCERY_PROMOTIONS } from "./grocery-promotions";
 import type {
   City,
   Database,
@@ -784,5 +785,6 @@ export function createSeedDatabase(): Database {
     addresses: [],
     auditLogs: [],
     settings,
+    promotions: DEFAULT_GROCERY_PROMOTIONS.map((promotion) => ({ ...promotion })),
   };
 }

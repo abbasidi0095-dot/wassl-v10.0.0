@@ -1,7 +1,7 @@
 # Wassl 11.0 — implementation progress
 
 Target: **11.0.0** unified Moroccan super-app.
-Current delivered baseline: **11.0.0-alpha.3** (1 November 2026).
+Current delivered baseline: **11.0.0-alpha.4** (1 November 2026).
 Production: not deployed from this milestone without explicit authorization.
 
 This document records exact progress. It is not a claim that the full 11.0
@@ -72,8 +72,28 @@ programme is complete.
   mixed cities and recurring dates.
 - Playwright covers barcode → basket and recurring-list settings.
 
-Still missing from Grocery 2.0: natural-language shopping assistant, flash and
-quantity promotion engine, inventory history and replenishment forecasting.
+### Grocery intelligence and promotions
+
+- Smart shopping assistant at `/grocery/assistant` with deterministic recipe
+  matching, cheapest-product intent, usual-purchase suggestions and an editable
+  list that adds to Wassl Basket.
+- Server-side grocery promotion engine: flash, quantity, bulk, scheduled and
+  store-wide offers. Discounts are applied in `createOrder`; badges appear on
+  the grocery storefront. Default merchant-specific offers are seeded.
+- Inventory intelligence: sales velocity, top sellers, slow movers, suggested
+  restock, one-click restock and recent stock movements.
+- Still missing: a merchant/admin promotion builder, manual stock-adjustment
+  history and replenishment forecasting beyond the 14-day velocity model.
+
+### Wassl Club core
+
+- Immutable loyalty ledger with opening-balance migration.
+- Basic / Plus / Premium tiers with lifetime progress.
+- Earn on completed orders, redeem at grocery checkout, return points on
+  cancellation, audited admin adjustments.
+- Customer dashboard at `/account/loyalty` with points, history and rewards.
+- Still missing: referral attribution, birthday rewards, reward redemption
+  codes, expiration jobs, campaign bonuses and admin threshold/ratio controls.
 
 ### Supporting changes
 
@@ -90,8 +110,8 @@ quantity promotion engine, inventory history and replenishment forecasting.
 ## Verification
 
 - `npx tsc --noEmit` — clean.
-- `npm test` — 91 passed, 4 skipped.
-- `npm run e2e` — 15 passed.
+- `npm test` — 108 passed, 4 skipped.
+- `npm run e2e` — 19 passed.
 - `npm run build` — clean.
 - Manual checks at 1440px and 390px: no horizontal overflow on home or search.
 - Product deep link opens the product dialog.
@@ -113,8 +133,8 @@ quantity promotion engine, inventory history and replenishment forecasting.
 | Consistent bottom navigation | Delivered | Delivery, grocery, taxi, orders and account remain visible |
 | Home prioritization | Partial | Restaurants, grocery, taxi, services and business exist; Express and local services await their workflows |
 | Personalized discovery | Delivered (deterministic) | Uses real orders, favourites, stock, hours and time of day |
-| Grocery 2.0 | Partial | Basket comparison, split checkout, barcode and recurring lists delivered; smart assistant, advanced promotions, inventory history/forecasting remain |
-| Wassl Club | Partial | Grocery points only; ledger, tiers, referrals, rewards and admin controls missing |
+| Grocery 2.0 | Delivered (core) | Basket, split checkout, barcode, recurring lists, assistant, promotions and inventory intelligence delivered; merchant promotion builder and deeper forecasting remain |
+| Wassl Club | Partial | Ledger, tiers, earn/redeem, dashboard and admin adjustments delivered; referrals, birthday, reward codes, expiry and campaign controls remain |
 | Wassl AI | Not started | Provider abstraction and three assistants |
 | Taxi 2.0 | Partial | Scheduled, multi-stop, saved places, ratings, lost-and-found, intercity, zones, heatmaps |
 | Wassl Express | Not started | Parcel vertical |
@@ -134,6 +154,10 @@ quantity promotion engine, inventory history and replenishment forecasting.
 - `src/lib/search.ts` — new search scorer and result builder.
 - `src/lib/city-services.ts` — new service defaults, merge and sanitisation.
 - `src/lib/basket.ts` — cross-store basket grouping, totals and recurring dates.
+- `src/lib/grocery-assistant.ts` — deterministic shopping assistant.
+- `src/lib/grocery-promotions.ts` — server-validated grocery offers.
+- `src/lib/inventory.ts` — inventory and replenishment intelligence.
+- `src/lib/loyalty.ts` — tiers, earning rules and rewards.
 - `src/lib/personalization.ts` — new deterministic home-feed builder.
 - `src/app/api/search/route.ts` — new search API.
 - `src/app/search/page.tsx` — search route shell.
@@ -160,6 +184,10 @@ quantity promotion engine, inventory history and replenishment forecasting.
 - `tests/personalization.test.ts` — new.
 - `tests/city-services.test.ts` — new.
 - `tests/basket.test.ts` — new.
+- `tests/grocery-assistant.test.ts` — new.
+- `tests/grocery-promotions.test.ts` — new.
+- `tests/inventory.test.ts` — new.
+- `tests/loyalty.test.ts` — new.
 - `e2e/customer.spec.ts` — two new cases.
 - `README.md`, `AGENTS.md`, `package.json` — milestone documentation.
 
@@ -173,11 +201,11 @@ quantity promotion engine, inventory history and replenishment forecasting.
      offers.
    - Support-ticket base and notification preferences.
 2. **Phase 2 — Grocery 2.0 remaining**
-   - Natural-language shopping assistant.
-   - Flash, quantity and bulk promotion engine.
-   - Inventory history, slow-moving products and replenishment forecasting.
-3. **Phase 3 — Wassl Club**
-   - Immutable loyalty ledger, tiers, referrals, rewards and admin controls.
+   - Merchant/admin promotion builder.
+   - Manual stock-adjustment history and richer forecasting.
+3. **Phase 3 — Wassl Club remaining**
+   - Referral attribution, birthday rewards, reward redemption codes, expiration
+     jobs, campaign bonuses and admin ratio/threshold controls.
 4. **Later phases**
    - Merchant Growth, Driver Intelligence, Taxi 2.0, Express, Services,
      Business, AI and Admin Intelligence.

@@ -24,6 +24,15 @@ import { casablancaNow } from "./hours";
 import { sanitizeCityServices } from "./city-services";
 import { nextRecurringDate } from "./basket";
 import {
+  DEFAULT_LOYALTY_REWARDS,
+  makeReferralCode,
+  pointsForOrder,
+  tierForLifetime,
+  tierMultiplier,
+  tierProgress,
+} from "./loyalty";
+import { applyGroceryPromotions } from "./grocery-promotions";
+import {
   BOOTSTRAP_ADMIN_EMAIL,
   BOOTSTRAP_ADMIN_PASSWORD,
   DEMO_CUSTOMER_EMAIL,
@@ -48,6 +57,7 @@ import type {
   DeviceToken,
   Driver,
   GrocerySettings,
+  LoyaltyAccount,
   Order,
   OrderEvent,
   OrderStatus,
@@ -59,6 +69,9 @@ import type {
   ShoppingList,
   ShoppingListRecurring,
   Store,
+  LoyaltyReward,
+  LoyaltyTier,
+  LoyaltyTransaction,
   TaxiRide,
   TaxiStatus,
   User,
@@ -1425,25 +1438,43 @@ export async function createOrder(
 
     let loyaltyDiscount = 0;
     let loyaltyPointsUsed = 0;
+    let loyaltyCustomer: User | undefined;
+    let loyaltyAccount: LoyaltyAccount | undefined;
     if (isGrocery && input.loyaltyPoints && actor.id) {
       const customer = db.users.find((user) => user.id === actor.id);
-      const balance = customer?.loyaltyPoints ?? 0;
-      const requested = Math.max(0, Math.min(Math.floor(input.loyaltyPoints), balance));
-      const maxPoints = Math.floor((subtotal * 0.5) * 10); // at most 50% of subtotal
-      const usable = Math.min(requested, maxPoints);
-      loyaltyPointsUsed = Math.floor(usable / 100) * 100;
-      loyaltyDiscount = loyaltyPointsUsed / 10;
-      if (customer && loyaltyPointsUsed > 0) {
-        customer.loyaltyPoints = balance - loyaltyPointsUsed;
+      if (customer) {
+        loyaltyCustomer = customer;
+        loyaltyAccount = ensureLoyaltyAccount(db, customer);
+        const balance = loyaltyAccount.points;
+        const requested = Math.max(
+          0,
+          Math.min(Math.floor(input.loyaltyPoints), balance),
+        );
+        const maxPoints = Math.floor(subtotal * 0.5 * 10); // at most 50% of subtotal
+        const usable = Math.min(requested, maxPoints);
+        loyaltyPointsUsed = Math.floor(usable / 100) * 100;
+        loyaltyDiscount = loyaltyPointsUsed / 10;
       }
     }
 
     const deliveryFee =
       promo?.ok && promo.quote.freeDelivery ? 0 : baseDeliveryFee;
     const discount = promo?.ok ? promo.quote.discount : 0;
+    const groceryPromotion = isGrocery
+      ? applyGroceryPromotions({
+          items: prepared.map((line) => ({
+            product: line.product,
+            qty: line.item.qty,
+          })),
+          subtotal,
+          storeId: store.id,
+          promotions: db.promotions ?? [],
+          now: new Date(),
+        })
+      : { discount: 0, applied: [] as Array<{ id: string; title: string; amount: number }> };
     const total = Math.max(
       0,
-      subtotal + deliveryFee - discount - loyaltyDiscount,
+      subtotal + deliveryFee - discount - loyaltyDiscount - groceryPromotion.discount,
     );
 
     // Reserve stock inside the same serialized mutation: no oversell window.
@@ -1498,6 +1529,10 @@ export async function createOrder(
       total,
       promoCode: promo?.ok ? promo.quote.code : undefined,
       discount: discount || undefined,
+      promotionDiscount: groceryPromotion.discount || undefined,
+      appliedPromotions: groceryPromotion.applied.length
+        ? groceryPromotion.applied.map((entry) => entry.title)
+        : undefined,
       paymentMethod: "cod",
       scheduledFor: input.scheduledFor,
       fulfillment: isGrocery ? fulfillment : undefined,
@@ -1527,6 +1562,16 @@ export async function createOrder(
       ],
     };
 
+    if (loyaltyAccount && loyaltyCustomer) {
+      recordLoyaltyRedemption(
+        db,
+        loyaltyAccount,
+        loyaltyCustomer,
+        order.id,
+        loyaltyPointsUsed,
+        nowIso,
+      );
+    }
     if (isGrocery) {
       for (const reservation of db.stockReservations ?? []) {
         if (!reservation.orderId && reservation.status === "reserved") {
@@ -1645,17 +1690,7 @@ export async function updateOrderStatus(
           reservation.updatedAt = now;
         }
       }
-      if (isGrocery && order.customerEmail) {
-        const customer = db.users.find(
-          (user) => user.email.toLowerCase() === order.customerEmail!.toLowerCase(),
-        );
-        const rate = store ? grocerySettings(store).loyaltyPointsPer10Mad : 1;
-        if (customer) {
-          customer.loyaltyPoints =
-            (customer.loyaltyPoints ?? 0) +
-            Math.floor(order.subtotal / 10) * Math.max(0, rate);
-        }
-      }
+      awardLoyaltyForOrder(db, order, store);
       if (isGrocery) publish({ type: "store", storeId: order.storeId, citySlug: order.citySlug });
     }
     if (next === "cancelled") {
@@ -1679,15 +1714,7 @@ export async function updateOrderStatus(
           product.stock += reservation.qty;
         }
       }
-      if (isGrocery && order.customerEmail && order.loyaltyPointsUsed) {
-        const customer = db.users.find(
-          (user) => user.email.toLowerCase() === order.customerEmail!.toLowerCase(),
-        );
-        if (customer) {
-          customer.loyaltyPoints =
-            (customer.loyaltyPoints ?? 0) + order.loyaltyPointsUsed;
-        }
-      }
+      refundLoyaltyOnCancellation(db, order);
       if (isGrocery) publish({ type: "store", storeId: order.storeId, citySlug: order.citySlug });
     }
 
@@ -3301,5 +3328,226 @@ export async function deleteStoreAdmin(
     });
     publish({ type: "store", storeId, citySlug: store.citySlug });
     return { id: store.id, name: store.name };
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Wassl Club                                                                  */
+/* -------------------------------------------------------------------------- */
+
+function ensureLoyaltyAccount(
+  db: Database,
+  user: User,
+): LoyaltyAccount {
+  db.loyaltyAccounts ??= [];
+  db.loyaltyTransactions ??= [];
+  let account = db.loyaltyAccounts.find((entry) => entry.userId === user.id);
+  if (!account) {
+    const points = Math.max(0, user.loyaltyPoints ?? 0);
+    account = {
+      userId: user.id,
+      points,
+      lifetimePoints: points,
+      tier: tierForLifetime(points),
+      referralCode: makeReferralCode(user.id),
+      joinedAt: user.createdAt ?? new Date().toISOString(),
+    };
+    db.loyaltyAccounts.push(account);
+    if (points > 0) {
+      db.loyaltyTransactions.push({
+        id: randomId("loyalty", 6),
+        userId: user.id,
+        type: "adjust",
+        points,
+        balanceAfter: points,
+        lifetimeAfter: points,
+        note: "Opening balance",
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }
+  account.tier = tierForLifetime(account.lifetimePoints);
+  user.loyaltyPoints = account.points;
+  return account;
+}
+
+function applyLoyaltyTransaction(
+  db: Database,
+  account: LoyaltyAccount,
+  user: User,
+  input: {
+    type: LoyaltyTransaction["type"];
+    points: number;
+    orderId?: string;
+    note?: string;
+    actorRole?: OrderActor["role"];
+    actorName?: string;
+    createdAt?: string;
+  },
+): LoyaltyTransaction {
+  const requested = Math.trunc(input.points);
+  const nextBalance = Math.max(0, account.points + requested);
+  const applied = nextBalance - account.points;
+  account.points = nextBalance;
+  if (applied > 0) account.lifetimePoints += applied;
+  account.tier = tierForLifetime(account.lifetimePoints);
+  user.loyaltyPoints = account.points;
+  const transaction: LoyaltyTransaction = {
+    id: randomId("loyalty", 6),
+    userId: user.id,
+    type: input.type,
+    points: applied,
+    balanceAfter: account.points,
+    lifetimeAfter: account.lifetimePoints,
+    orderId: input.orderId,
+    note: input.note,
+    actorRole: input.actorRole,
+    actorName: input.actorName,
+    createdAt: input.createdAt ?? new Date().toISOString(),
+  };
+  db.loyaltyTransactions ??= [];
+  db.loyaltyTransactions.push(transaction);
+  return transaction;
+}
+
+function awardLoyaltyForOrder(
+  db: Database,
+  order: Order,
+  store: Store | undefined,
+) {
+  if (!order.customerEmail) return;
+  const customer = db.users.find(
+    (user) => user.email.toLowerCase() === order.customerEmail!.toLowerCase(),
+  );
+  if (!customer) return;
+  db.loyaltyTransactions ??= [];
+  if (
+    db.loyaltyTransactions.some(
+      (entry) =>
+        entry.userId === customer.id &&
+        entry.orderId === order.id &&
+        entry.type === "earn",
+    )
+  ) {
+    return;
+  }
+  const account = ensureLoyaltyAccount(db, customer);
+  const base = pointsForOrder(order, store);
+  const points = Math.floor(base * tierMultiplier(account.tier));
+  if (points <= 0) return;
+  applyLoyaltyTransaction(db, account, customer, {
+    type: "earn",
+    points,
+    orderId: order.id,
+    note: `Order ${order.code}`,
+  });
+}
+
+function refundLoyaltyOnCancellation(db: Database, order: Order) {
+  if (!order.customerEmail || !order.loyaltyPointsUsed) return;
+  const customer = db.users.find(
+    (user) => user.email.toLowerCase() === order.customerEmail!.toLowerCase(),
+  );
+  if (!customer) return;
+  db.loyaltyTransactions ??= [];
+  if (
+    db.loyaltyTransactions.some(
+      (entry) =>
+        entry.userId === customer.id &&
+        entry.orderId === order.id &&
+        entry.type === "refund",
+    )
+  ) {
+    return;
+  }
+  const account = ensureLoyaltyAccount(db, customer);
+  applyLoyaltyTransaction(db, account, customer, {
+    type: "refund",
+    points: order.loyaltyPointsUsed,
+    orderId: order.id,
+    note: `Returned points for ${order.code}`,
+  });
+}
+
+function recordLoyaltyRedemption(
+  db: Database,
+  account: LoyaltyAccount,
+  user: User,
+  orderId: string,
+  points: number,
+  createdAt: string,
+) {
+  if (points <= 0) return;
+  applyLoyaltyTransaction(db, account, user, {
+    type: "redeem",
+    points: -points,
+    orderId,
+    note: "Redeemed at grocery checkout",
+    createdAt,
+  });
+}
+
+export async function getLoyaltyOverview(userId: string) {
+  return mutate((db) => {
+    const user = db.users.find((entry) => entry.id === userId);
+    if (!user) throw new Error("Account not found");
+    const account = ensureLoyaltyAccount(db, user);
+    const transactions = (db.loyaltyTransactions ?? [])
+      .filter((entry) => entry.userId === userId)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+      .slice(0, 60);
+    const rewards: LoyaltyReward[] =
+      db.loyaltyRewards?.length
+        ? db.loyaltyRewards
+        : DEFAULT_LOYALTY_REWARDS;
+    return {
+      account,
+      user: { name: user.name, email: user.email },
+      transactions,
+      rewards,
+      progress: tierProgress(account.lifetimePoints),
+    };
+  });
+}
+
+export async function adjustLoyaltyPoints(
+  userId: string,
+  points: number,
+  note: string,
+  actor: OrderActor,
+): Promise<LoyaltyAccount> {
+  const delta = Math.trunc(points);
+  if (!Number.isFinite(delta) || delta === 0) {
+    throw new Error("Enter a non-zero points adjustment");
+  }
+  if (Math.abs(delta) > 100000) {
+    throw new Error("Adjustment is too large");
+  }
+  return mutate((db) => {
+    const user = db.users.find((entry) => entry.id === userId);
+    if (!user) throw new Error("Account not found");
+    const account = ensureLoyaltyAccount(db, user);
+    applyLoyaltyTransaction(db, account, user, {
+      type: "adjust",
+      points: delta,
+      note: note.trim() || "Manual adjustment",
+      actorRole: actor.role,
+      actorName: actor.name,
+    });
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "loyalty.adjust",
+      entity: "auth",
+      entityId: user.id,
+      summary: `${delta > 0 ? "+" : ""}${delta} points for ${user.email}`,
+      note: note.trim() || undefined,
+    });
+    return account;
   });
 }

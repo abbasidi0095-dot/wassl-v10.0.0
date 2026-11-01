@@ -113,6 +113,9 @@ export default async function GroceryPage({
                 <Link href="/grocery/basket" className="btn btn-primary btn-sm h-9">
                   <ShoppingBasket size={13} /> {t("Wassl Basket")}
                 </Link>
+                <Link href="/grocery/assistant" className="btn btn-ghost btn-sm h-9">
+                  <Sparkles size={13} /> {t("Shopping assistant")}
+                </Link>
                 <Link href="/grocery/scan" className="btn btn-ghost btn-sm h-9">
                   <ScanBarcode size={13} /> {t("Scan barcode")}
                 </Link>

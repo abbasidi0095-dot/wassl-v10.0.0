@@ -29,6 +29,24 @@ and dark themes.
 
 ## Release history
 
+### 11.0.0-alpha.4 — 1 November 2026 — grocery intelligence and Wassl Club
+- Added the **Smart Shopping Assistant** at `/grocery/assistant`: natural
+  language requests become editable product lists using real grocery stock and
+  city prices. Couscous, cleaning, baby, breakfast, tea, pasta, salad and weekly
+  staples are supported, plus cheapest-product and usual-purchase intents.
+- Added a server-validated **grocery promotion engine**: flash, quantity, bulk,
+  scheduled and store-wide offers, discount badges on the grocery storefront and
+  automatic discounts in order totals.
+- Added **inventory intelligence** to Admin Grocery: units sold, grocery
+  revenue, slow movers, suggested restock quantities, one-click restock and
+  recent stock movements.
+- Added the core **Wassl Club**: immutable points ledger, Basic/Plus/Premium
+  tiers, earn on completed orders, redeem at grocery checkout, points history,
+  rewards catalogue, referral code and audited admin adjustments.
+- Existing points balances are migrated into the ledger as an opening entry.
+- Added unit tests for assistant, promotions, inventory and the loyalty ledger,
+  plus Playwright coverage for the assistant and Club dashboard.
+
 ### 11.0.0-alpha.3 — 1 November 2026 — Grocery 2.0 basket and scanner
 - Added **Wassl Basket**: search grocery products across stores, compare
   prices, choose substitutions and check out as separate orders per store with
@@ -516,6 +534,9 @@ staff out.
   shopping lists, pickup/express/scheduled checkout, loyalty and refunds
 - Wassl Basket: cross-store grocery comparison and split checkout into
   independent orders, barcode lookup and recurring shopping lists
+- Smart shopping assistant, server-validated grocery promotions and inventory
+  intelligence
+- Wassl Club: ledger-backed points, tiers, redemption and points history
 - Persistent live tracker dock for active orders and taxi rides (progress bar,
   expandable list, minimise to a floating pill, auto-hides when complete)
 - Notification centre with unread badge, in-app history, browser Web Push and
@@ -772,12 +793,12 @@ Full signing, push credential, deep-link and store-submission instructions are i
 - `npx tsc --noEmit` — clean
 - `npm run build` — clean
 - `npm audit` — 0 vulnerabilities
-- `npx vitest run` — 91 tests pass (state machine, order lifecycle, password auth,
+- `npx vitest run` — 108 tests pass (state machine, order lifecycle, password auth,
   account approval, OTP fallback, locked data source, promos, guest address book,
   transactional event batching)
 - `npm run test:pg` — 4 Postgres integration tests pass (seed/read, three
   concurrent writers, rollback, durable audit trail)
-- Playwright suite (15 tests) covers password sign-in, new-account review and admin
+- Playwright suite (19 tests) covers password sign-in, new-account review and admin
   approval against the production build
 - API flow tested against a production build: create order with modifiers and a
   promo → server repriced options and discount → merchant accept/prepare/ready →

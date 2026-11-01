@@ -5,6 +5,12 @@ import { createSeedDatabase, groceryExtra } from "./seed";
 import { GROCERY_PRESETS } from "./grocery-presets";
 import { defaultGrocerySettings } from "./grocery";
 import { defaultCityServices } from "./city-services";
+import { DEFAULT_GROCERY_PROMOTIONS } from "./grocery-promotions";
+import {
+  DEFAULT_LOYALTY_REWARDS,
+  makeReferralCode,
+  tierForLifetime,
+} from "./loyalty";
 
 /**
  * Persistence backends.
@@ -62,6 +68,41 @@ function hydrate(db: Database): Database {
   db.settings.accentColor ??= "#955b0b";
   db.settings.themePreset ??= "coastal";
   db.settings.defaultTheme ??= "system";
+  db.promotions ??= DEFAULT_GROCERY_PROMOTIONS.map((promotion) => ({ ...promotion }));
+  db.loyaltyAccounts ??= [];
+  db.loyaltyTransactions ??= [];
+  db.loyaltyRewards ??= DEFAULT_LOYALTY_REWARDS.map((reward) => ({ ...reward }));
+
+  // Migrate the legacy scalar balance into an immutable, ledger-backed account.
+  for (const user of db.users) {
+    let account = db.loyaltyAccounts.find((entry) => entry.userId === user.id);
+    if (!account) {
+      const points = Math.max(0, user.loyaltyPoints ?? 0);
+      account = {
+        userId: user.id,
+        points,
+        lifetimePoints: points,
+        tier: tierForLifetime(points),
+        referralCode: makeReferralCode(user.id),
+        joinedAt: user.createdAt ?? new Date().toISOString(),
+      };
+      db.loyaltyAccounts.push(account);
+      if (points > 0) {
+        db.loyaltyTransactions.push({
+          id: `loyalty_opening_${user.id}`,
+          userId: user.id,
+          type: "adjust",
+          points,
+          balanceAfter: points,
+          lifetimeAfter: points,
+          note: "Opening balance migrated from the previous points field",
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+    account.tier = tierForLifetime(account.lifetimePoints);
+    user.loyaltyPoints = account.points;
+  }
 
   // City services are additive: existing cities keep their current three
   // verticals and new verticals stay off until an operator enables them.

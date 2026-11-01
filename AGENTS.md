@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.0-alpha.3** (1 November 2026; Grocery 2.0 basket, barcode and recurring lists)
+- Release: **11.0.0-alpha.4** (1 November 2026; grocery intelligence, promotions and Wassl Club)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,23 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.0-alpha.4 — grocery intelligence, promotions and Wassl Club
+- `src/lib/grocery-assistant.ts` turns recipes, cheapest requests and usual
+  purchases into real product/store lists. `/api/grocery/assistant` and
+  `/grocery/assistant` expose an editable list that adds to Wassl Basket.
+- `src/lib/grocery-promotions.ts` applies flash, quantity, bulk, scheduled and
+  store-wide discounts inside `createOrder`. Product badges appear on the
+  grocery storefront. Default offers are seeded; merchant CRUD is not built yet.
+- `src/lib/inventory.ts` derives sales velocity, top sellers, slow movers,
+  suggested restock and stock movements from real orders/reservations. Admin
+  Grocery displays it and can restock with one click.
+- `src/lib/loyalty.ts` and the new ledger functions in `db.ts` add Wassl Club:
+  accounts, immutable transactions, tier progress, earn on delivery, redeem at
+  checkout, cancellation refunds, audited admin adjustments and migration of
+  legacy balances. `/account/loyalty` is the customer dashboard.
+- Added `tests/grocery-assistant.test.ts`, `tests/grocery-promotions.test.ts`,
+  `tests/inventory.test.ts`, `tests/loyalty.test.ts` and Playwright coverage.
 
 ### 11.0.0-alpha.3 — Grocery 2.0 basket, barcode and recurring lists
 - `src/lib/basket.ts` groups cross-store lines, computes per-store fees/minimums

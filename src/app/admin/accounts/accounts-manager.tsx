@@ -143,6 +143,50 @@ export function AccountsManager({
     }
   }
 
+  async function adjustPoints(user: AdminUserView) {
+    const raw = window.prompt(
+      `Points adjustment for ${user.email}. Use a negative number to deduct.`,
+      "0",
+    );
+    if (raw === null) return;
+    const points = Number(raw);
+    if (!Number.isInteger(points) || points === 0) {
+      setError("Enter a non-zero whole number of points");
+      return;
+    }
+    const note = window.prompt("Reason for the adjustment (recorded in the audit trail)", "") ?? "";
+    setBusy(user.id);
+    setToast("");
+    setError("");
+    try {
+      const response = await fetch("/api/admin/loyalty", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, points, note }),
+      });
+      const data = (await response.json()) as {
+        account?: { points: number };
+        error?: string;
+      };
+      if (!response.ok || !data.account) {
+        setError(data.error || "Could not adjust points");
+        return;
+      }
+      setUsers((current) =>
+        current.map((item) =>
+          item.id === user.id
+            ? { ...item, loyaltyPoints: data.account!.points }
+            : item,
+        ),
+      );
+      setToast(
+        `${points > 0 ? "+" : ""}${points} points for ${user.name}. Balance ${data.account.points}.`,
+      );
+    } finally {
+      setBusy("");
+    }
+  }
+
   async function approve(user: AdminUserView) {
     const draft = drafts[user.id];
     const result = await callApi(user, {
@@ -245,6 +289,7 @@ export function AccountsManager({
                 <th>Role</th>
                 <th>Store / driver</th>
                 <th>Status</th>
+                <th>Points</th>
                 <th />
               </tr>
             </thead>
@@ -352,6 +397,23 @@ export function AccountsManager({
                           Active
                         </span>
                       )}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] font-semibold tnum">
+                          {user.loyaltyPoints ?? 0}
+                        </span>
+                        {user.role === "customer" ? (
+                          <button
+                            type="button"
+                            onClick={() => void adjustPoints(user)}
+                            disabled={working}
+                            className="text-[11px] font-medium text-brand disabled:opacity-40"
+                          >
+                            Adjust
+                          </button>
+                        ) : null}
+                      </div>
                     </td>
                     <td>
                       <div className="flex items-center justify-end gap-1.5">

@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import type {
+  GroceryPromotion,
   GrocerySettings,
   Product,
   ProductVariant,
@@ -23,6 +24,7 @@ import type {
 } from "@/lib/types";
 import type { GroceryAvailability } from "@/lib/grocery";
 import { stockBadge } from "@/lib/grocery";
+import { promotionForProduct } from "@/lib/grocery-promotions";
 import { useCart } from "@/components/cart-provider";
 import { useI18n } from "@/components/locale-provider";
 import { ProductTile } from "@/components/product-icon";
@@ -39,6 +41,7 @@ export function GroceryStore({
   favorites: initialFavorites,
   signedIn,
   initialProductId,
+  promotions = [],
 }: {
   store: Store;
   photo: string;
@@ -49,6 +52,7 @@ export function GroceryStore({
   favorites: string[];
   signedIn: boolean;
   initialProductId?: string;
+  promotions?: GroceryPromotion[];
 }) {
   const router = useRouter();
   const { t } = useI18n();
@@ -500,8 +504,22 @@ export function GroceryStore({
 
                       <div className="mt-auto flex items-end justify-between gap-2 pt-1">
                         <div>
-                          <div className="text-[14px] font-semibold tnum">
-                            {money(product.price)}
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-[14px] font-semibold tnum">
+                              {money(product.price)}
+                            </span>
+                            {(() => {
+                              const promotion = promotionForProduct(
+                                product,
+                                promotions,
+                                store.id,
+                              );
+                              return promotion ? (
+                                <span className="rounded-[2px] bg-saffron/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-saffron-deep">
+                                  −{promotion.percentOff}%
+                                </span>
+                              ) : null;
+                            })()}
                           </div>
                           {badge.tone === "low" || badge.tone === "out" ? (
                             <div

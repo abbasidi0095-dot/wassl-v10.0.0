@@ -287,3 +287,26 @@ test("admin enables a service per city without disabling the others", async ({
   ).toBeChecked();
   await dialog.getByRole("button", { name: "Cancel" }).click();
 });
+
+test("admin grocery shows inventory intelligence", async ({ page }) => {
+  await loginViaUi(page, ADMIN_EMAIL, ADMIN_PASSWORD, "/admin");
+  await page.goto("/admin/grocery");
+  await expect(page.getByText("Inventory intelligence")).toBeVisible();
+  await expect(page.getByText("Top sellers")).toBeVisible();
+  await expect(page.getByText("Suggested restock")).toBeVisible();
+  await expect(page.getByText("Stock movements")).toBeVisible();
+});
+
+test("admin adjusts Wassl Club points with an audited note", async ({ page }) => {
+  await loginViaUi(page, ADMIN_EMAIL, ADMIN_PASSWORD, "/admin");
+  await page.goto("/admin/accounts");
+  const row = page.locator("tr").filter({ hasText: "customer@wassl.ma" }).first();
+  let step = 0;
+  page.on("dialog", async (dialog) => {
+    await dialog.accept(step === 0 ? "25" : "E2E goodwill");
+    step += 1;
+  });
+  await row.getByRole("button", { name: "Adjust" }).click();
+  await expect(page.getByText(/25 points for/)).toBeVisible();
+  await expect(row.getByText("25")).toBeVisible();
+});

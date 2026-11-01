@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Banknote,
@@ -16,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import type { City, Product, RefundRequest, Store } from "@/lib/types";
+import type { InventoryReport } from "@/lib/inventory";
 import { stockBadge } from "@/lib/grocery";
 import { useI18n } from "@/components/locale-provider";
 import { money, timeAgo } from "@/lib/utils";
@@ -27,13 +29,16 @@ export function GroceryAdmin({
   cities,
   initialProducts,
   initialRefunds,
+  inventory,
 }: {
   stores: Store[];
   cities: City[];
   initialProducts: Product[];
   initialRefunds: RefundRequest[];
+  inventory: InventoryReport;
 }) {
   const { t } = useI18n();
+  const router = useRouter();
   const [stores, setStores] = useState(initialStores);
   const [products, setProducts] = useState(initialProducts);
   const [refunds, setRefunds] = useState(initialRefunds);
@@ -103,6 +108,7 @@ export function GroceryAdmin({
           current.map((item) => (item.id === data.product!.id ? data.product! : item)),
         );
         setMessage(t("Stock updated"));
+        router.refresh();
       } else {
         setMessage(data.error || t("Could not update stock"));
       }
@@ -234,6 +240,149 @@ export function GroceryAdmin({
       </div>
 
       {message ? <div className="border-s-2 border-brand ps-3 text-[13px] text-brand">{message}</div> : null}
+
+      <section>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-[13px] font-semibold">{t("Inventory intelligence")}</h2>
+            <p className="mt-0.5 text-[11px] text-muted">
+              {t("Sales velocity and replenishment from real orders, last {days} days.", {
+                days: inventory.days,
+              })}
+            </p>
+          </div>
+          <span className="pill">{t("Last {days} days", { days: inventory.days })}</span>
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-4 lg:grid-cols-4">
+          {[
+            { label: t("Units sold"), value: inventory.soldQty },
+            { label: t("Grocery revenue"), value: money(inventory.revenue) },
+            { label: t("Slow movers"), value: inventory.slowCount },
+            { label: t("Restock lines"), value: inventory.restock.length },
+          ].map((item) => (
+            <div key={item.label}>
+              <div className="text-[11px] text-muted">{item.label}</div>
+              <div className="mt-1 text-[20px] font-semibold tnum">{item.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="card overflow-hidden">
+            <div className="border-b border-line px-4 py-3 text-[12px] font-semibold">
+              {t("Top sellers")}
+            </div>
+            <div className="divide-y divide-line">
+              {inventory.topSellers.map((item) => (
+                <div key={item.product.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[12px] font-semibold">{item.product.name}</div>
+                    <div className="truncate text-[10px] text-muted">{item.store.name}</div>
+                  </div>
+                  <div className="text-end text-[11px] tnum">
+                    <div className="font-semibold">{item.soldQty} {t("sold")}</div>
+                    <div className="text-muted">{money(item.revenue)}</div>
+                  </div>
+                </div>
+              ))}
+              {!inventory.topSellers.length ? (
+                <div className="px-4 py-6 text-center text-[11px] text-muted">
+                  {t("No sales in this period.")}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="card overflow-hidden">
+            <div className="border-b border-line px-4 py-3 text-[12px] font-semibold">
+              {t("Suggested restock")}
+            </div>
+            <div className="divide-y divide-line">
+              {inventory.restock.map((item) => (
+                <div key={item.product.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[12px] font-semibold">{item.product.name}</div>
+                    <div className="text-[10px] text-muted">
+                      {t("{stock} in stock · {days} days left", {
+                        stock: item.stock,
+                        days: item.daysLeft === null ? "—" : Math.max(0, Math.round(item.daysLeft)),
+                      })}
+                    </div>
+                  </div>
+                  {typeof item.product.stock === "number" ? (
+                    <button
+                      type="button"
+                      onClick={() => void adjust(item.product, item.suggestedRestock)}
+                      disabled={busy === item.product.id}
+                      className="btn btn-ghost btn-sm shrink-0"
+                    >
+                      <Plus size={11} /> {item.suggestedRestock}
+                    </button>
+                  ) : (
+                    <span className="text-[11px] text-muted tnum">+{item.suggestedRestock}</span>
+                  )}
+                </div>
+              ))}
+              {!inventory.restock.length ? (
+                <div className="px-4 py-6 text-center text-[11px] text-muted">
+                  {t("Stock levels look healthy.")}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="card overflow-hidden">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3">
+              <span className="text-[12px] font-semibold">{t("Slow movers")}</span>
+              <span className="text-[10px] text-muted tnum">{inventory.slowCount}</span>
+            </div>
+            <div className="divide-y divide-line">
+              {inventory.slowMovers.map((item) => (
+                <div key={item.product.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
+                  <div className="min-w-0">
+                    <div className="truncate text-[12px] font-semibold">{item.product.name}</div>
+                    <div className="text-[10px] text-muted">{item.store.name}</div>
+                  </div>
+                  <span className="shrink-0 text-[11px] text-muted tnum">{item.stock} {t("in stock")}</span>
+                </div>
+              ))}
+              {!inventory.slowMovers.length ? (
+                <div className="px-4 py-6 text-center text-[11px] text-muted">
+                  {t("Every product sold at least once.")}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="card overflow-hidden">
+            <div className="border-b border-line px-4 py-3 text-[12px] font-semibold">
+              {t("Stock movements")}
+            </div>
+            <div className="divide-y divide-line">
+              {inventory.history.map((entry) => (
+                <div key={entry.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
+                  <div className="min-w-0">
+                    <div className="truncate text-[12px] font-semibold">{entry.productName}</div>
+                    <div className="text-[10px] text-muted">
+                      {entry.storeName} · {timeAgo(entry.at)}
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-end">
+                    <div className="text-[11px] font-semibold tnum">−{entry.qty}</div>
+                    <div className="text-[9px] uppercase text-muted">{entry.status}</div>
+                  </div>
+                </div>
+              ))}
+              {!inventory.history.length ? (
+                <div className="px-4 py-6 text-center text-[11px] text-muted">
+                  {t("No stock movements recorded yet.")}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section>
         <div className="flex items-center justify-between">

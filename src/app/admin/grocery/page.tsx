@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
-import { getCities, getProducts, getRefundRequests, getStores } from "@/lib/db";
+import {
+  getCities,
+  getOrders,
+  getProducts,
+  getRefundRequests,
+  getStores,
+  getDb,
+} from "@/lib/db";
+import { inventoryIntelligence } from "@/lib/inventory";
 import { StaffHeader } from "@/components/staff-header";
 import { getTranslator } from "@/lib/i18n-server";
 import { GroceryAdmin } from "./grocery-admin";
@@ -20,6 +28,13 @@ export default async function AdminGroceryPage() {
   const products = (
     await Promise.all(groceryStores.map((store) => getProducts(store.id)))
   ).flat();
+  const [orders, db] = await Promise.all([getOrders(), getDb()]);
+  const inventory = inventoryIntelligence({
+    stores: groceryStores,
+    products,
+    orders,
+    reservations: db.stockReservations ?? [],
+  });
 
   return (
     <div className="staff-shell">
@@ -53,6 +68,7 @@ export default async function AdminGroceryPage() {
           cities={cities}
           initialProducts={products}
           initialRefunds={refunds}
+          inventory={inventory}
         />
       </main>
     </div>

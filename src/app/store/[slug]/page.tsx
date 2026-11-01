@@ -18,6 +18,7 @@ import { GroceryStore } from "@/components/grocery-store";
 import {
   getCities,
   getCity,
+  getDb,
   getDrivers,
   getProducts,
   getStore,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { groceryAvailability, grocerySettings } from "@/lib/grocery";
+import { activeGroceryPromotions } from "@/lib/grocery-promotions";
 import { getOpenState } from "@/lib/hours";
 import { storePhoto } from "@/lib/store-images";
 import { categoryLabel, money } from "@/lib/utils";
@@ -63,9 +65,10 @@ export default async function StorePage({
   const cities = await getCities();
 
   if (store.category === "grocery") {
-    const [drivers, session] = await Promise.all([
+    const [drivers, session, db] = await Promise.all([
       getDrivers(store.citySlug),
       getSession(),
+      getDb(),
     ]);
     const user = session ? await getUserById(session.userId) : undefined;
     const settings = grocerySettings(store);
@@ -87,6 +90,7 @@ export default async function StorePage({
             favorites={user?.favorites ?? []}
             signedIn={Boolean(session)}
             initialProductId={productParam}
+            promotions={activeGroceryPromotions(db.promotions ?? [], store.id)}
           />
         </main>
         <SiteFooter />

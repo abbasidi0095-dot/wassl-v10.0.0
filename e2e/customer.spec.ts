@@ -136,3 +136,31 @@ test("a shopping list can become a recurring basket", async ({ page }) => {
   await expect(page.getByText(/Next reminder/)).toBeVisible();
   await expect(page.getByText("Monthly").first()).toBeVisible();
 });
+
+test("shopping assistant turns couscous into an editable basket", async ({
+  page,
+}) => {
+  await page.goto("/grocery/assistant");
+  await page.getByLabel("What do you need?").fill("Prepare ingredients for couscous");
+  await page.getByRole("button", { name: "Build my list" }).click();
+  await expect(page.getByText("Couscous night")).toBeVisible();
+  await expect(page.getByText("Couscous 1kg")).toBeVisible();
+  await page.getByRole("button", { name: "Add all to basket" }).click();
+  await expect(page.getByText("Added to Wassl Basket")).toBeVisible();
+  await page.getByRole("link", { name: "Review basket" }).click();
+  await expect(page).toHaveURL(/\/grocery\/basket/);
+  await expect(page.getByText("Couscous 1kg").first()).toBeVisible();
+});
+
+test("Wassl Club dashboard shows tier, points and rewards", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("customer@wassl.ma");
+  await page.getByLabel("Password", { exact: true }).fill("Wsl-Customer-2Dkh!2026");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/(taxi|account|orders)/);
+  await page.goto("/account/loyalty");
+  await expect(page.getByText("Wassl Club").first()).toBeVisible();
+  await expect(page.getByText("Available points")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Points history" })).toBeVisible();
+  await expect(page.getByText("10 MAD grocery credit")).toBeVisible();
+});

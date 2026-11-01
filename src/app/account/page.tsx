@@ -12,6 +12,7 @@ import {
   ReceiptText,
   ShoppingBag,
   ShoppingBasket,
+  Star,
   UserRound,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth";
@@ -67,6 +68,12 @@ export default async function AccountPage() {
   const firstName = session.name.split(" ")[0];
 
   const quickLinks = [
+    {
+      href: "/account/loyalty",
+      label: t("Wassl Club"),
+      note: t("Points, tiers and rewards"),
+      icon: Star,
+    },
     {
       href: "/grocery/favorites",
       label: t("Favourites"),

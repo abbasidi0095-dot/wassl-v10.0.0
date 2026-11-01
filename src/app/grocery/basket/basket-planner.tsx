@@ -12,6 +12,7 @@ import {
   Plus,
   Search,
   ShoppingBasket,
+  Sparkles,
   Store as StoreIcon,
   Trash2,
 } from "lucide-react";
@@ -184,6 +185,9 @@ export function BasketPlanner({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Link href="/grocery/assistant" className="btn btn-ghost btn-sm">
+              <Sparkles size={12} /> {t("Shopping assistant")}
+            </Link>
             <Link href="/grocery/scan" className="btn btn-ghost btn-sm">
               <ScanBarcode size={12} /> {t("Scan barcode")}
             </Link>

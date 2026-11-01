@@ -308,6 +308,9 @@ export interface Order {
   /** Applied promo code and the amount it took off the order. */
   promoCode?: string;
   discount?: number;
+  /** Automatic grocery promotion discount, separate from a promo code. */
+  promotionDiscount?: number;
+  appliedPromotions?: string[];
   paymentMethod: "cod";
   scheduledFor?: string;
   createdAt: string;
@@ -451,6 +454,70 @@ export interface ShoppingListItem {
   checked?: boolean;
 }
 
+export type LoyaltyTier = "basic" | "plus" | "premium";
+
+export type LoyaltyTransactionType =
+  | "earn"
+  | "redeem"
+  | "refund"
+  | "adjust"
+  | "referral"
+  | "birthday"
+  | "campaign";
+
+export interface LoyaltyAccount {
+  userId: string;
+  points: number;
+  lifetimePoints: number;
+  tier: LoyaltyTier;
+  referralCode: string;
+  referredBy?: string;
+  joinedAt: string;
+}
+
+export interface LoyaltyTransaction {
+  id: string;
+  userId: string;
+  type: LoyaltyTransactionType;
+  /** Positive for earned/refunded, negative for redeemed/expired. */
+  points: number;
+  balanceAfter: number;
+  lifetimeAfter: number;
+  orderId?: string;
+  note?: string;
+  actorRole?: Role | "system";
+  actorName?: string;
+  createdAt: string;
+}
+
+export interface LoyaltyReward {
+  id: string;
+  title: string;
+  description: string;
+  pointsCost: number;
+  kind: "grocery_credit" | "delivery" | "discount";
+  value: number;
+  storeId?: string;
+  active: boolean;
+}
+
+export type GroceryPromotionKind = "flash" | "quantity" | "bulk";
+
+export interface GroceryPromotion {
+  id: string;
+  title: string;
+  kind: GroceryPromotionKind;
+  storeId?: string;
+  productIds?: string[];
+  categories?: string[];
+  percentOff: number;
+  minQty: number;
+  minSubtotal?: number;
+  startsAt: string;
+  endsAt: string;
+  active: boolean;
+}
+
 export type RecurringFrequency = "weekly" | "monthly";
 
 export interface ShoppingListRecurring {
@@ -520,6 +587,10 @@ export interface Database {
   pushSubscriptions?: PushSubscriptionRecord[];
   stockReservations?: StockReservation[];
   refundRequests?: RefundRequest[];
+  promotions?: GroceryPromotion[];
+  loyaltyAccounts?: LoyaltyAccount[];
+  loyaltyTransactions?: LoyaltyTransaction[];
+  loyaltyRewards?: LoyaltyReward[];
 }
 
 /**
