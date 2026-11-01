@@ -882,6 +882,13 @@ const fr: Record<string, string> = {
   "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "Aucun abonnement push pour le moment. Appuyez sur Activer les alertes, autorisez les notifications, puis réessayez. Sur iOS, vérifiez aussi Réglages → Notifications → Wassl.",
   "Send the test after 10 seconds so you can lock the phone": "Envoyer le test dans 10 secondes pour pouvoir verrouiller le téléphone",
   "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.": "Test programmé. Verrouillez votre téléphone et vérifiez le centre de notifications dans 10 secondes.",
+  "Alerts need attention": "Les alertes nécessitent votre attention",
+  "Open Wassl from the Home Screen icon. Safari tabs cannot receive iPhone notifications.": "Ouvrez Wassl depuis l'icône de l'écran d'accueil. Les onglets Safari ne peuvent pas recevoir de notifications iPhone.",
+  "iOS 16.4 or later is required for Home Screen notifications.": "iOS 16.4 ou une version ultérieure est requis pour les notifications de l'écran d'accueil.",
+  "Allow notifications in iPhone Settings → Notifications → Wassl.": "Autorisez les notifications dans Réglages iPhone → Notifications → Wassl.",
+  "Sign in to enable notifications.": "Connectez-vous pour activer les notifications.",
+  "The server push key is missing.": "La clé de notification du serveur est manquante.",
+  "Could not save the push subscription. Try again.": "Impossible d'enregistrer l'abonnement aux notifications. Réessayez.",
 };
 
 const es: Record<string, string> = {
@@ -1740,6 +1747,13 @@ const es: Record<string, string> = {
   "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "Aún no hay suscripción push. Pulsa Activar alertas, permite las notificaciones y vuelve a probar. En iOS revisa también Ajustes → Notificaciones → Wassl.",
   "Send the test after 10 seconds so you can lock the phone": "Enviar la prueba en 10 segundos para poder bloquear el teléfono",
   "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.": "Prueba programada. Bloquea el teléfono y revisa el centro de notificaciones en 10 segundos.",
+  "Alerts need attention": "Las alertas necesitan atención",
+  "Open Wassl from the Home Screen icon. Safari tabs cannot receive iPhone notifications.": "Abre Wassl desde el icono de la pantalla de inicio. Las pestañas de Safari no pueden recibir notificaciones del iPhone.",
+  "iOS 16.4 or later is required for Home Screen notifications.": "Se requiere iOS 16.4 o posterior para las notificaciones de la pantalla de inicio.",
+  "Allow notifications in iPhone Settings → Notifications → Wassl.": "Permite las notificaciones en Ajustes del iPhone → Notificaciones → Wassl.",
+  "Sign in to enable notifications.": "Inicia sesión para activar las notificaciones.",
+  "The server push key is missing.": "Falta la clave de notificaciones del servidor.",
+  "Could not save the push subscription. Try again.": "No se pudo guardar la suscripción push. Inténtalo de nuevo.",
 };
 
 const ar: Record<string, string> = {
@@ -2595,6 +2609,13 @@ const ar: Record<string, string> = {
   "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.": "لا يوجد اشتراك إشعارات بعد. اضغط تفعيل التنبيهات واسمح بالإشعارات ثم أعد الاختبار. على iOS تحقق أيضاً من الإعدادات → الإشعارات → وصل.",
   "Send the test after 10 seconds so you can lock the phone": "أرسل الاختبار بعد 10 ثوانٍ حتى تتمكن من قفل الهاتف",
   "Test scheduled. Lock your phone now and check Notification Center in 10 seconds.": "تم جدولة الاختبار. اقفل هاتفك وتحقق من مركز الإشعارات بعد 10 ثوانٍ.",
+  "Alerts need attention": "التنبيهات تحتاج إلى انتباهك",
+  "Open Wassl from the Home Screen icon. Safari tabs cannot receive iPhone notifications.": "افتح وصل من أيقونة الشاشة الرئيسية. لا يمكن لعلامات تبويب Safari استلام إشعارات iPhone.",
+  "iOS 16.4 or later is required for Home Screen notifications.": "يتطلب iOS 16.4 أو أحدث لإشعارات الشاشة الرئيسية.",
+  "Allow notifications in iPhone Settings → Notifications → Wassl.": "اسمح بالإشعارات من إعدادات iPhone → الإشعارات → وصل.",
+  "Sign in to enable notifications.": "سجّل الدخول لتفعيل الإشعارات.",
+  "The server push key is missing.": "مفتاح إشعارات الخادم مفقود.",
+  "Could not save the push subscription. Try again.": "تعذر حفظ اشتراك الإشعارات. حاول مرة أخرى.",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

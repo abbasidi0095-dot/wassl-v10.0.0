@@ -21,6 +21,7 @@ export function NotificationBell() {
     notifications,
     unread,
     pushState,
+    pushError,
     markAllRead,
     clearNotifications,
     enablePush,
@@ -89,9 +90,11 @@ export function NotificationBell() {
               <div>
                 <div className="text-[13px] font-semibold">{t("Notifications")}</div>
                 <div className="text-[11px] text-muted">
-                  {pushState === "subscribed" || pushState === "granted"
-                    ? t("Live updates are on")
-                    : t("Turn on alerts for orders and rides")}
+                  {pushError
+                    ? t("Alerts need attention")
+                    : pushState === "subscribed" || pushState === "granted"
+                      ? t("Live updates are on")
+                      : t("Turn on alerts for orders and rides")}
                 </div>
               </div>
               <button
@@ -207,6 +210,11 @@ export function NotificationBell() {
                 {t("This browser does not support web notifications.")}
               </p>
             ) : null}
+            {pushError && tested === null ? (
+              <p className="border-t border-line px-4 py-2 text-[11px] leading-4 text-danger">
+                {pushError}
+              </p>
+            ) : null}
             {pushState === "denied" ? (
               <p className="border-t border-line px-4 py-2 text-[11px] font-bold text-muted">
                 {t("Allow notifications in your browser settings to receive alerts.")}
@@ -231,7 +239,8 @@ export function NotificationBell() {
                       "Server delivered the test to {count} device(s). If no banner appears, check iOS Settings → Notifications → Wassl and allow Lock Screen, Notification Center and Banners.",
                       { count: tested },
                     )
-                  : t(
+                  : pushError ||
+                    t(
                       "No push subscription yet. Tap Enable alerts, allow notifications, then test again. On iOS also check Settings → Notifications → Wassl.",
                     )}
               </p>

@@ -29,6 +29,17 @@ and dark themes.
 
 ## Release history
 
+### 11.7.3 — 1 November 2026 — iOS push timeout diagnostics
+- Wait for an active service worker with an 8-second timeout.
+- Surface subscribe failures and service-worker startup failures instead of a
+  generic no-subscription message.
+
+### 11.7.2 — 1 November 2026 — iOS push diagnostics
+- Removed the false-negative `window.PushManager` check and wait for the active
+  service worker before subscribing.
+- Detect non-standalone iOS tabs and iOS below 16.4.
+- Show the exact reason if the subscription cannot be created or saved.
+
 ### 11.7.1 — 1 November 2026 — iOS push reset and delayed test
 - The test replaces a stale push subscription once and retries.
 - Added a **10s** test so the phone can be locked before checking Notification
