@@ -1358,3 +1358,12 @@ html.wassl-splash-skip .wassl-splash {
     display: none;
   }
 }
+
+/* Six tabs must keep full labels on 320–360px phones. */
+@media (max-width: 365px) {
+  .tabbar a {
+    font-size: 9.5px;
+    letter-spacing: 0;
+    padding-inline: 0;
+  }
+}

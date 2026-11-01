@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.3.1** (1 November 2026; cobalt and tangerine palette)
+- Release: **11.3.2** (1 November 2026; taxi in the dock)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,10 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.3.2 — taxi in the dock
+- Dock: Home, Food, Grocery, Pharmacy, Taxi, Account.
+- Small-phone type rule keeps all six labels visible at 320px.
 
 ### 11.3.1 — palette fallback polish
 - Dark-mode signal fallbacks now use the new tangerine.

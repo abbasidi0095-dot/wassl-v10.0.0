@@ -29,6 +29,11 @@ and dark themes.
 
 ## Release history
 
+### 11.3.2 — 1 November 2026 — taxi in the dock
+- Added **Taxi** to the bottom tab bar: Home, Food, Grocery, Pharmacy, Taxi,
+  Account.
+- Six tabs keep full labels down to 320px.
+
 ### 11.3.1 — 1 November 2026 — palette fallback polish
 - Aligned the dark-mode signal fallbacks with the new tangerine so themed
   surfaces stay consistent before admin colours load.

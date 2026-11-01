@@ -108,6 +108,7 @@ export function SiteHeader({
     { href: `/city/${selected}`, label: t("Food"), icon: UtensilsCrossed },
     { href: "/grocery", label: t("Grocery"), icon: ShoppingBasket },
     { href: "/pharmacy", label: t("Pharmacy"), icon: Pill },
+    { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
     {
       href: account ? accountHref(account) : "/login",
       label: account

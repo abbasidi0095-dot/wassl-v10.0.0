@@ -112,8 +112,9 @@ test("home is a simple launcher with services and open stores", async ({
   await expect(page.locator(".promo-ticker")).toBeVisible();
   await expect(page.getByRole("link", { name: /See all restaurants and cafés/ })).toBeVisible();
   await expect(page.getByText("Open now in Dakhla")).toBeVisible();
-  await expect(page.locator(".tabbar a")).toHaveCount(5);
+  await expect(page.locator(".tabbar a")).toHaveCount(6);
   await expect(page.locator(".tabbar a").nth(1)).toContainText("Food");
+  await expect(page.locator(".tabbar a").nth(4)).toContainText("Taxi");
 });
 
 test("a dock tab opens the next page at the top", async ({ page }) => {
